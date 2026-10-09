@@ -57,7 +57,7 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public List<GeoSearchItemDto> Search(string? keyword, int limit)
+        public List<GeoSearchItemDto> GetSearchList(string? keyword, int limit)
         {
             if (string.IsNullOrWhiteSpace(keyword))
             {
@@ -72,7 +72,7 @@ namespace Rampage.NaturalistAtlas.BLL
             }
             limit = Math.Clamp(limit, 1, 30);
 
-            return CityDao.SelectGeoSearch(trimmed, limit).Select(row => new GeoSearchItemDto
+            return CityDao.GetGeoSearchList(trimmed, limit).Select(row => new GeoSearchItemDto
             {
                 Level = row.Level,
                 Id = row.Id,

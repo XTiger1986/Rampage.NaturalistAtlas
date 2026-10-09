@@ -65,6 +65,6 @@ namespace Rampage.NaturalistAtlas.BLL
         /// 解析采集城市Id清单（GeneralSetting.CollectionCityIds，空/非法回退默认城市）
         /// Parse the collection-city id list (GeneralSetting.CollectionCityIds; falls back to the default city)
         /// </summary>
-        System.Collections.Generic.List<int> GetCollectionCityIds();
+        System.Collections.Generic.List<int> GetCollectionCityIdsList();
     }
 }

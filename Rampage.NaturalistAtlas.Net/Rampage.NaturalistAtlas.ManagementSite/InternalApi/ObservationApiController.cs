@@ -40,7 +40,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
         [HttpPost("status")]
         public R QueryObservationStatus([FromForm][ValidAttribute] ObservationStatusInput input)
         {
-            return Execute(() => ObservationService.ChangeObservationStatus(input.ObservationId, input.Status));
+            return Execute(() => ObservationService.UpdateObservationStatus(input.ObservationId, input.Status));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
         [HttpPost("hide-by-author")]
         public R QueryHideByAuthor([FromForm][ValidAttribute] HideByAuthorInput input)
         {
-            return Execute(() => ObservationService.HideObservationsByAuthor(input.UserLogin));
+            return Execute(() => ObservationService.UpdateObservationsHiddenByAuthor(input.UserLogin));
         }
 
         /// <summary>

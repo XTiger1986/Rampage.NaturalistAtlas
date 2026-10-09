@@ -47,7 +47,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <param name="cityId">城市Id / City id</param>
         /// <param name="status">目标状态 / Target status</param>
         /// <returns>操作结果 / Result</returns>
-        R ChangeCityStatus(int cityId, CommonStatus status);
+        R UpdateCityStatus(int cityId, CommonStatus status);
 
         /// <summary>
         /// 删除城市（被观察/同步游标/物候统计引用时拒绝）

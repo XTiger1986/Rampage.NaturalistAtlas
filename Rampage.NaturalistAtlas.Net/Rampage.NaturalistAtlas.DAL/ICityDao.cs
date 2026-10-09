@@ -18,6 +18,6 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="keyword">关键字（中英文名；国家/区划代码精确匹配）/ Keyword (Chinese/English names; exact match on country/region codes)</param>
         /// <param name="limit">条数上限 / Limit</param>
         /// <returns>搜索行 / Search rows</returns>
-        List<GeoSearchRowDto> SelectGeoSearch(string keyword, int limit);
+        List<GeoSearchRowDto> GetGeoSearchList(string keyword, int limit);
     }
 }

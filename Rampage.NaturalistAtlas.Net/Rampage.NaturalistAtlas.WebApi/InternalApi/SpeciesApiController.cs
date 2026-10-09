@@ -75,7 +75,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
         {
             try
             {
-                return R<List<SpeciesRankItemDto>>.Success(AtlasSpeciesService.GetSimilarSpecies(id, cityId));
+                return R<List<SpeciesRankItemDto>>.Success(AtlasSpeciesService.GetSimilarSpeciesList(id, cityId));
             }
             catch (Exception ex)
             {

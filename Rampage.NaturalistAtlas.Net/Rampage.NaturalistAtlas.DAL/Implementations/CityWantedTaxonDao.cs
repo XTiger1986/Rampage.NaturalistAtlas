@@ -16,7 +16,7 @@ namespace Rampage.NaturalistAtlas.DAL
         private const int INSERT_BATCH_SIZE = 100;
 
         /// <inheritdoc/>
-        public int ReplaceAll(int cityId, List<CityWantedTaxon> rows)
+        public int SaveAll(int cityId, List<CityWantedTaxon> rows)
         {
             DatabaseClient.BeginTransaction();
             try
@@ -64,7 +64,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<WantedTaxonItemDto> SelectPublic(int cityId, short[] iconicList, int limit)
+        public List<WantedTaxonItemDto> GetPublicList(int cityId, short[] iconicList, int limit)
         {
             string iconicWhere = iconicList.Length > 0 ? " AND iconic_taxon IN (" + string.Join(",", iconicList) + ")" : string.Empty;
             return DatabaseClient.SelectList<WantedTaxonItemDto>(

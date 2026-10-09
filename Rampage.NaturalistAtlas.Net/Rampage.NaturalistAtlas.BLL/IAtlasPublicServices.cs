@@ -26,7 +26,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <param name="keyword">关键字 / Keyword</param>
         /// <param name="limit">条数上限（1~30）/ Limit (1~30)</param>
         /// <returns>搜索结果 / Results</returns>
-        List<GeoSearchItemDto> Search(string? keyword, int limit);
+        List<GeoSearchItemDto> GetSearchList(string? keyword, int limit);
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// </summary>
         /// <param name="taxonId">taxon.id</param>
         /// <returns>按链序排列的祖先节点（无档案或链为空时返回空表）/ Ancestors in path order (empty when the taxon or path is missing)</returns>
-        List<TaxonAncestorDto> GetTaxonAncestors(string taxonId);
+        List<TaxonAncestorDto> GetTaxonAncestorsList(string taxonId);
 
         /// <summary>
         /// 物种详情（分类档案 + 本市统计 + 照片墙 + 分布点）/ Species detail (profile, city stats, photo wall, points)
@@ -117,7 +117,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <param name="taxonId">taxon.id</param>
         /// <param name="cityId">城市 id / City id</param>
         /// <returns>相似物种（记录数降序，无链或无同胞返回空表）/ Similar species (empty when no path or siblings)</returns>
-        List<SpeciesRankItemDto> GetSimilarSpecies(string taxonId, int cityId);
+        List<SpeciesRankItemDto> GetSimilarSpeciesList(string taxonId, int cityId);
 
         /// <summary>
         /// 物候矩阵（Top N 物种 × 12 月；忽略月份筛选）/ Phenology matrix (top N species × 12 months; month filter ignored)
@@ -134,7 +134,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <param name="cityId">城市 id / City id</param>
         /// <param name="iconic">类群代码（空 = 全部）/ Iconic codes (empty = all)</param>
         /// <returns>wanted 条目（周边记录数降序）/ Items descending by the nearby count</returns>
-        List<WantedTaxonItemDto> GetGaps(int cityId, string? iconic);
+        List<WantedTaxonItemDto> GetGapsList(int cityId, string? iconic);
     }
 
     /// <summary>

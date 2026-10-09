@@ -44,7 +44,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
         [HttpPost("status")]
         public R QueryCountryStatus([FromForm][ValidAttribute] GeoStatusInput input)
         {
-            return Execute(() => CountryService.ChangeCountryStatus(input.Id, input.Status));
+            return Execute(() => CountryService.UpdateCountryStatus(input.Id, input.Status));
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
         [HttpPost("status")]
         public R QueryProvinceStatus([FromForm][ValidAttribute] GeoStatusInput input)
         {
-            return Execute(() => ProvinceService.ChangeProvinceStatus(input.Id, input.Status));
+            return Execute(() => ProvinceService.UpdateProvinceStatus(input.Id, input.Status));
         }
 
         /// <summary>

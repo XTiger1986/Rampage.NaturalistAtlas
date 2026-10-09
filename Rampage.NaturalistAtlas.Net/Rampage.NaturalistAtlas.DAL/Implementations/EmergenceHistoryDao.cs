@@ -22,7 +22,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<EmergenceRowDto> SelectMonthSeries(int cityId, string taxonId)
+        public List<EmergenceRowDto> GetMonthSeriesList(int cityId, string taxonId)
         {
             return DatabaseClient.SelectList<EmergenceRowDto>(
                 @"SELECT month::int AS Idx, record_count::bigint AS RecordCount, 0::bigint AS ResearchCount
@@ -32,7 +32,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public void ReplaceMonths(int cityId, string taxonId, List<EmergenceHistory> rows)
+        public void SaveMonths(int cityId, string taxonId, List<EmergenceHistory> rows)
         {
             if (rows.Count == 0)
             {
@@ -78,7 +78,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<string> SelectDueTaxaIds(int cityId, int limit)
+        public List<string> GetDueTaxaIdsList(int cityId, int limit)
         {
             // MAX(eh.update_time) 为 NULL = 该城市此分类从未拉过直方图（最优先）；
             // 否则按缓存最旧优先，每日低频节拍渐进覆盖全量分类

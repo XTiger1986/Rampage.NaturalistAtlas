@@ -43,7 +43,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
         [HttpPost("status")]
         public R QueryCityStatus([FromForm][ValidAttribute] CityStatusInput input)
         {
-            return Execute(() => CityService.ChangeCityStatus(input.Id, input.Status));
+            return Execute(() => CityService.UpdateCityStatus(input.Id, input.Status));
         }
 
         /// <summary>

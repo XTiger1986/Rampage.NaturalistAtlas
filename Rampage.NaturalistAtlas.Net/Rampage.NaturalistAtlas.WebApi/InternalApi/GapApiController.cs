@@ -30,7 +30,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
         {
             try
             {
-                return R<List<WantedTaxonItemDto>>.Success(AtlasSpeciesService.GetGaps(cityId, iconic));
+                return R<List<WantedTaxonItemDto>>.Success(AtlasSpeciesService.GetGapsList(cityId, iconic));
             }
             catch (Exception ex)
             {

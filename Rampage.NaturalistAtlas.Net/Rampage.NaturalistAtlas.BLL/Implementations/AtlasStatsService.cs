@@ -51,7 +51,7 @@ namespace Rampage.NaturalistAtlas.BLL
                 DateTime now = UtcNow;
                 DateOnly monthStart = new DateOnly(now.Year, now.Month, 1);
 
-                OverviewBaseRowDto baseRow = ObservationDao.SelectOverviewBase(cityId, qualityList, monthStart);
+                OverviewBaseRowDto baseRow = ObservationDao.GetOverviewBase(cityId, qualityList, monthStart);
                 return new CityOverviewDto
                 {
                     CityId = cityId,
@@ -64,12 +64,12 @@ namespace Rampage.NaturalistAtlas.BLL
                     NewestSourceCreatedAt = baseRow.Newest,
                     // 近 12 个月趋势（含当月；BLL 补 0 月桶）
                     // 12-month trend (including this month; zero months filled by the BLL)
-                    Monthly12 = FillMonthly12(ObservationDao.SelectMonthly12(cityId, qualityList, monthStart.AddMonths(-11)), monthStart),
-                    IconicDistribution = ObservationDao.SelectOverviewIconic(cityId, qualityList),
-                    TopObservers = ObservationDao.SelectTopObservers(cityId, qualityList, TOP_OBSERVER_LIMIT),
+                    Monthly12 = FillMonthly12(ObservationDao.GetMonthly12List(cityId, qualityList, monthStart.AddMonths(-11)), monthStart),
+                    IconicDistribution = ObservationDao.GetOverviewIconicList(cityId, qualityList),
+                    TopObservers = ObservationDao.GetTopObserversList(cityId, qualityList, TOP_OBSERVER_LIMIT),
                     // 新星口径固定为研究级（与"仅研究级"开关无关），避免待鉴定记录误报
                     // Rising stars always count research grade (independent of the toggle) to avoid false positives from needs_id rows
-                    RisingStars = ObservationDao.SelectRisingStars(cityId, monthStart, RISING_STAR_THRESHOLD, RISING_STAR_LIMIT)
+                    RisingStars = ObservationDao.GetRisingStarsList(cityId, monthStart, RISING_STAR_THRESHOLD, RISING_STAR_LIMIT)
                 };
             }, CACHE_KEY_OVERVIEW_TPL, OVERVIEW_CACHE_SECONDS, cityId, researchOnly ? 1 : 0);
         }

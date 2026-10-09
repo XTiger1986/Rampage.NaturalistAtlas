@@ -46,7 +46,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
         {
             try
             {
-                return R<List<GeoSearchItemDto>>.Success(AtlasGeoService.Search(keyword, limit));
+                return R<List<GeoSearchItemDto>>.Success(AtlasGeoService.GetSearchList(keyword, limit));
             }
             catch (Exception ex)
             {

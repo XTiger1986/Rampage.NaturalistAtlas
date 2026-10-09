@@ -12,7 +12,7 @@ namespace Rampage.NaturalistAtlas.DAL
     public class SyncLogDao : SuperDao<SyncLog>, ISyncLogDao
     {
         /// <inheritdoc/>
-        public int MarkStaleRunningFailed(AtlasSource source, int cityId, string task, DateTime before)
+        public int UpdateStaleRunningFailed(AtlasSource source, int cityId, string task, DateTime before)
         {
             return DatabaseClient.Execute(
                 "UPDATE sync_log SET status = 2, end_time = @Time, message = '进程中断，未收尾 / interrupted, never finalized', update_time = @Time " +

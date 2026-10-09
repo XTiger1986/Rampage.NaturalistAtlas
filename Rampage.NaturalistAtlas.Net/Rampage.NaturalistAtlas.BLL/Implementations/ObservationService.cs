@@ -120,7 +120,7 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public R ChangeObservationStatus(string observationId, ObservationStatus status)
+        public R UpdateObservationStatus(string observationId, ObservationStatus status)
         {
             if (string.IsNullOrWhiteSpace(observationId))
             {
@@ -156,7 +156,7 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public R HideObservationsByAuthor(string userLogin)
+        public R UpdateObservationsHiddenByAuthor(string userLogin)
         {
             if (string.IsNullOrWhiteSpace(userLogin))
             {
@@ -166,7 +166,7 @@ namespace Rampage.NaturalistAtlas.BLL
             // 单条批量 UPDATE（事务内）：此前列全量载入 + 逐行 UpdateById，万条 = 万次往返且部分失败留混合态
             // One bulk UPDATE in a transaction (the old per-row loop meant one round-trip per row and
             // a mixed state on partial failure)
-            int affected = ObservationDao.HideByAuthor(userLogin, UtcNow);
+            int affected = ObservationDao.UpdateHiddenByAuthor(userLogin, UtcNow);
             if (affected == 0)
             {
                 return R.Failure($"观察者「{userLogin}」名下没有可隐藏的正常观察");

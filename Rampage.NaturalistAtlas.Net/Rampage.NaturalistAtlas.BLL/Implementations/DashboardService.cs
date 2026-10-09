@@ -51,39 +51,39 @@ namespace Rampage.NaturalistAtlas.BLL
             int? cityId = city?.Id;
             result.CityName = city?.Name;
 
-            DashboardBaseStatDto baseStat = ObservationDao.SelectBaseStat(cityId);
+            DashboardBaseStatDto baseStat = ObservationDao.GetBaseStat(cityId);
             result.TotalObservation = baseStat.Total;
             result.ResearchCount = baseStat.Research;
             result.ResearchRatio = baseStat.Total > 0 ? (double)baseStat.Research / baseStat.Total : null;
 
-            result.MonthInsertCount = ObservationDao.SelectMonthInsertCount(new DateTime(now.Year, now.Month, 1), cityId);
+            result.MonthInsertCount = ObservationDao.GetMonthInsertCount(new DateTime(now.Year, now.Month, 1), cityId);
 
-            DateTime? newest = ObservationDao.SelectNewestSourceCreatedAt(cityId);
+            DateTime? newest = ObservationDao.GetNewestSourceCreatedAt(cityId);
             if (newest.HasValue)
             {
                 result.FreshnessDays = Math.Round((now - newest.Value).TotalDays, 1);
             }
 
-            result.IconicDistribution = BuildIconicSlices(ObservationDao.SelectIconicDistribution(cityId));
+            result.IconicDistribution = BuildIconicSlices(ObservationDao.GetIconicDistributionList(cityId));
 
             result.Recent30Days = FillDateGaps(
-                ObservationDao.SelectIngestTrend(now.Date.AddDays(-29), cityId),
+                ObservationDao.GetIngestTrendList(now.Date.AddDays(-29), cityId),
                 now.Date.AddDays(-29), now.Date);
 
             DateOnly monthFrom = DateOnly.FromDateTime(now.AddMonths(-11));
             result.Monthly12 = FillMonthGaps(
-                ObservationDao.SelectMonthlyDistribution(monthFrom, cityId),
+                ObservationDao.GetMonthlyDistributionList(monthFrom, cityId),
                 monthFrom, DateOnly.FromDateTime(now));
 
             // 运营视角的附加图表（全站口径：城市排行天然跨城；失败/举报趋势关心的是整个采集与工单面）
             // Ops-view extra charts (whole-site: the ranking is cross-city by nature; failure/report
             // trends watch the whole collection and ticket surface)
-            result.CityTop10 = ObservationDao.SelectCityTopN(10);
+            result.CityTop10 = ObservationDao.GetCityTopNList(10);
             result.SyncFailure30Days = FillDateGaps(
-                ObservationDao.SelectSyncFailureTrend(now.Date.AddDays(-29)),
+                ObservationDao.GetSyncFailureTrendList(now.Date.AddDays(-29)),
                 now.Date.AddDays(-29), now.Date);
             result.Report30Days = FillDateGaps(
-                ObservationDao.SelectReportTrend(now.Date.AddDays(-29)),
+                ObservationDao.GetReportTrendList(now.Date.AddDays(-29)),
                 now.Date.AddDays(-29), now.Date);
 
             result.PendingReportCount = ReportDao.Count(r => r.Status == ReportStatus.Pending);

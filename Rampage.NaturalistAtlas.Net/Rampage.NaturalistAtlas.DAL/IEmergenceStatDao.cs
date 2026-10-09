@@ -18,6 +18,6 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="taxonId">taxon.id</param>
         /// <param name="fromYear">起始统计年份（含）/ First stat year (inclusive)</param>
         /// <returns>旬序聚合行，无预聚合数据时为空 / Ten-day rows; empty when not pre-aggregated</returns>
-        List<EmergenceRowDto> SelectTenDaySeries(int cityId, string taxonId, int fromYear);
+        List<EmergenceRowDto> GetTenDaySeriesList(int cityId, string taxonId, int fromYear);
     }
 }

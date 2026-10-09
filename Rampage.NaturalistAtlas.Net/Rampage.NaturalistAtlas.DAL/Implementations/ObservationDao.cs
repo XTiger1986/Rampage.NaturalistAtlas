@@ -95,7 +95,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public DashboardBaseStatDto SelectBaseStat(int? cityId)
+        public DashboardBaseStatDto GetBaseStat(int? cityId)
         {
             return DatabaseClient.SelectOne<DashboardBaseStatDto>(
                 $"SELECT COUNT(*) AS Total, COUNT(*) FILTER (WHERE quality_grade = 1) AS Research FROM observation WHERE status = 0{CityScope(cityId)}")
@@ -103,7 +103,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public long SelectMonthInsertCount(DateTime monthStart, int? cityId)
+        public long GetMonthInsertCount(DateTime monthStart, int? cityId)
         {
             return DatabaseClient.SelectOne<ScalarRow<long>>(
                 $"SELECT COUNT(*) AS Value FROM observation WHERE status = 0 AND create_time >= @MonthStart{CityScope(cityId)}",
@@ -111,7 +111,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public DateTime? SelectNewestSourceCreatedAt(int? cityId)
+        public DateTime? GetNewestSourceCreatedAt(int? cityId)
         {
             // MAX 于空结果集返回 NULL，Dapper 映射为 default(DateTime)，按无数据处理
             DateTime value = DatabaseClient.SelectOne<ScalarRow<DateTime>>(
@@ -120,14 +120,14 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<DashboardIconicRowDto> SelectIconicDistribution(int? cityId)
+        public List<DashboardIconicRowDto> GetIconicDistributionList(int? cityId)
         {
             return DatabaseClient.SelectList<DashboardIconicRowDto>(
                 $"SELECT iconic_taxon AS IconicTaxon, COUNT(*) AS Count FROM observation WHERE status = 0{CityScope(cityId)} GROUP BY iconic_taxon ORDER BY 2 DESC");
         }
 
         /// <inheritdoc/>
-        public List<DashboardTrendRowDto> SelectIngestTrend(DateTime from, int? cityId)
+        public List<DashboardTrendRowDto> GetIngestTrendList(DateTime from, int? cityId)
         {
             return DatabaseClient.SelectList<DashboardTrendRowDto>(
                 $"SELECT to_char(create_time, 'YYYY-MM-DD') AS Label, COUNT(*) AS Value FROM observation WHERE status = 0 AND create_time >= @From{CityScope(cityId)} GROUP BY 1 ORDER BY 1",
@@ -135,7 +135,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<DashboardTrendRowDto> SelectMonthlyDistribution(DateOnly from, int? cityId)
+        public List<DashboardTrendRowDto> GetMonthlyDistributionList(DateOnly from, int? cityId)
         {
             return DatabaseClient.SelectList<DashboardTrendRowDto>(
                 $"SELECT to_char(date_trunc('month', observed_on), 'YYYY-MM') AS Label, COUNT(*) AS Value FROM observation WHERE status = 0 AND observed_on >= @From{CityScope(cityId)} GROUP BY 1 ORDER BY 1",
@@ -143,7 +143,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<DashboardSliceDto> SelectCityTopN(int limit)
+        public List<DashboardSliceDto> GetCityTopNList(int limit)
         {
             return DatabaseClient.SelectList<DashboardSliceDto>(
                 @"SELECT COALESCE(NULLIF(c.name, ''), c.id::text) AS Label, COUNT(o.id) AS Value
@@ -156,7 +156,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<DashboardTrendRowDto> SelectSyncFailureTrend(DateTime from)
+        public List<DashboardTrendRowDto> GetSyncFailureTrendList(DateTime from)
         {
             return DatabaseClient.SelectList<DashboardTrendRowDto>(
                 "SELECT to_char(start_time, 'YYYY-MM-DD') AS Label, COUNT(*) AS Value FROM sync_log WHERE status NOT IN (0, 1) AND start_time >= @From GROUP BY 1 ORDER BY 1",
@@ -164,7 +164,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<DashboardTrendRowDto> SelectReportTrend(DateTime from)
+        public List<DashboardTrendRowDto> GetReportTrendList(DateTime from)
         {
             return DatabaseClient.SelectList<DashboardTrendRowDto>(
                 "SELECT to_char(create_time, 'YYYY-MM-DD') AS Label, COUNT(*) AS Value FROM report WHERE create_time >= @From GROUP BY 1 ORDER BY 1",
@@ -172,7 +172,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public UpsertCountDto BatchUpsert(List<Observation> rows)
+        public UpsertCountDto SaveBatch(List<Observation> rows)
         {
             UpsertCountDto result = new UpsertCountDto();
             if (rows.Count == 0)
@@ -212,7 +212,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<string> SelectRandomSampleIds(AtlasSource source, int cityId, int count)
+        public List<string> GetRandomSampleIdsList(AtlasSource source, int cityId, int count)
         {
             return DatabaseClient.SelectList<StringRow>(
                 "SELECT source_observation_id AS Value FROM observation WHERE source = @Source AND city_id = @CityId AND status = 0 ORDER BY random() LIMIT @Count",
@@ -222,7 +222,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public int HideByAuthor(string userLogin, DateTime now)
+        public int UpdateHiddenByAuthor(string userLogin, DateTime now)
         {
             return DatabaseClient.Execute(
                 "UPDATE observation SET status = 1, update_time = @Now WHERE user_login = @UserLogin AND status = 0",
@@ -230,7 +230,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public int MarkSourceDeleted(AtlasSource source, List<string> sourceObservationIds)
+        public int UpdateSourceDeleted(AtlasSource source, List<string> sourceObservationIds)
         {
             if (sourceObservationIds.Count == 0)
             {

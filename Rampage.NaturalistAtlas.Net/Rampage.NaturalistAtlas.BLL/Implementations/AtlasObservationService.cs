@@ -41,14 +41,14 @@ namespace Rampage.NaturalistAtlas.BLL
         {
             limit = Math.Clamp(limit, 1, 10000);
             return HandleWebCache(() => {
-                List<ObservationPointDto> points = ObservationDao.SelectPublicPoints(query, limit);
+                List<ObservationPointDto> points = ObservationDao.GetPublicPointsList(query, limit);
                 // 未触顶时总数即点位数，省去一次 COUNT
                 // Below the limit the total equals the point count, saving a COUNT query
                 bool truncated = points.Count >= limit;
                 return new ObservationPointResultDto
                 {
                     Points = points,
-                    Total = truncated ? ObservationDao.CountPublic(query) : points.Count,
+                    Total = truncated ? ObservationDao.GetPublicCount(query) : points.Count,
                     Truncated = truncated
                 };
             }, CACHE_KEY_POINTS_TPL, POINTS_CACHE_SECONDS, query.ToCacheKey(), limit) ?? new ObservationPointResultDto();
@@ -58,8 +58,8 @@ namespace Rampage.NaturalistAtlas.BLL
         public PageData<ObservationCardDto> GetCardPage(AtlasObservationQuery query, int pageIndex, int pageSize, bool photoOnly = false)
         {
             PagerInfo pager = new PagerInfo { PageIndex = pageIndex, PageSize = Math.Clamp(pageSize, 1, 60) };
-            List<ObservationCardDto> list = ObservationDao.SelectPublicCardPage(query, (pager.PageIndex - 1) * pager.PageSize, pager.PageSize, photoOnly);
-            pager.RecordCount = ObservationDao.CountPublic(query, photoOnly);
+            List<ObservationCardDto> list = ObservationDao.GetPublicCardPageList(query, (pager.PageIndex - 1) * pager.PageSize, pager.PageSize, photoOnly);
+            pager.RecordCount = ObservationDao.GetPublicCount(query, photoOnly);
             return new PageData<ObservationCardDto> { Pager = pager, DataList = list };
         }
 
@@ -70,7 +70,7 @@ namespace Rampage.NaturalistAtlas.BLL
             {
                 return null;
             }
-            ObservationDetailDto? detail = ObservationDao.SelectPublicDetail(id.Trim());
+            ObservationDetailDto? detail = ObservationDao.GetPublicDetail(id.Trim());
             if (detail != null)
             {
                 detail.SourceUrl = BuildSourceUrl(detail.Source, detail.SourceObservationId);

@@ -46,7 +46,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <param name="observationId">观察Id（雪花）/ Observation id (snowflake)</param>
         /// <param name="status">目标状态（0 或 1）/ Target status (0 or 1)</param>
         /// <returns>操作结果 / Result</returns>
-        R ChangeObservationStatus(string observationId, ObservationStatus status);
+        R UpdateObservationStatus(string observationId, ObservationStatus status);
 
         /// <summary>
         /// 按作者隐藏：将该观察者名下全部正常观察置为隐藏（产品文档 §十一 内容安全运营手段）
@@ -54,6 +54,6 @@ namespace Rampage.NaturalistAtlas.BLL
         /// </summary>
         /// <param name="userLogin">观察者公开昵称 / Observer public login</param>
         /// <returns>操作结果（Data 为受影响行数） / Result (Data carries the affected row count)</returns>
-        R HideObservationsByAuthor(string userLogin);
+        R UpdateObservationsHiddenByAuthor(string userLogin);
     }
 }

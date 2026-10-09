@@ -12,7 +12,7 @@ namespace Rampage.NaturalistAtlas.DAL
     public class SyncCursorDao : SuperDao<SyncCursor>, ISyncCursorDao
     {
         /// <inheritdoc/>
-        public SyncCursor? SelectByTask(AtlasSource source, int cityId, string task)
+        public SyncCursor? GetByTask(AtlasSource source, int cityId, string task)
         {
             List<SyncCursor> rows = DatabaseClient.SelectList<SyncCursor>(
                 @"SELECT id AS Id, source AS Source, city_id AS CityId, task AS Task, watermark AS Watermark,

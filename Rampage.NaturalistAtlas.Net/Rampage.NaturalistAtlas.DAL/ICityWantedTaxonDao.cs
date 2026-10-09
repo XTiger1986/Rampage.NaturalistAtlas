@@ -18,7 +18,7 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="cityId">城市 id / City id</param>
         /// <param name="rows">快照行（调用方已赋雪花 id）/ Snapshot rows (snowflake ids assigned by the caller)</param>
         /// <returns>写入行数 / Rows written</returns>
-        int ReplaceAll(int cityId, List<CityWantedTaxon> rows);
+        int SaveAll(int cityId, List<CityWantedTaxon> rows);
 
         /// <summary>
         /// 公开接口读取：按周边记录数降序 / Public read, descending by the nearby count
@@ -27,6 +27,6 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="iconicList">类群筛选（空 = 全部）/ Iconic filter (empty = all)</param>
         /// <param name="limit">条数上限 / Limit</param>
         /// <returns>wanted 条目 / Wanted items</returns>
-        List<WantedTaxonItemDto> SelectPublic(int cityId, short[] iconicList, int limit);
+        List<WantedTaxonItemDto> GetPublicList(int cityId, short[] iconicList, int limit);
     }
 }

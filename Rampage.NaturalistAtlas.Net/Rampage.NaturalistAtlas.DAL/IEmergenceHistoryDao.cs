@@ -17,7 +17,7 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="cityId">城市 id / City id</param>
         /// <param name="taxonId">taxon.id</param>
         /// <returns>月份行，无缓存时为空 / Month rows; empty when not cached</returns>
-        List<EmergenceRowDto> SelectMonthSeries(int cityId, string taxonId);
+        List<EmergenceRowDto> GetMonthSeriesList(int cityId, string taxonId);
 
         /// <summary>
         /// 全量重写一个 (城市, 分类) 的 12 个月行（删除旧行 + 分块批量插入，事务内）
@@ -26,7 +26,7 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="cityId">城市 id / City id</param>
         /// <param name="taxonId">taxon.id</param>
         /// <param name="rows">12 个月行（month 1~12）/ The 12 month rows</param>
-        void ReplaceMonths(int cityId, string taxonId, List<EmergenceHistory> rows);
+        void SaveMonths(int cityId, string taxonId, List<EmergenceHistory> rows);
 
         /// <summary>
         /// 选取待刷新直方图的分类：该城市有可见观察的分类，按直方图缓存新旧排序
@@ -38,6 +38,6 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="cityId">城市 id / City id</param>
         /// <param name="limit">取前 N 个 / Top N</param>
         /// <returns>分类 id 列表（本站雪花 id）/ Taxon ids (our snowflake ids)</returns>
-        List<string> SelectDueTaxaIds(int cityId, int limit);
+        List<string> GetDueTaxaIdsList(int cityId, int limit);
     }
 }

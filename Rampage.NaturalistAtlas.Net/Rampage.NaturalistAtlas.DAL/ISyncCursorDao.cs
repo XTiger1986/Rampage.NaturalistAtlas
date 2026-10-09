@@ -17,6 +17,6 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="cityId">城市Id（全局任务约定 0）/ City id (0 by convention for global tasks)</param>
         /// <param name="task">任务类型（SyncTaskCodes）/ Task type (SyncTaskCodes)</param>
         /// <returns>水位行，不存在返回 null / The cursor row, or null when missing</returns>
-        SyncCursor? SelectByTask(AtlasSource source, int cityId, string task);
+        SyncCursor? GetByTask(AtlasSource source, int cityId, string task);
     }
 }

@@ -116,7 +116,7 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public R ChangeCountryStatus(int countryId, CommonStatus status)
+        public R UpdateCountryStatus(int countryId, CommonStatus status)
         {
             if (countryId <= 0 || !Enum.IsDefined(status))
             {
@@ -288,7 +288,7 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public R ChangeProvinceStatus(int provinceId, CommonStatus status)
+        public R UpdateProvinceStatus(int provinceId, CommonStatus status)
         {
             if (provinceId <= 0 || !Enum.IsDefined(status))
             {

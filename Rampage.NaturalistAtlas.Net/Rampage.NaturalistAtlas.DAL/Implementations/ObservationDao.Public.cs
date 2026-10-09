@@ -11,7 +11,7 @@ namespace Rampage.NaturalistAtlas.DAL
     public partial class ObservationDao
     {
         /// <inheritdoc/>
-        public List<ObservationPointDto> SelectPublicPoints(AtlasObservationQuery query, int limit)
+        public List<ObservationPointDto> GetPublicPointsList(AtlasObservationQuery query, int limit)
         {
             Dictionary<string, object?> param = new Dictionary<string, object?> { ["Limit"] = limit };
             string where = AtlasFilterSql.BuildWhere(query, param);
@@ -24,7 +24,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public long CountPublic(AtlasObservationQuery query, bool photoOnly = false)
+        public long GetPublicCount(AtlasObservationQuery query, bool photoOnly = false)
         {
             Dictionary<string, object?> param = new Dictionary<string, object?>();
             string where = AtlasFilterSql.BuildWhere(query, param);
@@ -37,7 +37,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<ObservationCardDto> SelectPublicCardPage(AtlasObservationQuery query, int offset, int size, bool photoOnly = false)
+        public List<ObservationCardDto> GetPublicCardPageList(AtlasObservationQuery query, int offset, int size, bool photoOnly = false)
         {
             Dictionary<string, object?> param = new Dictionary<string, object?> { ["Offset"] = offset, ["Size"] = size };
             string where = AtlasFilterSql.BuildWhere(query, param);
@@ -54,7 +54,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public ObservationDetailDto? SelectPublicDetail(string id)
+        public ObservationDetailDto? GetPublicDetail(string id)
         {
             return DatabaseClient.SelectOne<ObservationDetailDto>(
                 $@"SELECT {AtlasFilterSql.CARD_COLUMNS},
@@ -90,7 +90,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<SpeciesRankItemDto> SelectSpeciesRankPage(AtlasObservationQuery query, string? keyword, string order, int offset, int size)
+        public List<SpeciesRankItemDto> GetSpeciesRankPageList(AtlasObservationQuery query, string? keyword, string order, int offset, int size)
         {
             Dictionary<string, object?> param = new Dictionary<string, object?> { ["Offset"] = offset, ["Size"] = size };
             string agg = BuildRankSource(query, keyword, param, out string keywordWhere);
@@ -120,7 +120,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public long CountSpeciesRank(AtlasObservationQuery query, string? keyword)
+        public long GetSpeciesRankCount(AtlasObservationQuery query, string? keyword)
         {
             Dictionary<string, object?> param = new Dictionary<string, object?>();
             string agg = BuildRankSource(query, keyword, param, out string keywordWhere);
@@ -130,7 +130,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public SpeciesStatRowDto SelectSpeciesStat(int cityId, string taxonId)
+        public SpeciesStatRowDto GetSpeciesStat(int cityId, string taxonId)
         {
             return DatabaseClient.SelectOne<SpeciesStatRowDto>(
                 @"SELECT COUNT(*) AS RecordCount, COUNT(DISTINCT NULLIF(user_login, '')) AS ObserverCount,
@@ -141,7 +141,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<EmergenceRowDto> SelectTenDayEmergence(int cityId, string taxonId, DateOnly from)
+        public List<EmergenceRowDto> GetTenDayEmergenceList(int cityId, string taxonId, DateOnly from)
         {
             // 旬序 = (月 - 1) × 3 + 旬（1~10 日 → 1，11~20 日 → 2，21 日~月末 → 3）
             // Ten-day index = (month - 1) × 3 + period (days 1-10 → 1, 11-20 → 2, 21-end → 3)
@@ -155,7 +155,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<EmergenceRowDto> SelectMonthEmergence(int cityId, string taxonId)
+        public List<EmergenceRowDto> GetMonthEmergenceList(int cityId, string taxonId)
         {
             return DatabaseClient.SelectList<EmergenceRowDto>(
                 @"SELECT EXTRACT(MONTH FROM observed_on)::int AS Idx,
@@ -167,7 +167,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<SpeciesRankItemDto> SelectSimilarSpecies(int cityId, string taxonId, int limit)
+        public List<SpeciesRankItemDto> GetSimilarSpeciesList(int cityId, string taxonId, int limit)
         {
             // 同胞口径：ancestry 相同（即同父，天然限定同属内种/种下）；本站未同步祖先链的返回空。
             // 注意 taxon.status 是 CommonStatus（1=启用/0=停用），与 observation.status（0=正常）语义相反
@@ -198,7 +198,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<PhenologyCellRowDto> SelectPhenologyCells(AtlasObservationQuery query, int top)
+        public List<PhenologyCellRowDto> GetPhenologyCellsList(AtlasObservationQuery query, int top)
         {
             Dictionary<string, object?> param = new Dictionary<string, object?> { ["Top"] = top };
             string where = AtlasFilterSql.BuildWhere(query, param, includeMonth: false);
@@ -225,7 +225,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public OverviewBaseRowDto SelectOverviewBase(int cityId, short[] qualityList, DateOnly monthStart)
+        public OverviewBaseRowDto GetOverviewBase(int cityId, short[] qualityList, DateOnly monthStart)
         {
             return DatabaseClient.SelectOne<OverviewBaseRowDto>(
                 $@"SELECT COUNT(*) AS Total, COUNT(*) FILTER (WHERE quality_grade = 1) AS Research,
@@ -238,7 +238,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<IconicCountDto> SelectOverviewIconic(int cityId, short[] qualityList)
+        public List<IconicCountDto> GetOverviewIconicList(int cityId, short[] qualityList)
         {
             return DatabaseClient.SelectList<IconicCountDto>(
                 $@"SELECT iconic_taxon AS IconicTaxon, COUNT(*) AS Count
@@ -250,7 +250,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<ObserverCountDto> SelectTopObservers(int cityId, short[] qualityList, int limit)
+        public List<ObserverCountDto> GetTopObserversList(int cityId, short[] qualityList, int limit)
         {
             return DatabaseClient.SelectList<ObserverCountDto>(
                 $@"SELECT user_login AS UserLogin, COUNT(*) AS Count
@@ -263,7 +263,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<MonthlyCountDto> SelectMonthly12(int cityId, short[] qualityList, DateOnly from)
+        public List<MonthlyCountDto> GetMonthly12List(int cityId, short[] qualityList, DateOnly from)
         {
             return DatabaseClient.SelectList<MonthlyCountDto>(
                 $@"SELECT to_char(date_trunc('month', observed_on), 'YYYY-MM') AS Month, COUNT(*) AS Count
@@ -275,7 +275,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<SpeciesRankItemDto> SelectRisingStars(int cityId, DateOnly monthStart, int threshold, int limit)
+        public List<SpeciesRankItemDto> GetRisingStarsList(int cityId, DateOnly monthStart, int threshold, int limit)
         {
             // ReachedOn：研究级累计第 threshold 条的 observed_on（LATERAL 只对 LIMIT 后的当页物种执行）
             // ReachedOn: the observed_on of the threshold-th research-grade record (LATERAL over the paged species only)

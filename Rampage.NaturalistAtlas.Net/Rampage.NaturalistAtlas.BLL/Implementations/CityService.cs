@@ -182,7 +182,7 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public R ChangeCityStatus(int cityId, CommonStatus status)
+        public R UpdateCityStatus(int cityId, CommonStatus status)
         {
             if (cityId <= 0 || !Enum.IsDefined(status))
             {

@@ -36,7 +36,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <summary>
         /// 启用/停用国家 / Enable or disable a country
         /// </summary>
-        R ChangeCountryStatus(int countryId, CommonStatus status);
+        R UpdateCountryStatus(int countryId, CommonStatus status);
 
         /// <summary>
         /// 删除国家（被省份/城市引用时拒绝） / Delete a country (rejected while referenced by provinces or cities)
@@ -68,7 +68,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <summary>
         /// 启用/停用省份 / Enable or disable a province
         /// </summary>
-        R ChangeProvinceStatus(int provinceId, CommonStatus status);
+        R UpdateProvinceStatus(int provinceId, CommonStatus status);
 
         /// <summary>
         /// 删除省份（被城市引用时拒绝） / Delete a province (rejected while referenced by cities)

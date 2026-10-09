@@ -36,7 +36,7 @@ namespace Rampage.NaturalistAtlas.Collector
                 using (Rampage.DependencyInjection.RampageScope.Begin(RampageBooter.Application.GetServiceProvider()))
                 {
                     IAtlasCollectionService collectionService = GlobalScope.ServiceProvider.GetRequiredService<IAtlasCollectionService>();
-                    foreach (int cityId in collectionService.GetCollectionCityIds())
+                    foreach (int cityId in collectionService.GetCollectionCityIdsList())
                     {
                         collectionService.RunHistogramAsync(cityId).GetAwaiter().GetResult();
                     }
@@ -65,7 +65,7 @@ namespace Rampage.NaturalistAtlas.Collector
                 using (Rampage.DependencyInjection.RampageScope.Begin(RampageBooter.Application.GetServiceProvider()))
                 {
                     IAtlasCollectionService collectionService = GlobalScope.ServiceProvider.GetRequiredService<IAtlasCollectionService>();
-                    foreach (int cityId in collectionService.GetCollectionCityIds())
+                    foreach (int cityId in collectionService.GetCollectionCityIdsList())
                     {
                         collectionService.RunDeletionCheckAsync(AtlasSource.INaturalist, cityId).GetAwaiter().GetResult();
                         collectionService.RunDeletionCheckAsync(AtlasSource.Gbif, cityId).GetAwaiter().GetResult();

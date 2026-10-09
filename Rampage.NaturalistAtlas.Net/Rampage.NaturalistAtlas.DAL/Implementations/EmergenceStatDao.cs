@@ -12,7 +12,7 @@ namespace Rampage.NaturalistAtlas.DAL
     public class EmergenceStatDao : SuperDao<EmergenceStat>, IEmergenceStatDao
     {
         /// <inheritdoc/>
-        public List<EmergenceRowDto> SelectTenDaySeries(int cityId, string taxonId, int fromYear)
+        public List<EmergenceRowDto> GetTenDaySeriesList(int cityId, string taxonId, int fromYear)
         {
             return DatabaseClient.SelectList<EmergenceRowDto>(
                 @"SELECT ten_day::int AS Idx, SUM(record_count) AS RecordCount, SUM(research_count) AS ResearchCount

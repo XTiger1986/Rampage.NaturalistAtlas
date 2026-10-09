@@ -95,8 +95,8 @@ namespace Rampage.NaturalistAtlas.BLL
             }
 
             return HandleWebCache(() => {
-                List<SpeciesRankItemDto> list = ObservationDao.SelectSpeciesRankPage(effective, kw, orderKey, (pager.PageIndex - 1) * pager.PageSize, pager.PageSize);
-                pager.RecordCount = ObservationDao.CountSpeciesRank(effective, kw);
+                List<SpeciesRankItemDto> list = ObservationDao.GetSpeciesRankPageList(effective, kw, orderKey, (pager.PageIndex - 1) * pager.PageSize, pager.PageSize);
+                pager.RecordCount = ObservationDao.GetSpeciesRankCount(effective, kw);
                 return new PageData<SpeciesRankItemDto> { Pager = pager, DataList = list };
             }, CACHE_KEY_RANK_TPL, SHORT_CACHE_SECONDS,
                 effective.ToCacheKey(), orderKey, kw ?? "-", pager.PageIndex, pager.PageSize)
@@ -112,7 +112,7 @@ namespace Rampage.NaturalistAtlas.BLL
             }
             string id = taxonId.Trim();
             return HandleWebCache<SpeciesDetailDto?>(() => {
-                TaxonInfoDto? taxon = TaxonDao.SelectTaxonInfo(id);
+                TaxonInfoDto? taxon = TaxonDao.GetTaxonInfo(id);
                 if (taxon == null)
                 {
                     return null;
@@ -123,15 +123,15 @@ namespace Rampage.NaturalistAtlas.BLL
                     return detail;
                 }
 
-                SpeciesStatRowDto stat = ObservationDao.SelectSpeciesStat(cityId, id);
+                SpeciesStatRowDto stat = ObservationDao.GetSpeciesStat(cityId, id);
                 detail.RecordCount = stat.RecordCount;
                 detail.ObserverCount = stat.ObserverCount;
                 detail.FirstObservedOn = stat.FirstObservedOn;
                 detail.LastObservedOn = stat.LastObservedOn;
 
                 AtlasObservationQuery query = new AtlasObservationQuery { CityId = cityId, TaxonId = id };
-                detail.Photos = ObservationDao.SelectPublicCardPage(query, 0, PHOTO_WALL_SIZE, photoOnly: true);
-                detail.Points = ObservationDao.SelectPublicPoints(query, SPECIES_POINT_LIMIT);
+                detail.Photos = ObservationDao.GetPublicCardPageList(query, 0, PHOTO_WALL_SIZE, photoOnly: true);
+                detail.Points = ObservationDao.GetPublicPointsList(query, SPECIES_POINT_LIMIT);
                 return detail;
             }, CACHE_KEY_DETAIL_TPL, SHORT_CACHE_SECONDS, id, cityId);
         }
@@ -152,10 +152,10 @@ namespace Rampage.NaturalistAtlas.BLL
                 {
                     // 全历史：优先源站直方图缓存（无研究级拆分，仅研究级时改用本站明细）
                     // All time: prefer the source histogram cache (no research split; research-only falls back to local rows)
-                    rows = researchOnly ? new List<EmergenceRowDto>() : EmergenceHistoryDao.SelectMonthSeries(cityId, id);
+                    rows = researchOnly ? new List<EmergenceRowDto>() : EmergenceHistoryDao.GetMonthSeriesList(cityId, id);
                     if (rows.Count == 0)
                     {
-                        rows = ObservationDao.SelectMonthEmergence(cityId, id);
+                        rows = ObservationDao.GetMonthEmergenceList(cityId, id);
                     }
                 }
                 else
@@ -163,10 +163,10 @@ namespace Rampage.NaturalistAtlas.BLL
                     // 明细：近两年逐旬，优先预聚合表，未启用时由明细实时聚合
                     // Detail: last two years by ten-day, pre-aggregated first, else aggregated live from rows
                     int fromYear = UtcNow.Year - DETAIL_YEARS + 1;
-                    rows = EmergenceStatDao.SelectTenDaySeries(cityId, id, fromYear);
+                    rows = EmergenceStatDao.GetTenDaySeriesList(cityId, id, fromYear);
                     if (rows.Count == 0)
                     {
-                        rows = ObservationDao.SelectTenDayEmergence(cityId, id, new DateOnly(fromYear, 1, 1));
+                        rows = ObservationDao.GetTenDayEmergenceList(cityId, id, new DateOnly(fromYear, 1, 1));
                     }
                 }
                 return BuildEmergence(history, rows, researchOnly);
@@ -184,7 +184,7 @@ namespace Rampage.NaturalistAtlas.BLL
                 // Unpivoted cells → species rows: SQL is ordered by total, so grouping in first-seen order keeps the ranking
                 List<PhenologyRowDto> rows = new List<PhenologyRowDto>();
                 Dictionary<string, PhenologyRowDto> dict = new Dictionary<string, PhenologyRowDto>();
-                foreach (PhenologyCellRowDto cell in ObservationDao.SelectPhenologyCells(noMonth, top))
+                foreach (PhenologyCellRowDto cell in ObservationDao.GetPhenologyCellsList(noMonth, top))
                 {
                     if (!dict.TryGetValue(cell.TaxonId, out PhenologyRowDto? row))
                     {
@@ -209,7 +209,7 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public List<TaxonAncestorDto> GetTaxonAncestors(string taxonId)
+        public List<TaxonAncestorDto> GetTaxonAncestorsList(string taxonId)
         {
             string id = (taxonId ?? string.Empty).Trim();
             if (id.Length == 0)
@@ -226,7 +226,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// </summary>
         private List<TaxonAncestorDto> ResolveAncestors(string taxonId)
         {
-            TaxonInfoDto? taxon = TaxonDao.SelectTaxonInfo(taxonId);
+            TaxonInfoDto? taxon = TaxonDao.GetTaxonInfo(taxonId);
             if (taxon == null || string.IsNullOrWhiteSpace(taxon.Ancestry))
             {
                 return new List<TaxonAncestorDto>();
@@ -238,7 +238,7 @@ namespace Rampage.NaturalistAtlas.BLL
             }
             // 一次批量查询整条链（比逐段查询少 N-1 次往返；链最长约 70 段，IN 完全可行）
             // One batch query for the whole chain (saves N-1 round trips; the path is at most ~70 segments, fine for IN)
-            List<Taxon> found = TaxonDao.SelectBySourceIds((AtlasSource)taxon.Source, segments.ToList());
+            List<Taxon> found = TaxonDao.GetBySourceIdsList((AtlasSource)taxon.Source, segments.ToList());
             Dictionary<string, Taxon> bySourceId = found.ToDictionary(t => t.SourceTaxonId, t => t);
             List<TaxonAncestorDto> chain = new List<TaxonAncestorDto>(segments.Length);
             foreach (string segment in segments)
@@ -261,14 +261,14 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public List<WantedTaxonItemDto> GetGaps(int cityId, string? iconic)
+        public List<WantedTaxonItemDto> GetGapsList(int cityId, string? iconic)
         {
             if (cityId <= 0)
             {
                 return new List<WantedTaxonItemDto>();
             }
             short[] iconicList = ParseIconicCodes(iconic);
-            return HandleWebCache(() => CityWantedTaxonDao.SelectPublic(cityId, iconicList, GAPS_LIMIT),
+            return HandleWebCache(() => CityWantedTaxonDao.GetPublicList(cityId, iconicList, GAPS_LIMIT),
                 CACHE_KEY_GAPS_TPL, LONG_CACHE_SECONDS, cityId, string.Join(",", iconicList))
                 ?? new List<WantedTaxonItemDto>();
         }
@@ -295,14 +295,14 @@ namespace Rampage.NaturalistAtlas.BLL
         }
 
         /// <inheritdoc/>
-        public List<SpeciesRankItemDto> GetSimilarSpecies(string taxonId, int cityId)
+        public List<SpeciesRankItemDto> GetSimilarSpeciesList(string taxonId, int cityId)
         {
             string id = (taxonId ?? string.Empty).Trim();
             if (id.Length == 0 || cityId <= 0)
             {
                 return new List<SpeciesRankItemDto>();
             }
-            return HandleWebCache(() => ObservationDao.SelectSimilarSpecies(cityId, id, SIMILAR_LIMIT),
+            return HandleWebCache(() => ObservationDao.GetSimilarSpeciesList(cityId, id, SIMILAR_LIMIT),
                 CACHE_KEY_SIMILAR_TPL, LONG_CACHE_SECONDS, id, cityId)
                 ?? new List<SpeciesRankItemDto>();
         }

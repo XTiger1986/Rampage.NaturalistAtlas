@@ -19,7 +19,7 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <param name="task">任务类型 / Task type</param>
         /// <param name="before">仅处理开始时间早于该时刻的行 / Only rows started before this moment</param>
         /// <returns>收尾行数 / Affected row count</returns>
-        int MarkStaleRunningFailed(AtlasSource source, int cityId, string task, DateTime before);
+        int UpdateStaleRunningFailed(AtlasSource source, int cityId, string task, DateTime before);
 
         /// <summary>
         /// 清理过期的成功日志（失败/熔断行保留供排障，量也小）；防日志表被日常空转行无限灌满

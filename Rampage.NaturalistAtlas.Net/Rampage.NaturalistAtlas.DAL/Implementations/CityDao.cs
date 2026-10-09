@@ -12,7 +12,7 @@ namespace Rampage.NaturalistAtlas.DAL
     public class CityDao : SuperDao<City>, ICityDao
     {
         /// <inheritdoc/>
-        public List<GeoSearchRowDto> SelectGeoSearch(string keyword, int limit)
+        public List<GeoSearchRowDto> GetGeoSearchList(string keyword, int limit)
         {
             // 城市中心点取 bbox 中点（city 表无独立中心点列）；省份/国家用表内定位中心点
             // A city's center is its bbox midpoint (the city table has no center column); provinces/countries use their stored centers

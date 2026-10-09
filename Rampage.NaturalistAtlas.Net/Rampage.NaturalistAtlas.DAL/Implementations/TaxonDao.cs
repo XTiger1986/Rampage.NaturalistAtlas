@@ -59,7 +59,7 @@ namespace Rampage.NaturalistAtlas.DAL
             "threatened AS Threatened, ancestry AS Ancestry, status AS Status, create_time AS CreateTime, update_time AS UpdateTime";
 
         /// <inheritdoc/>
-        public TaxonInfoDto? SelectTaxonInfo(string taxonId)
+        public TaxonInfoDto? GetTaxonInfo(string taxonId)
         {
             return DatabaseClient.SelectOne<TaxonInfoDto>(
                 @"SELECT id AS TaxonId, source AS Source, source_taxon_id AS SourceTaxonId, rank AS Rank,
@@ -69,7 +69,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public UpsertCountDto BatchUpsert(List<Taxon> rows)
+        public UpsertCountDto SaveBatch(List<Taxon> rows)
         {
             UpsertCountDto result = new UpsertCountDto();
             if (rows.Count == 0)
@@ -109,7 +109,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<Taxon> SelectBySourceIds(AtlasSource source, List<string> sourceTaxonIds)
+        public List<Taxon> GetBySourceIdsList(AtlasSource source, List<string> sourceTaxonIds)
         {
             if (sourceTaxonIds.Count == 0)
             {
@@ -121,7 +121,7 @@ namespace Rampage.NaturalistAtlas.DAL
         }
 
         /// <inheritdoc/>
-        public List<Taxon> SelectRefreshBatch(AtlasSource source, int limit)
+        public List<Taxon> GetRefreshBatchList(AtlasSource source, int limit)
         {
             return DatabaseClient.SelectList<Taxon>(
                 $"SELECT {SELECT_COLUMN_SQL} FROM taxon WHERE source = @Source ORDER BY update_time ASC LIMIT @Limit",

@@ -28,7 +28,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
         {
             try
             {
-                return R<List<TaxonAncestorDto>>.Success(AtlasSpeciesService.GetTaxonAncestors(id));
+                return R<List<TaxonAncestorDto>>.Success(AtlasSpeciesService.GetTaxonAncestorsList(id));
             }
             catch (Exception ex)
             {

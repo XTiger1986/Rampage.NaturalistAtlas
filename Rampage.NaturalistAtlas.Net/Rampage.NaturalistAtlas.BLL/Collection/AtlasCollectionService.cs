@@ -180,7 +180,7 @@ namespace Rampage.NaturalistAtlas.Collection
         }
 
         /// <inheritdoc/>
-        public List<int> GetCollectionCityIds()
+        public List<int> GetCollectionCityIdsList()
         {
             return ParseCollectionCities(SettingService.GetSettingFromCache<GeneralSetting>()).ConvertAll(c => c.Id);
         }
@@ -469,7 +469,7 @@ namespace Rampage.NaturalistAtlas.Collection
             TaskRunResult result = new TaskRunResult();
             InatApiClient api = new InatApiClient(ctx.Setting.InatApiBaseUrl, ctx.Setting.InatRateLimitPerMinute);
             int sampleSize = ReadConfigInt(ctx.Config, "SampleSize", 50);
-            List<string> sampleIds = ObservationDao.SelectRandomSampleIds(AtlasSource.INaturalist, ctx.Cursor.CityId, sampleSize);
+            List<string> sampleIds = ObservationDao.GetRandomSampleIdsList(AtlasSource.INaturalist, ctx.Cursor.CityId, sampleSize);
             if (sampleIds.Count == 0)
             {
                 result.Message = "无样本 / no sample";
@@ -497,7 +497,7 @@ namespace Rampage.NaturalistAtlas.Collection
                 List<string> missing = batch.FindAll(id => !present.Contains(id));
                 if (missing.Count > 0)
                 {
-                    deletedCount += ObservationDao.MarkSourceDeleted(AtlasSource.INaturalist, missing);
+                    deletedCount += ObservationDao.UpdateSourceDeleted(AtlasSource.INaturalist, missing);
                 }
             }
             result.Message = $"抽样{sampleIds.Count} 确认源站删除{deletedCount}";
@@ -510,7 +510,7 @@ namespace Rampage.NaturalistAtlas.Collection
             TaskRunResult result = new TaskRunResult();
             GbifApiClient api = new GbifApiClient(ctx.Setting.GbifApiBaseUrl, ctx.Setting.GbifRateLimitPerMinute);
             int sampleSize = ReadConfigInt(ctx.Config, "SampleSize", 50);
-            List<string> sampleIds = ObservationDao.SelectRandomSampleIds(AtlasSource.Gbif, ctx.Cursor.CityId, sampleSize);
+            List<string> sampleIds = ObservationDao.GetRandomSampleIdsList(AtlasSource.Gbif, ctx.Cursor.CityId, sampleSize);
             if (sampleIds.Count == 0)
             {
                 result.Message = "无样本 / no sample";
@@ -531,7 +531,7 @@ namespace Rampage.NaturalistAtlas.Collection
                     missing.Add(id);
                 }
             }
-            int deletedCount = missing.Count > 0 ? ObservationDao.MarkSourceDeleted(AtlasSource.Gbif, missing) : 0;
+            int deletedCount = missing.Count > 0 ? ObservationDao.UpdateSourceDeleted(AtlasSource.Gbif, missing) : 0;
             result.Message = $"抽样{sampleIds.Count} 确认源站删除{deletedCount}";
             return result;
         }
@@ -635,7 +635,7 @@ namespace Rampage.NaturalistAtlas.Collection
                     LogInfo($"[集邮缺口] 预算在城市 {city.Name} 中途耗尽，本城跳过待下轮");
                     break;
                 }
-                CityWantedTaxonDao.ReplaceAll(city.Id, rows);
+                CityWantedTaxonDao.SaveAll(city.Id, rows);
                 totalRows += rows.Count;
                 processed++;
                 LogInfo($"[集邮缺口] {city.Name} 写入{rows.Count} 条（预算余{Math.Max(0, budget)}）");
@@ -671,7 +671,7 @@ namespace Rampage.NaturalistAtlas.Collection
 
             InatApiClient api = new InatApiClient(ctx.Setting.InatV1ApiBaseUrl, ctx.Setting.InatRateLimitPerMinute);
             int budget = ReadConfigInt(ctx.Config, "RequestBudget", 90);
-            List<string> dueTaxaIds = EmergenceHistoryDao.SelectDueTaxaIds(ctx.Cursor.CityId, budget);
+            List<string> dueTaxaIds = EmergenceHistoryDao.GetDueTaxaIdsList(ctx.Cursor.CityId, budget);
             if (dueTaxaIds.Count == 0)
             {
                 result.Message = "无待刷新分类 / nothing due";
@@ -701,7 +701,7 @@ namespace Rampage.NaturalistAtlas.Collection
                 List<EmergenceHistory> rows = MapHistogram(response.Results, ctx.Cursor.CityId, taxonId);
                 if (rows.Count > 0)
                 {
-                    EmergenceHistoryDao.ReplaceMonths(ctx.Cursor.CityId, taxonId, rows);
+                    EmergenceHistoryDao.SaveMonths(ctx.Cursor.CityId, taxonId, rows);
                     updated++;
                 }
                 else
@@ -825,7 +825,7 @@ namespace Rampage.NaturalistAtlas.Collection
         {
             TaskRunResult result = new TaskRunResult();
             InatApiClient api = new InatApiClient(ctx.Setting.InatApiBaseUrl, ctx.Setting.InatRateLimitPerMinute);
-            List<Taxon> batch = TaxonDao.SelectRefreshBatch(AtlasSource.INaturalist, TAXON_REFRESH_BATCH_SIZE);
+            List<Taxon> batch = TaxonDao.GetRefreshBatchList(AtlasSource.INaturalist, TAXON_REFRESH_BATCH_SIZE);
             if (batch.Count == 0)
             {
                 result.Message = "无待刷新分类 / nothing to refresh";
@@ -855,7 +855,7 @@ namespace Rampage.NaturalistAtlas.Collection
             }
             if (refreshed.Count > 0)
             {
-                TaxonDao.BatchUpsert(refreshed);
+                TaxonDao.SaveBatch(refreshed);
                 result.UpdateCount = refreshed.Count;
             }
             result.Message = $"刷新{refreshed.Count}/{batch.Count}条分类 请求{result.RequestCount}";
@@ -867,7 +867,7 @@ namespace Rampage.NaturalistAtlas.Collection
         {
             TaskRunResult result = new TaskRunResult();
             GbifApiClient api = new GbifApiClient(ctx.Setting.GbifApiBaseUrl, ctx.Setting.GbifRateLimitPerMinute);
-            List<Taxon> batch = TaxonDao.SelectRefreshBatch(AtlasSource.Gbif, TAXON_REFRESH_BATCH_SIZE);
+            List<Taxon> batch = TaxonDao.GetRefreshBatchList(AtlasSource.Gbif, TAXON_REFRESH_BATCH_SIZE);
             if (batch.Count == 0)
             {
                 result.Message = "无待刷新分类 / nothing to refresh";
@@ -896,7 +896,7 @@ namespace Rampage.NaturalistAtlas.Collection
             }
             if (refreshed.Count > 0)
             {
-                TaxonDao.BatchUpsert(refreshed);
+                TaxonDao.SaveBatch(refreshed);
                 result.UpdateCount = refreshed.Count;
             }
             result.Message = $"刷新{refreshed.Count}/{batch.Count}条分类 请求{result.RequestCount}";
@@ -989,7 +989,7 @@ namespace Rampage.NaturalistAtlas.Collection
             List<Taxon> newTaxa = new List<Taxon>();
             if (taxonDict.Count > 0)
             {
-                List<Taxon> existing = TaxonDao.SelectBySourceIds(source, taxonDict.Keys.ToList());
+                List<Taxon> existing = TaxonDao.GetBySourceIdsList(source, taxonDict.Keys.ToList());
                 foreach (Taxon row in existing)
                 {
                     taxonDict[row.SourceTaxonId] = row;
@@ -1021,11 +1021,11 @@ namespace Rampage.NaturalistAtlas.Collection
             {
                 if (newTaxa.Count > 0)
                 {
-                    TaxonDao.BatchUpsert(newTaxa);
+                    TaxonDao.SaveBatch(newTaxa);
                 }
                 if (ready.Count > 0)
                 {
-                    UpsertCountDto count = ObservationDao.BatchUpsert(ready);
+                    UpsertCountDto count = ObservationDao.SaveBatch(ready);
                     total.Insert += count.Insert;
                     total.Update += count.Update;
                 }
@@ -1076,7 +1076,7 @@ namespace Rampage.NaturalistAtlas.Collection
             try
             {
                 GeneralSetting setting = SettingService.GetSettingFromCache<GeneralSetting>();
-                cursor = SyncCursorDao.SelectByTask(source, cityId, task);
+                cursor = SyncCursorDao.GetByTask(source, cityId, task);
                 if (cursor == null)
                 {
                     cursor = new SyncCursor
@@ -1110,7 +1110,7 @@ namespace Rampage.NaturalistAtlas.Collection
                 // 收尾上次进程中断遗留的"运行中"僵尸日志（仅同任务范围、开始于 1 小时前之前）；静默路径也执行
                 // Finalize zombie still-running rows left by an interrupted process (same task scope,
                 // started over an hour ago); runs on the silent path too
-                SyncLogDao.MarkStaleRunningFailed(source, cityId, task, UtcNow.AddHours(-1));
+                SyncLogDao.UpdateStaleRunningFailed(source, cityId, task, UtcNow.AddHours(-1));
 
                 if (silentWhen != null && silentWhen(ctx.Config))
                 {
