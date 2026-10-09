@@ -1,0 +1,22 @@
+# 依赖
+node_modules
+
+# 构建产物
+dist
+dist-ssr
+
+# 本地环境变量覆盖（私有配置，不入库）
+# .env.development / .env.production / .env.example 为项目配置，正常入库
+*.local
+
+# 类型检查增量缓存
+*.tsbuildinfo
+
+# 日志
+logs
+*.log
+npm-debug.log*
+
+# 编辑器/系统
+.DS_Store
+.idea

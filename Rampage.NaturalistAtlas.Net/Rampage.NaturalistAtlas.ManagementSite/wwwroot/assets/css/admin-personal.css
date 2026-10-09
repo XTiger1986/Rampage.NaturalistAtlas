@@ -1,0 +1,70 @@
+/* =====================================================================
+   admin-personal.css — 个人中心（资料/密码/头像）专属样式
+   主题：神秘自然（蕨绿导航 / 苔藓头像框）
+   ===================================================================== */
+
+/* --- 页内导航（三个 Personal 页共用） --- */
+.personal-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 8px;
+    border: 1px solid var(--sp-line, rgba(178, 226, 194, .1));
+    border-radius: 10px;
+    background: rgba(190, 240, 205, .02);
+}
+
+.personal-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: var(--sp-text-secondary, #93b3a0);
+    text-decoration: none;
+    font-size: .9rem;
+    transition: background .15s ease, color .15s ease;
+}
+
+.personal-nav a:hover {
+    background: rgba(190, 240, 205, .07);
+    color: var(--sp-text, #e9f4ec);
+}
+
+.personal-nav a.active {
+    background: linear-gradient(135deg, #3fbf7f, #2f9663);
+    color: #06130c;
+}
+
+/* --- 头像预览：蕨绿描边 + 生机辉光 --- */
+.personal-avatar-preview {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--sp-primary, #3fbf7f);
+    box-shadow: 0 4px 24px rgba(63, 191, 127, .25);
+}
+
+/* 无头像时的首字母占位 */
+.personal-avatar-placeholder {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #06130c;
+    background: linear-gradient(135deg, #3fbf7f, #2f9663);
+}
+
+/* 上传中遮罩态（JS 切换） */
+.personal-avatar-preview.is-uploading,
+.personal-avatar-placeholder.is-uploading {
+    opacity: .55;
+    filter: grayscale(.4);
+    pointer-events: none;
+}

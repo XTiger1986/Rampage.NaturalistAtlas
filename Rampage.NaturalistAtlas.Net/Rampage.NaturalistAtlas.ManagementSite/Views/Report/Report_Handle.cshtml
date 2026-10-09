@@ -1,0 +1,158 @@
+@model ObservationDetailDto?
+@{
+    // 举报处理页：工单信息 + 被举报观察摘要 → 隐藏结单 / 驳回结单（POST api/report/handle）
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    Rampage.NaturalistAtlas.Model.Po.Report ReportData = ViewBag.Report;
+    ObservationDetailDto? ObservationDetail = Model;
+    var obs = ObservationDetail?.Observation;
+    ViewBag.PageTitle = $"处理举报 - {ReportData.Id}";
+    bool CanHide = obs != null && obs.Status != ObservationStatus.SourceDeleted;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-observation.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-outline-secondary" href="~/Report/Report_List"><i class="fa-solid fa-arrow-left me-1"></i>返回列表</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-5">
+        <div class="sp-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-flag me-2"></i>举报信息</h2>
+                <span class="badge @(ReportData.Status == ReportStatus.Pending ? "bg-warning" : "bg-secondary")">@EnumReader.GetText(ReportData.Status)</span>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">举报原因</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(ReportData.Reason)</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">补充说明</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(ReportData.Content) ? "-" : ReportData.Content)</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">联系方式</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(ReportData.Contact) ? "-（匿名）" : ReportData.Contact)</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">提交时间</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@DateTimeTool.UtcToLocal(ReportData.CreateTime, CTZ).ToCommonString()</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">工单Id</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@ReportData.Id</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="sp-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-binoculars me-2"></i>被举报观察</h2>
+                @if (obs != null)
+                {
+                    <a class="btn btn-sm btn-outline-info" href="~/Observation/Observation_Detail?ObservationId=@(obs.Id)">查看完整详情</a>
+                }
+            </div>
+            <div class="sp-panel__bd">
+                @if (obs != null)
+                {
+                    <div class="d-flex gap-3 align-items-start">
+                        @if (!string.IsNullOrEmpty(obs.PhotoSquareUrl))
+                        {
+                            <img class="obs-thumb obs-thumb--lg" src="@obs.PhotoSquareUrl" alt="" referrerpolicy="no-referrer" />
+                        }
+                        <div class="flex-grow-1">
+                            <div>@(string.IsNullOrWhiteSpace(ObservationDetail!.Taxon?.ScientificName) ? "（无分类）" : ObservationDetail.Taxon!.ScientificName) · @EnumReader.GetText(obs.IconicTaxon) · @EnumReader.GetText(obs.QualityGrade)</div>
+                            <div class="text-muted small mt-1">观察日期 @obs.ObservedOn.ToString("yyyy-MM-dd") · 观察者 @obs.UserLogin · 源站ID <span class="sp-mono">@obs.SourceObservationId</span></div>
+                            <div class="mt-2">当前状态：<span class="badge @(obs.Status == ObservationStatus.Normal ? "bg-success" : (obs.Status == ObservationStatus.Hidden ? "bg-warning" : "bg-secondary"))">@EnumReader.GetText(obs.Status)</span></div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="sp-empty">对应的观察不存在（可能已被清理），只能驳回结单</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-gavel me-2"></i>处理决定</h2>
+    </div>
+    <div class="sp-panel__bd">
+        @if (ReportData.Status == ReportStatus.Pending)
+        {
+            <form id="ReportHandleForm" action="~/api/report/handle" method="post">
+                <input type="hidden" name="ReportId" value="@ReportData.Id" />
+                <div class="mb-3">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="Hide" id="radHide" value="true" @(CanHide ? "" : "disabled") />
+                        <label class="form-check-label" for="radHide">
+                            隐藏观察并结单 —— 观察置为「隐藏」，主站在隐藏缓存 TTL（见常规设置）内不再展示
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="Hide" id="radReject" value="false" checked />
+                        <label class="form-check-label" for="radReject">驳回举报 —— 观察保持原状，工单记为「驳回」</label>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label" for="txtRemark">处理备注</label>
+                    <div class="col-sm-10">
+                        <textarea id="txtRemark" name="Remark" class="form-control" rows="3" maxlength="500" placeholder="记录处理依据（可选，审计留痕）"></textarea>
+                        <div class="invalid-feedback" verify-name="Remark"></div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary px-5" type="submit"><i class="fa-solid fa-gavel me-1"></i>提交处理</button>
+                </div>
+                <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+            </form>
+        }
+        else
+        {
+            <div class="setting-hint">
+                <i class="fa-solid fa-circle-info me-1"></i>
+                该工单已于 @DateTimeTool.UtcToLocal(ReportData.HandleTime!.Value, CTZ).ToCommonString() 处理为「@EnumReader.GetText(ReportData.Status)」，不能重复操作。
+                @if (!string.IsNullOrWhiteSpace(ReportData.HandleRemark))
+                {
+                    <span>处理备注：@ReportData.HandleRemark</span>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        $(function () {
+            RPG.FormSubmitter('ReportHandleForm', {
+                validationHandler: function (formData) {
+                    if (formData.Hide !== 'true' && formData.Hide !== 'false') {
+                        return { Hide: '请选择处理动作' };
+                    }
+                    return true;
+                },
+                completeHandler: function (jsonResult) {
+                    window.location.href = '/Report/Report_List';
+                },
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+        });
+    </script>
+}

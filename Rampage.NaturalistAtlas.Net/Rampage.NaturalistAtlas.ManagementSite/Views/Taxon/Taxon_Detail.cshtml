@@ -1,0 +1,132 @@
+@model TaxonDetailDto
+@{
+    // 分类单元详情：档案 + 关联观察数 + 祖先链（按链序）
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    TaxonDetailDto Data = Model!;
+    ViewBag.PageTitle = $"分类详情 - {Data.ScientificName}";
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-city.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-outline-secondary" href="~/Taxon/Taxon_List"><i class="fa-solid fa-arrow-left me-1"></i>返回列表</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3">
+        <div class="sp-stat">
+            <div class="sp-stat__num">@Data.ObservationCount.ToString("N0")</div>
+            <div class="sp-stat__label">关联观察数</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="sp-stat">
+            <div class="sp-stat__num">@EnumReader.GetText(Data.IconicTaxon)</div>
+            <div class="sp-stat__label">类群</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="sp-stat">
+            <div class="sp-stat__num">@EnumReader.GetText(Data.Rank)</div>
+            <div class="sp-stat__label">分类阶元</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="sp-stat">
+            <div class="sp-stat__num">@(Data.Status == CommonStatus.Enabled ? "正常" : "源站已弃用")</div>
+            <div class="sp-stat__label">状态</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="sp-stat">
+            <div class="sp-stat__num">@(Data.Threatened ? "受威胁" : "—")</div>
+            <div class="sp-stat__label">保护状况</div>
+        </div>
+    </div>
+</div>
+
+<div class="sp-panel mb-3">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title">
+            <i class="fa-solid fa-leaf me-2"></i>@(string.IsNullOrWhiteSpace(Data.CommonNameCn) ? Data.ScientificName : $"{Data.CommonNameCn}（{Data.ScientificName}）")
+            @if (Data.Threatened)
+            {
+                <span class="badge bg-danger ms-1" title="源站红色名录等保守标记的受威胁物种"><i class="fa-solid fa-triangle-exclamation me-1"></i>受威胁物种</span>
+            }
+        </h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="row mb-2">
+            <label class="col-sm-2 col-form-label">英文常用名</label>
+            <div class="col-sm-10"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(Data.CommonNameEn) ? "-" : Data.CommonNameEn)</p></div>
+        </div>
+        <div class="row mb-2">
+            <label class="col-sm-2 col-form-label">数据源 / 源站ID</label>
+            <div class="col-sm-10"><p class="form-control-plaintext">@EnumReader.GetText(Data.Source) · <span class="sp-mono">@Data.SourceTaxonId</span></p></div>
+        </div>
+        <div class="row mb-2">
+            <label class="col-sm-2 col-form-label">本地ID</label>
+            <div class="col-sm-10"><p class="form-control-plaintext sp-mono">@Data.Id</p></div>
+        </div>
+        <div class="row mb-2">
+            <label class="col-sm-2 col-form-label">祖先链原文</label>
+            <div class="col-sm-10"><p class="form-control-plaintext sp-mono small">@(string.IsNullOrWhiteSpace(Data.Ancestry) ? "-" : Data.Ancestry)</p></div>
+        </div>
+        <div class="row mb-2">
+            <label class="col-sm-2 col-form-label">创建 / 修改</label>
+            <div class="col-sm-10"><p class="form-control-plaintext">@DateTimeTool.UtcToLocal(Data.CreateTime, CTZ).ToCommonString() / @DateTimeTool.UtcToLocal(Data.UpdateTime, CTZ).ToCommonString()</p></div>
+        </div>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-diagram-project me-2"></i>分类谱系（祖先链）</h2>
+    </div>
+    <div class="sp-panel__bd">
+        @if (Data.AncestorList.Count > 0)
+        {
+            <div class="sp-table-wrap">
+                <table class="table table-hover sp-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>学名</th>
+                            <th>中文常用名</th>
+                            <th>阶元</th>
+                            <th>源站ID</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @for (int i = 0; i < Data.AncestorList.Count; i++)
+                    {
+                        var ancestor = Data.AncestorList[i];
+                        <tr>
+                            <td>@(i + 1)</td>
+                            <td class="sp-mono">@ancestor.ScientificName</td>
+                            <td>@(string.IsNullOrWhiteSpace(ancestor.CommonNameCn) ? "-" : ancestor.CommonNameCn)</td>
+                            <td>@EnumReader.GetText(ancestor.Rank)</td>
+                            <td class="sp-mono">@ancestor.SourceTaxonId</td>
+                            <td>
+                                <span class="badge @(ancestor.Status == CommonStatus.Enabled ? "bg-success" : "bg-secondary")">@EnumReader.GetText(ancestor.Status)</span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="sp-empty">无祖先链数据（顶级分类或源站未提供）</div>
+        }
+    </div>
+</div>

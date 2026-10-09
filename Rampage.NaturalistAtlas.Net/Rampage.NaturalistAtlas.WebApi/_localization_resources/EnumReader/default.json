@@ -1,0 +1,36 @@
+{
+  "Success": "成功",
+  "Failure": "失败",
+  "NotLoggedIn": "未登录",
+  "Unauthorized": "未授权",
+  "PasswordIncorrect": "密码不正确",
+  "IncorrectAccount": "用户名或密码不正确",
+  "InvalidAccount": "账号不存在",
+  "DisabledAccount": "账号被禁用",
+  "TokenExpired": "凭据过期",
+  "InvalidToken": "凭据无效",
+  "RefreshToken": "凭据需要刷新",
+  "IllegalArguments": "参数非法",
+  "DataVerificationFailed": "数据验证失败",
+  "DataNotExists": "数据不存在",
+  "DataExists": "数据已存在",
+  "ExistsAssociatedData": "存在关联数据",
+  "OperationTooFrequent": "操作太频繁",
+  "IncorrectVerificationCode": "验证码错误",
+  "VerificationCodeExpired": "验证码已经过期或失效",
+
+  "ValidationResultCode.Success": "验证通过",
+  "ValidationResultCode.Warning": "验证通过，但存在问题",
+  "ValidationResultCode.Failure": "验证不通过",
+
+  "CommonStatus.Enabled": "启用",
+  "CommonStatus.Disabled": "禁用",
+  "UserGender.Unknown": "未知",
+  "UserGender.Male": "男性",
+  "UserGender.Female": "女性",
+  "YesOrNoStatus.Yes": "是",
+  "YesOrNoStatus.No": "否",
+  "RightOrWrongStatus.Correct": "正确",
+  "RightOrWrongStatus.Incorrect": "错误"
+
+}

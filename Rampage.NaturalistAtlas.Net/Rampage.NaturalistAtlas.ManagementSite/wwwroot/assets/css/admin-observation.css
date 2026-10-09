@@ -1,0 +1,35 @@
+/* =====================================================================
+   admin-observation.css — 内容治理模块（观察数据/举报工单）专属样式
+   ===================================================================== */
+
+/* --- 列表缩略图（75 方图） --- */
+.obs-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--sp-line, rgba(178, 226, 194, .1));
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.obs-thumb--empty {
+    color: var(--sp-text-secondary, #93b3a0);
+    background: rgba(190, 240, 205, .04);
+}
+
+.obs-thumb--lg {
+    width: 96px;
+    height: 96px;
+    border-radius: 10px;
+}
+
+/* --- 详情大图（中图 500 展示） --- */
+.obs-photo-large {
+    max-width: 100%;
+    max-height: 420px;
+    border-radius: 10px;
+    border: 1px solid var(--sp-line, rgba(178, 226, 194, .1));
+}

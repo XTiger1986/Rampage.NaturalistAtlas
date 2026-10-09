@@ -1,0 +1,208 @@
+﻿@model AdminDto
+@{
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    AdminDto Data = Model!;
+    List<ManageGroupDto> GroupList = ViewBag.GroupList;
+    List<AdminPermissionDto> AdminPermissionList = ViewBag.AdminPermissionList ?? new List<AdminPermissionDto>();
+    Dictionary<string, PermissionResourceInfo> ResourceDict = ViewBag.ResourceDict;
+    Dictionary<string, List<PermissionActionInfo>> ResourceActionListDict = ViewBag.ResourceActionListDict;
+
+    string PageTitle = Data.Id <= 0 ? GL.Get("AddAdmin", string.Empty)! : GL.GetText("EditTheAdmin", Data.DisplayName);
+    ViewBag.PageTitle = PageTitle;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-admin.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-outline-secondary" href="~/Admin/Admin_List"><i class="fa-solid fa-arrow-left me-1"></i>@(GL.Get("ReturnList"))</a>
+        @if (Data.Id > 0)
+        {
+            <a class="btn btn-primary" href="~/Admin/Admin_Add"><i class="fa-solid fa-plus me-1"></i>@(GL.Get("AddAdmin"))</a>
+        }
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title">@PageTitle</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form id="AdminEditForm" action="~/api/admin/save" method="post">
+            <div class="row mb-3">
+                <label for="txtUsername" class="col-sm-2 col-form-label">@GL.Get("Username")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtUsername" name="Username" class="form-control" placeholder="@GL.Get("Username")" value="@Data.Username" />
+                    <div class="invalid-feedback" verify-name="Username"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="txtPassword" class="col-sm-2 col-form-label">@GL.Get("Password")</label>
+                <div class="col-sm-10">
+                    <input type="password" id="txtPassword" name="Password" class="form-control" placeholder="@(GL.Get("Password"))@(Data.Id > 0 ? "(" + GL.Get("LeaveBlankNotModify") + ")" : "")" autocomplete="new-password" value="" />
+                    <div class="invalid-feedback" verify-name="Password"></div>
+                </div>
+            </div>
+            <div class="row mb-3" id="divPasswordConfirm" style="display:none;">
+                <label for="txtPasswordConfirm" class="col-sm-2 col-form-label">@GL.Get("ConfirmPassword")</label>
+                <div class="col-sm-10">
+                    <input type="password" id="txtPasswordConfirm" name="PasswordConfirm" class="form-control" placeholder="@GL.Get("ReenterPasswordToConfirm")" />
+                    <div class="invalid-feedback" verify-name="PasswordConfirm"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="txtTrueName" class="col-sm-2 col-form-label">@GL.Get("RealName")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtTrueName" name="TrueName" class="form-control" value="@Data.TrueName" />
+                    <div class="invalid-feedback" verify-name="TrueName"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="txtMobile" class="col-sm-2 col-form-label">@GL.Get("MobileNumber")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtMobile" name="Mobile" class="form-control" value="@Data.Mobile" />
+                    <div class="invalid-feedback" verify-name="Mobile"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="txtEmail" class="col-sm-2 col-form-label">@GL.Get("Email")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtEmail" name="Email" class="form-control" value="@Data.Email" />
+                    <div class="invalid-feedback" verify-name="Email"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@GL.Get("Gender")</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<UserGender> { FormItemId = "txtGender", FormItemName = "Gender", SelectedValue = Data.Gender }' />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@GL.Get("IsSuperAdministrator")</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_YesNoRadioBox.cshtml" model='new BooleanSelector { FormItemId = "txtIsMaster", FormItemName = "IsMaster", SelectedValue = Data.IsMaster }' />
+                    <div class="form-text">@GL.Get("IsSuperAdministratorExplanatoryEext")</div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@GL.Get("ManagementGroup")</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_ListCheckBox.cshtml" model='new ListSelector<ManageGroupDto, int, string> { FormItemId = "chkGroupIds", FormItemName = "GroupIds", ValueField = "Id", TextField = "Name", SelectedValues = Data.GroupIds, Data = GroupList }' />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="col-form-label">@GL.Get("Permissions")</label>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="chkAllResourceIds" data-wrap="@ResourceActionListDict.Count" />
+                    <label class="form-check-label" for="chkAllResourceIds">@GL.Get("SelectAll")</label>
+                </div>
+                <div class="table-responsive">
+                    <table class="table admin-perm-table">
+                        @foreach (var item in ResourceActionListDict)
+                        {
+                            var actionList = item.Value;
+                            if (actionList == null || !actionList.Any()) { continue; }
+                            PermissionResourceInfo resourceInfo = ResourceDict[item.Key];
+                            bool isChecked = AdminPermissionList.Any(p => StringTool.EqualsIgnoreCase(p.Resource, item.Key));
+                            <tr>
+                                <th style="width:22%;">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" value="@item.Key" id="chkResourceIds_@item.Key" name="ResourceIds" role="switch" @(isChecked ? "checked" : null) />
+                                        <label class="form-check-label" for="chkResourceIds_@item.Key">@resourceInfo.GetResourceText()</label>
+                                    </div>
+                                </th>
+                                <td>
+                                    @foreach (PermissionActionInfo actionInfo in actionList)
+                                    {
+                                        <span class="sp-tag">@actionInfo.GetTitle()</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@GL.Get("Status")</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<CommonStatus>{ FormItemId = "seltStatus", FormItemName = "Status", SelectedValue = Data.Status }' />
+                </div>
+            </div>
+
+            @if (Data.Id > 0)
+            {
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">@GL.Get("LastLoginTime")</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" value="@DateTimeTool.UtcToLocal(Data.LoginTime, CTZ).ToCommonString()" readonly />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">@GL.Get("LastLoginIP")</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" value="@Data.LoginIp" readonly />
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-center">
+                <input type="hidden" id="hdId" name="Id" value="@Data.Id" />
+                <button class="btn btn-primary px-5" type="submit">@(Data.Id <= 0 ? GL.Get("SubmitToAdd") : GL.Get("SubmitToSave"))</button>
+            </div>
+            <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        function handleAllCheckerStatus() {
+            var chkAll = $('#chkAllResourceIds');
+            var totalChecked = 0;
+            var tc = parseInt(chkAll.attr('data-wrap'), 10) || 0;
+            $('input[name=ResourceIds]').each(function () {
+                if ($(this).is(':checked')) totalChecked += 1;
+            });
+            chkAll.prop('checked', totalChecked >= tc && tc > 0);
+        }
+
+        $(function () {
+            RPG.FormSubmitter('AdminEditForm', {
+                validationHanlder: function (formData) {
+                    if (formData.Password && formData.Password.length > 0 && formData.Password !== formData.PasswordConfirm) {
+                        return { PasswordConfirm: '@(GL.Get("TheTwoPasswordEntriesDoNotMatch"))' };
+                    }
+                    return true;
+                },
+                completeHandler: function (jsonResult) {
+                    if (jsonResult.IsSuccess && parseInt($('#hdId').val(), 10) <= 0) {
+                        setTimeout(function () {
+                            location.href = '/Admin/Admin_Modify?AdminId=' + jsonResult.Data.Id;
+                        }, 800);
+                    }
+                },
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+
+            $('#txtPassword').on('keyup', function () {
+                $('#divPasswordConfirm').toggle(!!($(this).val() || '').length);
+            });
+
+            $('#chkAllResourceIds').on('click', function () {
+                $('input[name=ResourceIds]').prop('checked', $(this).is(':checked'));
+            });
+            $('input[name=ResourceIds]').on('click', handleAllCheckerStatus);
+            handleAllCheckerStatus();
+        });
+    </script>
+}

@@ -1,0 +1,16 @@
+/* =====================================================================
+   admin-city.css — 基础数据模块（城市/分类单元）专属样式
+   ===================================================================== */
+
+/* --- bbox 经纬度成对输入（City_Edit） --- */
+.city-bbox-pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 560px;
+}
+
+.city-bbox-pair .form-control {
+    flex: 1 1 200px;
+    min-width: 160px;
+}

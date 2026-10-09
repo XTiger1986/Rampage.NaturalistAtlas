@@ -1,0 +1,16 @@
+/* =====================================================================
+   admin-sync.css — 采集同步模块（任务/日志）专属样式
+   ===================================================================== */
+
+/* --- config JSON 原文预览块 --- */
+.sync-config-pre {
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--sp-line, rgba(178, 226, 194, .1));
+    border-radius: 8px;
+    background: rgba(190, 240, 205, .03);
+    color: var(--sp-text, #e9f4ec);
+    font-size: .82rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+}

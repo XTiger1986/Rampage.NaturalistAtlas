@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FluentScheduler" Version="5.5.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <ProjectReference Include="..\..\..\Rampage\Distributed\Rampage.RedisLibrary\Rampage.RedisLibrary.csproj" />
+    <ProjectReference Include="..\..\..\Rampage\Rampage.Web\Rampage.Web.csproj" />
+    <ProjectReference Include="..\..\..\Rampage\Rampage\Rampage.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.Common\Rampage.NaturalistAtlas.Common.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.DAL\Rampage.NaturalistAtlas.DAL.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.Model\Rampage.NaturalistAtlas.Model.csproj" />
+  </ItemGroup>
+
+</Project>

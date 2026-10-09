@@ -1,0 +1,42 @@
+﻿@{
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    CurrentAuthorizationInfo CurrentAuthorization = (CurrentAuthorizationInfo)ViewBag.CurrentAuthorization;
+    PermissionActionInfo? CurrentAction = CurrentAuthorization.CurrentAction;
+    ManageMenuDto? CurrentMenu = CurrentAuthorization.CurrentMenu;
+    List<MenuBreadCrumb>? MenuBreadCrumbList = CurrentAuthorization.MenuBreadCrumbList;
+
+    string pageTitle = CurrentAction != null
+        ? (CurrentAction.GetTitle() ?? string.Empty)
+        : Convert.ToString(ViewBag.PageTitle) ?? string.Empty;
+}
+
+<div class="sp-page-head-main">
+    <h1 class="sp-page-title">@pageTitle</h1>
+    <ol class="sp-breadcrumb">
+        <li><a href="~/">@(GL.Get("Dashboard", "管理首页"))</a></li>
+        @if (MenuBreadCrumbList != null && MenuBreadCrumbList.Any())
+        {
+            foreach (MenuBreadCrumb menu in MenuBreadCrumbList)
+            {
+                var title = menu.ActionInfo != null ? menu.ActionInfo.GetTitle() : menu.Title;
+                var isActive = CurrentMenu != null && CurrentMenu.Id == menu.Id;
+                <li class="@(isActive ? "active" : "")">
+                    @if (string.IsNullOrEmpty(menu.Url) || isActive)
+                    {
+                        <span>@title</span>
+                    }
+                    else
+                    {
+                        <a href="@menu.Url">@title</a>
+                    }
+                </li>
+            }
+        }
+        else if (!string.IsNullOrEmpty(pageTitle))
+        {
+            <li class="active"><span>@pageTitle</span></li>
+        }
+    </ol>
+</div>

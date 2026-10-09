@@ -1,0 +1,164 @@
+@model ListViewData<ObservationRowDto, ObservationAdminFilter>
+@{
+    // 观察数据列表：多条件筛选 + 行内隐藏/恢复；右上角提供按作者批量隐藏
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    List<ObservationRowDto> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    ObservationAdminFilter DataFilter = Model!.DataFilter;
+    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> CityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-observation.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <form id="HideByAuthorForm" class="d-flex gap-2" onsubmit="return false;">
+            <input type="text" id="txtHideAuthor" class="form-control" style="width:180px" placeholder="观察者昵称" />
+            <button type="button" id="btnHideByAuthor" class="btn btn-danger" title="将该观察者名下全部正常观察置为隐藏">
+                <i class="fa-solid fa-user-slash me-1"></i>按作者隐藏
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-binoculars me-2"></i>观察数据列表</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form class="sp-toolbar" action="~/Observation/Observation_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                <select name="CityId" class="form-select" style="width:120px">
+                    <option value="">全部城市</option>
+                    @foreach (var city in CityList)
+                    {
+                        <option value="@city.Id" selected="@(DataFilter.CityId == city.Id)">@city.DisplayName</option>
+                    }
+                </select>
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<IconicTaxon> { FormItemId = "seltIconic", FormItemName = "IconicTaxon", Css = "form-select", Style = "width:120px", DefaultText = "全部类群", DefaultValue = "", SelectedValue = DataFilter.IconicTaxon }' />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<QualityGrade> { FormItemId = "seltGrade", FormItemName = "QualityGrade", Css = "form-select", Style = "width:130px", DefaultText = "全部级别", DefaultValue = "", SelectedValue = DataFilter.QualityGrade }' />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<ObservationStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = DataFilter.Source }' />
+            </div>
+            <div class="sp-toolbar__filters">
+                <input type="text" name="UserLogin" class="form-control" style="width:150px" placeholder="观察者昵称" value="@DataFilter.UserLogin" />
+                <input type="text" name="SourceObservationId" class="form-control sp-mono" style="width:170px" placeholder="源站观察ID" value="@DataFilter.SourceObservationId" />
+                <input type="text" name="TaxonId" class="form-control sp-mono" style="width:190px" placeholder="分类单元Id（雪花）" value="@DataFilter.TaxonId" />
+                <span class="sp-toolbar__label">观察日期</span>
+                <input type="date" name="ObservedOnFrom" class="form-control" style="width:150px" value="@(DataFilter.ObservedOnFrom?.ToString("yyyy-MM-dd"))" />
+                <span class="sp-toolbar__label">至</span>
+                <input type="date" name="ObservedOnTo" class="form-control" style="width:150px" value="@(DataFilter.ObservedOnTo?.ToString("yyyy-MM-dd"))" />
+                @{
+                    string sort = ViewBag.Sort as string ?? "create_desc";
+                }
+                <select name="Sort" class="form-select" style="width:150px">
+                    <option value="create_desc" selected="@(sort == "create_desc")">入库时间 新→旧</option>
+                    <option value="create_asc" selected="@(sort == "create_asc")">入库时间 旧→新</option>
+                    <option value="observed_desc" selected="@(sort == "observed_desc")">观察日期 新→旧</option>
+                    <option value="observed_asc" selected="@(sort == "observed_asc")">观察日期 旧→新</option>
+                </select>
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <button type="button" id="btnExportObsCsv" class="btn btn-outline-success" title="按当前筛选导出最多 5000 行 CSV">
+                    <i class="fa-solid fa-file-csv me-1"></i>导出 CSV
+                </button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>照片</th>
+                        <th>源站ID</th>
+                        <th>分类</th>
+                        <th>类群</th>
+                        <th>级别</th>
+                        <th>城市</th>
+                        <th>观察日期</th>
+                        <th>观察者</th>
+                        <th>状态</th>
+                        <th>入库</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.PhotoSquareUrl))
+                                {
+                                    <img class="obs-thumb" src="@item.PhotoSquareUrl" alt="" loading="lazy" referrerpolicy="no-referrer" />
+                                }
+                                else
+                                {
+                                    <span class="obs-thumb obs-thumb--empty"><i class="fa-regular fa-image"></i></span>
+                                }
+                            </td>
+                            <td class="sp-mono">@item.SourceObservationId</td>
+                            <td>
+                                <div>@(string.IsNullOrWhiteSpace(item.TaxonScientificName) ? "-" : item.TaxonScientificName)</div>
+                                @if (!string.IsNullOrWhiteSpace(item.TaxonCommonNameCn))
+                                {
+                                    <div class="text-muted small">@item.TaxonCommonNameCn</div>
+                                }
+                            </td>
+                            <td><span class="badge text-bg-light">@EnumReader.GetText(item.IconicTaxon)</span></td>
+                            <td>@EnumReader.GetText(item.QualityGrade)</td>
+                            <td>@(item.CityName ?? item.CityId.ToString())</td>
+                            <td>@item.ObservedOn.ToString("yyyy-MM-dd")</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.UserLogin) ? "-" : item.UserLogin)</td>
+                            <td>
+                                <span class="badge @(item.Status == ObservationStatus.Normal ? "bg-success" : (item.Status == ObservationStatus.Hidden ? "bg-warning" : "bg-secondary"))">@EnumReader.GetText(item.Status)</span>
+                            </td>
+                            <td>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</td>
+                            <td class="text-nowrap">
+                                <a href="~/Observation/Observation_Detail?ObservationId=@(item.Id)" class="btn btn-sm btn-info">
+                                    <i class="fa-solid fa-magnifying-glass me-1"></i>详情
+                                </a>
+                                @if (item.Status == ObservationStatus.Normal)
+                                {
+                                    <button type="button" data-id="@item.Id" data-status="1" data-action="obs-status" class="btn btn-sm btn-warning">
+                                        <i class="fa-solid fa-eye-slash me-1"></i>隐藏
+                                    </button>
+                                }
+                                else if (item.Status == ObservationStatus.Hidden)
+                                {
+                                    <button type="button" data-id="@item.Id" data-status="0" data-action="obs-status" class="btn btn-sm btn-success">
+                                        <i class="fa-solid fa-eye me-1"></i>恢复
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="11" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/js/admin-observation.js?v=@AppInfo.ResVer"></script>
+}

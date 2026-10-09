@@ -1,0 +1,48 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "DatabaseFactory": {
+    "DataAccessTypeName": "Rampage.Dapper.DapperDataAccessor, Rampage.Dapper",
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "Type": "PostgreSQL",
+        "ConnectionString": "Host=127.0.0.1;Port=5432;Database=naturalist;Username=rampage;Password=rampage;"
+      }
+    ]
+  },
+  "JwtAuthenticationConfig": {
+    "Rampage.SourceX": {
+      "SecretKey": "af4f4532c14f23615c6db3da5353a2a3547cc9e2f026ee4d5bdaa605dd48e29ed66a780c6bf57de00196a6845432a273184b30ced27224d09f57490696042f67",
+      "Issuer": "NaturalistAtlas",
+      "Audience": "NaturalistAtlas.Client",
+      "ExpiredSeconds": 300,
+      "RefreshExpiredSeconds": 86400
+    },
+    "Rampage.NaturalistAtlas.Api": {
+      "SecretKey": "1cb3b8e74d290c3d8d8413e6994af508449f9a022075ecf726b7ad8e06f46b0da9b7f328d8bd89a47714071eb8584f3546b82b0ca89c10e3f4c326d3d82fa15e",
+      "Issuer": "NaturalistAtlas.WebApi",
+      "Audience": "NaturalistAtlas.WebApi.Client",
+      "ExpiredSeconds": 300,
+      "RefreshExpiredSeconds": 86400
+    }
+  },
+  "Cors": {
+    "AllowLocalhost": false,
+    "AllowedOrigins": [
+      "https://www.example.com",
+      "https://m.example.com"
+    ]
+  },
+  "RedisResilience": {
+    "RequireLockForCriticalWrites": true,
+    "IdempotencySoftFail": true
+  },
+  "SignalR": {
+    "UseRedisBackplane": true
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "Cors": {
+    "Enabled": false,
+    "AllowLocalhost": false,
+    "AllowedOrigins": [
+      "https://www.example.com",
+      "https://m.example.com"
+    ]
+  },
+  "DatabaseFactory": {
+    "DataAccessTypeName": "Rampage.Dapper.DapperDataAccessor, Rampage.Dapper",
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "Type": "PostgreSQL",
+        "ConnectionString": "Host=127.0.0.1;Port=5432;Database=naturalist;Username=rampage;Password=rampage;"
+      },
+      {
+        "Name": "RampageManagement",
+        "Type": "PostgreSQL",
+        "ConnectionString": "Host=127.0.0.1;Port=5432;Database=naturalist_management;Username=rampage;Password=rampage;"
+      }
+    ]
+  },
+  "SuperHttpClients": {
+    "Clients": [
+      {
+        "Name": "NaturalistAtlasApi",
+        "Root": "http://localhost:5214/"
+      },
+      {
+        "Name": "NaturalistAtlasFileStorage",
+        "Root": "http://localhost:5258/"
+      }
+    ]
+  },
+  "JwtAuthenticationConfig": {
+    "Rampage.Management": {
+      "SecretKey": "30d117f4aa3bd40363fc76efccda1308d9330c180262d7ab14cc6bc36b142871ab03fd71642561a343e9fa8e2348cc60a82238096688ad5c085417fee648f464",
+      "Issuer": "Rampage.Management",
+      "Audience": "Rampage.Management.Client",
+      "ExpiredSeconds": 300,
+      "RefreshExpiredSeconds": 86400
+    }
+  }
+}

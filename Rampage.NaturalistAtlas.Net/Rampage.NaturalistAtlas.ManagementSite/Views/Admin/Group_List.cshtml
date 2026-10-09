@@ -1,0 +1,81 @@
+﻿@model ListViewData<ManageGroupDto>
+@{
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    List<ManageGroupDto> DataList = Model!.DataList;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-admin.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-primary" href="~/Admin/Group_Add"><i class="fa-solid fa-plus me-1"></i>@GL.Get("AddAdminGroup")</a>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title">@GL.Get("AdminGroupList")</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>@GL.Get("Name")</th>
+                        <th>@GL.Get("Description")</th>
+                        <th>@GL.Get("Status")</th>
+                        <th>@GL.Get("CreatedTime")/@GL.Get("UpdateTime")</th>
+                        <th>@GL.Get("Operations")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>@item.Id</td>
+                            <td>@item.Name</td>
+                            <td>@item.Description</td>
+                            <td>
+                                <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-danger")">@EnumReader.GetText(item.Status)</span>
+                            </td>
+                            <td>
+                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, CTZ).ToCommonString()</div>
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="~/Admin/Group_Modify?GroupId=@(item.Id)" class="btn btn-sm btn-info">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                </a>
+                                <button type="button" data-id="@item.Id" data-action="delete-group" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/js/admin-admin.js?v=@AppInfo.ResVer"></script>
+    <script>
+        AdminPages.bindDelete('[data-action=delete-group]', function (id) {
+            return '/api/admin/group/delete/' + id;
+        }, '@(GL.Get("ConfirmDeleteAdminGroupText"))');
+    </script>
+}

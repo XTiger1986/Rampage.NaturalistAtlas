@@ -1,0 +1,137 @@
+/*
+ * 设计令牌（Design Tokens）
+ *
+ * 所有界面颜色/字体/圆角/阴影/毛玻璃参数只在此定义，组件一律通过 Tailwind 语义类
+ * （bg-surface、text-ink、border-line、text-accent …，映射见 styles/main.css 的 @theme inline）
+ * 或 var(--c-xxx) 使用，禁止硬编码色值——否则主题切换会失效。
+ *
+ * 主题通过 <html data-theme="journal|night|spectrum"> 切换（stores/theme.ts 负责写入）。
+ */
+
+/* ========== 共享令牌（与主题无关） ========== */
+:root {
+  /* 字体：正文无衬线，标题按主题切换 */
+  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-serif: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  /* 布局尺寸 */
+  --topbar-h: 56px;
+  --panel-w: 420px;
+  --z-map: 0;
+  --z-overlay: 10;
+  --z-panel: 20;
+  --z-topbar: 30;
+  --z-modal: 50;
+
+  /* 动效曲线与时长 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 150ms;
+  --dur-base: 260ms;
+  --dur-slow: 480ms;
+}
+
+/* ========== 方案 A：博物志·纸本（Field Journal） ==========
+ * 暖米纸 + 墨色文字 + 赭石强调；标题用宋体；面板为不透明纸片，1px 墨线描边，几乎无阴影
+ */
+[data-theme='journal'] {
+  color-scheme: light;
+  --c-bg: #efe6d2;
+  --c-surface: #fbf7ee;
+  --c-surface-2: #f3ecdc;
+  --c-surface-glass: rgba(251, 247, 238, 0.96);
+  --c-line: #d6c7a6;
+  --c-line-strong: #3b2f22;
+  --c-ink: #2b2118;
+  --c-ink-2: #5a4a38;
+  --c-ink-3: #8c7a62;
+  --c-accent: #7a4f2a;
+  --c-accent-soft: rgba(122, 79, 42, 0.12);
+  --c-accent-ink: #fbf7ee;
+  --c-danger: #a8423c;
+  --c-warn: #b8913a;
+
+  --font-display: var(--font-serif);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --panel-blur: 0px;
+  --panel-shadow: 0 1px 0 rgba(59, 47, 34, 0.08), 0 8px 24px -12px rgba(59, 47, 34, 0.25);
+  --card-shadow: 2px 3px 0 rgba(59, 47, 34, 0.18);
+  --card-border: 1px solid #3b2f22;
+  /* 标本签卡片：白纸 + 红色标签线 */
+  --card-label-line: #a8423c;
+  /* 聚合簇：墨线环 */
+  --cluster-ring: #2b2118;
+  --glow: none;
+  /* 纸纹背景（SVG 噪点，极轻） */
+  --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .23 0 0 0 0 .18 0 0 0 0 .13 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ========== 方案 B：夜观·萤火（Night Safari，默认） ==========
+ * 深林夜色 + 玻璃拟态面板 + 萤火绿强调；类群点自带光晕
+ */
+[data-theme='night'] {
+  color-scheme: dark;
+  --c-bg: #0b1512;
+  --c-surface: #14231f;
+  --c-surface-2: #1b2e29;
+  --c-surface-glass: rgba(14, 26, 23, 0.62);
+  --c-line: rgba(160, 220, 190, 0.14);
+  --c-line-strong: rgba(160, 220, 190, 0.32);
+  --c-ink: #e7f3ec;
+  --c-ink-2: #a9c2b6;
+  --c-ink-3: #6f8a7e;
+  --c-accent: #7cf2b0;
+  --c-accent-soft: rgba(124, 242, 176, 0.14);
+  --c-accent-ink: #062014;
+  --c-danger: #ff6b7d;
+  --c-warn: #ffd35a;
+
+  --font-display: var(--font-body);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --panel-blur: 18px;
+  --panel-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+  --card-border: 1px solid rgba(160, 220, 190, 0.18);
+  --card-label-line: transparent;
+  --cluster-ring: rgba(255, 255, 255, 0.85);
+  --glow: 0 0 18px 2px currentColor;
+  --paper-texture: none;
+}
+
+/* ========== 方案 C：四季·光谱（Seasonal Spectrum） ==========
+ * 明亮通透 + 大照片卡 + 柔和阴影；--c-accent 由 stores/theme.ts 按时间滑块月份动态覆写
+ */
+[data-theme='spectrum'] {
+  color-scheme: light;
+  --c-bg: #f7f9fb;
+  --c-surface: #ffffff;
+  --c-surface-2: #f1f4f7;
+  --c-surface-glass: rgba(255, 255, 255, 0.82);
+  --c-line: #e3e8ee;
+  --c-line-strong: #c9d2dc;
+  --c-ink: #17202b;
+  --c-ink-2: #4a5665;
+  --c-ink-3: #8a96a5;
+  --c-accent: #2f9e5b;
+  --c-accent-soft: color-mix(in srgb, var(--c-accent) 14%, transparent);
+  --c-accent-ink: #ffffff;
+  --c-danger: #e11d48;
+  --c-warn: #eab308;
+
+  --font-display: var(--font-body);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --panel-blur: 14px;
+  --panel-shadow: 0 18px 40px -18px rgba(23, 32, 43, 0.25);
+  --card-shadow: 0 12px 28px -12px rgba(23, 32, 43, 0.35);
+  --card-border: 0 solid transparent;
+  --card-label-line: transparent;
+  --cluster-ring: #ffffff;
+  --glow: none;
+  --paper-texture: none;
+}

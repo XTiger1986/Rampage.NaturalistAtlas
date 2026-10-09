@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Rampage\DatabaseLibrary\Rampage.Dapper\Rampage.Dapper.csproj" />
+    <ProjectReference Include="..\..\..\Rampage\DatabaseLibrary\Rampage.DatabaseLibrary.PostgreSQL\Rampage.DatabaseLibrary.PostgreSQL.csproj" />
+    <ProjectReference Include="..\..\..\Rampage\Distributed\Rampage.RedisLibrary\Rampage.RedisLibrary.csproj" />
+    <ProjectReference Include="..\..\..\Rampage\Rampage.Web\Rampage.Web.csproj" />
+    <ProjectReference Include="..\..\..\Rampage\Rampage\Rampage.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.BLL\Rampage.NaturalistAtlas.BLL.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.Common\Rampage.NaturalistAtlas.Common.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.Model\Rampage.NaturalistAtlas.Model.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,77 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "SecurityUtility": {
+    "AES_KEY": "xtiger1986_rampage__naturalist__"
+  },
+  "Cors": {
+    "Enabled": false,
+    "AllowLocalhost": true,
+    "AllowedOrigins": []
+  },
+  "ForwardedHeaders": {
+    "Enabled": false,
+    "KnownProxies": [ "127.0.0.1" ],
+    "KnownNetworks": [],
+    "ForwardLimit": 1,
+    "ClientIpMode": "Connection"
+  },
+  "DatabaseFactory": {
+    "DataAccessTypeName": "Rampage.Dapper.DapperDataAccessor, Rampage.Dapper",
+    "UnmappedModelFallback": "NaturalistAtlas",
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "Type": "PostgreSQL",
+        "ConnectionString": "Host=127.0.0.1;Port=5432;Database=naturalist;Username=rampage;Password=rampage;"
+      },
+      {
+        "Name": "RampageManagement",
+        "Type": "PostgreSQL",
+        "ConnectionString": "Host=127.0.0.1;Port=5432;Database=naturalist_management;Username=rampage;Password=rampage;"
+      }
+    ]
+  },
+  "RedisFactory": {
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "ConnectionString": "127.0.0.1:6379,connectTimeout=3000,syncTimeout=5000,abortConnect=false",
+        "PrefixKey": "NaturalistAtlas"
+      }
+    ]
+  },
+  "RedisResilience": {
+    "RequireLockForCriticalWrites": true,
+    "IdempotencySoftFail": true
+  },
+  "SuperHttpClients": {
+    "Clients": [
+      {
+        "Name": "NaturalistAtlasApi",
+        "Root": "http://localhost:5214/"
+      },
+      {
+        "Name": "NaturalistAtlasFileStorage",
+        "Root": "http://localhost:5258/"
+      }
+    ]
+  },
+  "JwtAuthenticationConfig": {
+    "Rampage.Management": {
+      "SecretKey": "c6023ba8e27899b122e7255bb4ff6f57e5487e337bf98e1d235287860f354387fa6cfda5983dfd56c38d1f00510ea729766929c070c41435bcadac8ed6aba26a",
+      "Issuer": "Rampage.Management",
+      "Audience": "Rampage.Management.Client",
+      "ExpiredSeconds": 300,
+      "RefreshExpiredSeconds": 86400
+    }
+  },
+  "Management": {
+    "WorkerId": 3
+  }
+}

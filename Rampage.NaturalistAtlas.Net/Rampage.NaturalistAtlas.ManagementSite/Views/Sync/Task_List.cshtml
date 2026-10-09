@@ -1,0 +1,115 @@
+@model ListViewData<SyncCursor, SyncCursorAdminFilter>
+@{
+    // 采集任务列表：水位与上次运行状态；「手动触发」按钮预留禁用（待采集端接入）
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    List<SyncCursor> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    SyncCursorAdminFilter DataFilter = Model!.DataFilter;
+    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> CityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
+    Dictionary<int, string> CityNameDict = ViewBag.CityNameDict ?? new Dictionary<int, string>();
+    List<string> TaskOptions = Rampage.NaturalistAtlas.Model.Enums.SyncTaskCodes.All.ToList();
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-sync.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-cloud-arrow-down me-2"></i>采集任务</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="setting-hint">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            任务由采集端（Collector）按计划执行；此处展示水位与运行状态，可调整任务参数。手动触发将在采集端接入后开放。
+        </div>
+
+        <form class="sp-toolbar" action="~/Sync/Task_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = DataFilter.Source }' />
+                <select name="CityId" class="form-select" style="width:120px">
+                    <option value="">全部城市</option>
+                    @foreach (var city in CityList)
+                    {
+                        <option value="@city.Id" selected="@(DataFilter.CityId == city.Id)">@city.DisplayName</option>
+                    }
+                </select>
+                <select name="Task" class="form-select" style="width:150px">
+                    <option value="">全部任务类型</option>
+                    @foreach (var task in TaskOptions)
+                    {
+                        <option value="@task" selected="@(DataFilter.Task == task)">@SyncTaskCodes.LabelOf(task)</option>
+                    }
+                </select>
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<CursorRunStatus> { FormItemId = "seltStatus", FormItemName = "LastRunStatus", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.LastRunStatus }' />
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>数据源</th>
+                        <th>城市</th>
+                        <th>任务类型</th>
+                        <th>增量水位</th>
+                        <th>上次运行</th>
+                        <th>上次运行摘要</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>@item.Id</td>
+                            <td>@EnumReader.GetText(item.Source)</td>
+                            <td>@(CityNameDict.TryGetValue(item.CityId, out string? cityName) ? cityName : item.CityId.ToString())</td>
+                            <td><code class="sp-mono" title="@item.Task">@SyncTaskCodes.LabelOf(item.Task)</code></td>
+                            <td>@(item.Watermark.HasValue ? DateTimeTool.UtcToLocal(item.Watermark.Value, CTZ).ToCommonString() : "未开始")</td>
+                            <td>
+                                <div>
+                                    <span class="badge @(item.LastRunStatus == CursorRunStatus.Success ? "bg-success" : (item.LastRunStatus == CursorRunStatus.Failed ? "bg-danger" : (item.LastRunStatus == CursorRunStatus.CircuitSkipped ? "bg-secondary" : "bg-warning")))">@EnumReader.GetText(item.LastRunStatus)</span>
+                                </div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.LastRunTime, CTZ).ToCommonString()</div>
+                            </td>
+                            <td style="max-width:280px" class="small">@(string.IsNullOrWhiteSpace(item.LastRunMessage) ? "-" : item.LastRunMessage)</td>
+                            <td class="text-nowrap">
+                                <a href="~/Sync/Task_Edit?Id=@(item.Id)" class="btn btn-sm btn-info">
+                                    <i class="fa-solid fa-sliders me-1"></i>参数
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled
+                                        title="待采集端（Collector）接入触发机制后开放">
+                                    <i class="fa-solid fa-play me-1"></i>触发
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>

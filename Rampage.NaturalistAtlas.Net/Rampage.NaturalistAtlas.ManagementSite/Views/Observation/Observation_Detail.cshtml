@@ -1,0 +1,176 @@
+@model ObservationDetailDto
+@{
+    // 观察详情：照片 + 档案字段 + 分类/城市 + 举报记录；顶部隐藏/恢复操作
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    ObservationDetailDto Data = Model!;
+    var obs = Data.Observation;
+    ViewBag.PageTitle = $"观察详情 - {obs.SourceObservationId}";
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-observation.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-outline-secondary" href="~/Observation/Observation_List"><i class="fa-solid fa-arrow-left me-1"></i>返回列表</a>
+        @if (obs.Status == ObservationStatus.Normal)
+        {
+            <button type="button" data-id="@obs.Id" data-status="1" data-action="obs-status" class="btn btn-warning">
+                <i class="fa-solid fa-eye-slash me-1"></i>隐藏
+            </button>
+        }
+        else if (obs.Status == ObservationStatus.Hidden)
+        {
+            <button type="button" data-id="@obs.Id" data-status="0" data-action="obs-status" class="btn btn-success">
+                <i class="fa-solid fa-eye me-1"></i>恢复
+            </button>
+        }
+        <a class="btn btn-outline-info" href="~/Report/Report_List?ObservationId=@(obs.Id)">
+            <i class="fa-solid fa-flag me-1"></i>举报记录
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="sp-panel">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-camera me-2"></i>首图</h2>
+            </div>
+            <div class="sp-panel__bd text-center">
+                @if (!string.IsNullOrEmpty(obs.PhotoLargeUrl))
+                {
+                    <a href="@obs.PhotoLargeUrl" target="_blank" rel="noopener noreferrer">
+                        <img class="obs-photo-large" src="@(obs.PhotoMediumUrl ?? obs.PhotoLargeUrl)" alt="观察首图" referrerpolicy="no-referrer" />
+                    </a>
+                    <div class="text-muted small mt-2">点击查看 1024 大图 · 授权：@EnumReader.GetText(obs.License)</div>
+                }
+                else
+                {
+                    <div class="sp-empty"><i class="fa-regular fa-image me-1"></i>无照片</div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="sp-panel mb-3">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title">
+                    <i class="fa-solid fa-binoculars me-2"></i>@(string.IsNullOrWhiteSpace(Data.Taxon?.ScientificName) ? "观察档案" : Data.Taxon!.ScientificName)
+                </h2>
+                <span class="badge @(obs.Status == ObservationStatus.Normal ? "bg-success" : (obs.Status == ObservationStatus.Hidden ? "bg-warning" : "bg-secondary"))">@EnumReader.GetText(obs.Status)</span>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">中文常用名</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(Data.Taxon?.CommonNameCn) ? "-" : Data.Taxon!.CommonNameCn)</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">类群 / 鉴定级别</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(obs.IconicTaxon) · @EnumReader.GetText(obs.QualityGrade) · 鉴定 @obs.IdentificationsCount 次</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">观察日期 / 时刻</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@obs.ObservedOn.ToString("yyyy-MM-dd")@(obs.ObservedAt.HasValue ? " " + DateTimeTool.UtcToLocal(obs.ObservedAt.Value, CTZ).ToCommonString() : "（仅日期）")</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">公开坐标</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@obs.Lng.ToString("0.######"), @obs.Lat.ToString("0.######")@(obs.PositionalAccuracy.HasValue ? $"（精度 ±{obs.PositionalAccuracy}m）" : "") · @EnumReader.GetText(obs.Geoprivacy)</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">观察者</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@obs.UserLogin</p></div>
+                </div>
+                @if (obs.RecordBasis.HasValue)
+                {
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">记录类型</label>
+                        <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(obs.RecordBasis.Value)</p></div>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(obs.DatasetTitle))
+                {
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">数据发布机构</label>
+                        <div class="col-sm-9"><p class="form-control-plaintext">@obs.DatasetTitle <span class="text-muted small sp-mono">(@obs.DatasetKey)</span></p></div>
+                    </div>
+                }
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">来源 / 源站ID</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(obs.Source) · <span class="sp-mono">@obs.SourceObservationId</span></p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">所属城市</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@(Data.CityName ?? obs.CityId.ToString())</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">本地Id</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@obs.Id</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">源站发布 / 更新</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@(obs.SourceCreatedAt.HasValue ? DateTimeTool.UtcToLocal(obs.SourceCreatedAt.Value, CTZ).ToCommonString() : "-") / @(obs.SourceUpdatedAt.HasValue ? DateTimeTool.UtcToLocal(obs.SourceUpdatedAt.Value, CTZ).ToCommonString() : "-")</p></div>
+                </div>
+                <div class="row mb-2">
+                    <label class="col-sm-3 col-form-label">入库 / 修改</label>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@DateTimeTool.UtcToLocal(obs.CreateTime, CTZ).ToCommonString() / @DateTimeTool.UtcToLocal(obs.UpdateTime, CTZ).ToCommonString()</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-flag me-2"></i>举报记录</h2>
+        <a class="btn btn-sm btn-outline-info" href="~/Report/Report_List?ObservationId=@(obs.Id)">在工单中查看</a>
+    </div>
+    <div class="sp-panel__bd">
+        @if (Data.ReportList.Count > 0)
+        {
+            <div class="sp-table-wrap">
+                <table class="table table-hover sp-table">
+                    <thead>
+                        <tr>
+                            <th>原因</th>
+                            <th>说明</th>
+                            <th>联系方式</th>
+                            <th>工单状态</th>
+                            <th>提交时间</th>
+                            <th>处理时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var report in Data.ReportList)
+                    {
+                        <tr>
+                            <td>@EnumReader.GetText(report.Reason)</td>
+                            <td>@(string.IsNullOrWhiteSpace(report.Content) ? "-" : report.Content)</td>
+                            <td>@(string.IsNullOrWhiteSpace(report.Contact) ? "-" : report.Contact)</td>
+                            <td>
+                                <span class="badge @(report.Status == ReportStatus.Pending ? "bg-warning" : (report.Status == ReportStatus.Hidden ? "bg-success" : "bg-secondary"))">@EnumReader.GetText(report.Status)</span>
+                            </td>
+                            <td>@DateTimeTool.UtcToLocal(report.CreateTime, CTZ).ToCommonString()</td>
+                            <td>@(report.HandleTime.HasValue ? DateTimeTool.UtcToLocal(report.HandleTime.Value, CTZ).ToCommonString() : "-")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="sp-empty">该观察暂无举报记录</div>
+        }
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/js/admin-observation.js?v=@AppInfo.ResVer"></script>
+}

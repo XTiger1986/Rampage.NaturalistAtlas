@@ -1,0 +1,186 @@
+/*
+ * 全局样式入口 / Global stylesheet entry
+ * - Tailwind CSS v4（CSS 优先配置）； / - Tailwind CSS v4 (CSS-first configuration);
+ * - 设计令牌见 ../theme/tokens.css；此处通过 @theme inline 把令牌映射为 Tailwind 语义工具类， / - Design tokens live in ../theme/tokens.css; @theme inline here maps them to Tailwind semantic utilities,
+ *   例如 bg-surface / text-ink / border-line / text-accent / rounded-panel / font-display。 / e.g. bg-surface / text-ink / border-line / text-accent / rounded-panel / font-display.
+ */
+@import 'tailwindcss';
+@import '../theme/tokens.css';
+
+/* 暗色变体跟随 data-theme="night"，而非系统偏好 / The dark variant follows data-theme="night", not the system preference */
+@custom-variant dark (&:where([data-theme='night'], [data-theme='night'] *));
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-glass: var(--c-surface-glass);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+  --color-accent: var(--c-accent);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-accent-ink: var(--c-accent-ink);
+  --color-danger: var(--c-danger);
+  --color-warn: var(--c-warn);
+
+  --radius-panel: var(--radius-lg);
+  --radius-card: var(--radius-md);
+  --radius-chip: var(--radius-sm);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+/* ========== 基础 / Base ========== */
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--c-bg);
+  color: var(--c-ink);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden; /* 应用为全屏地图，滚动只发生在面板内部 / the app is a fullscreen map; scrolling happens only inside panels */
+}
+
+/* 主题切换时颜色平滑过渡（仅颜色类属性，避免影响布局动画） / Smooth color transition on theme switch (color-type properties only, so layout animations are unaffected) */
+body,
+.glass-panel,
+.theme-transition {
+  transition:
+    background-color var(--dur-slow) var(--ease-out),
+    color var(--dur-slow) var(--ease-out),
+    border-color var(--dur-slow) var(--ease-out);
+}
+
+/* 纸本主题：全局纸纹（z 低于 modal：大图/对话框不受纸纹污染） / Journal theme: global paper texture (z below modals: lightboxes/dialogs stay unpolluted) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--paper-texture);
+  z-index: 40;
+  mix-blend-mode: multiply;
+}
+
+/* 通用淡入淡出（HUD 提示条等 Vue <Transition name="fade">） / Generic fade (for Vue <Transition name="fade">, e.g. HUD toast bars) */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 触控目标扩展：视觉尺寸不变，命中区向外扩 8px（Apple HIG ≥44pt 的折中实现， / Touch-target expansion: visual size unchanged, hit area grows 8px outward (a compromise toward Apple HIG ≥44pt,
+   用于图例芯片/鉴定按钮/抽屉把手等小控件；不拦截相邻元素之外的区域） / for small controls like legend chips/verify buttons/drawer handles; never intercepts beyond adjacent elements) */
+.hit-expand {
+  position: relative;
+}
+.hit-expand::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+/* ========== 组件级通用样式 / Shared component styles ========== */
+
+/* 浮层面板：毛玻璃（night/spectrum）或纸片（journal） / Overlay panel: frosted glass (night/spectrum) or paper sheet (journal) */
+.glass-panel {
+  background: var(--c-surface-glass);
+  backdrop-filter: blur(var(--panel-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--panel-blur)) saturate(1.4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--panel-shadow);
+}
+
+/* 标题字体（纸本主题为宋体） / Display font (serif under the journal theme) */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+/* 细滚动条 / Thin scrollbar */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line-strong) transparent;
+}
+
+/* 数字等宽，统计卡片使用 / Tabular numerals, used by stat cards */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========== MapLibre 控件主题化 / MapLibre control theming ========== */
+.maplibregl-ctrl-attrib {
+  background: var(--c-surface-glass) !important;
+  color: var(--c-ink-3) !important;
+  font-size: 10px;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--c-ink-2) !important;
+}
+.maplibregl-ctrl-scale {
+  background: var(--c-surface-glass) !important;
+  color: var(--c-ink-2) !important;
+  border-color: var(--c-ink-3) !important;
+}
+.maplibregl-ctrl-group {
+  background: var(--c-surface-glass) !important;
+  border: 1px solid var(--c-line) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--panel-shadow) !important;
+  backdrop-filter: blur(var(--panel-blur));
+}
+.maplibregl-ctrl-group button + button {
+  border-top-color: var(--c-line) !important;
+}
+[data-theme='night'] .maplibregl-ctrl-icon {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* ========== 动效 / Motion ========== */
+
+/* 聚合簇呼吸光晕（夜观主题） / Cluster breathing halo (night theme) */
+@keyframes firefly-breath {
+  0%,
+  100% {
+    box-shadow: 0 0 10px 1px var(--cluster-color);
+  }
+  50% {
+    box-shadow: 0 0 22px 6px var(--cluster-color);
+  }
+}
+
+/* 面板进入 / Panel enter */
+.panel-enter-active,
+.panel-leave-active {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
+}
+.panel-enter-from,
+.panel-leave-to {
+  transform: translateX(-16px);
+  opacity: 0;
+}
+
+/* 尊重系统"减少动态效果"偏好 / Respect the system "reduce motion" preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

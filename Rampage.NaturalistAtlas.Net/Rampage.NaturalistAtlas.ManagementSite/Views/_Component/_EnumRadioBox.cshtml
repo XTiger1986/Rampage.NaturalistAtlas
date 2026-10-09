@@ -1,0 +1,29 @@
+﻿@{
+    var Selector = Model!;
+    Selector.Init();
+}
+
+
+@if (Selector.UseDefault)
+{
+    <div class="form-check form-check-inline">
+        <input type="radio" id="@(Selector.FormItemId)" name="@(Selector.FormItemName)" value="@(Selector.DefaultValue)" class="form-check-input" />
+        <label for="@(Selector.FormItemId)" class="form-check-label @(Selector.Css)" style="@(Selector.Style)">@(Selector.DefaultText)</label>
+    </div>
+}
+@foreach (var item in Selector.Items)
+{
+    <div class="form-check form-check-inline">
+        @if (Selector.UseStringValue)
+        {
+            <input type="radio" id="@(Selector.FormItemId)_@(item.Value)" name="@(Selector.FormItemName)" value="@(item.Text)" class="form-check-input" @Html.Raw(Selector.IsSelected(item.Text) ? "checked=\"checked\"" : "") />
+        }
+        else
+        {
+            <input type="radio" id="@(Selector.FormItemId)_@(item.Value)" name="@(Selector.FormItemName)" value="@(item.Value)" class="form-check-input" @Html.Raw(Selector.IsSelected(item.Value) ? "checked=\"checked\"" : "") />
+        }
+        <label for="@(Selector.FormItemId)_@(item.Value)" class="form-check-label @(Selector.Css)" style="@(Selector.Style)">@(item.Text)</label>
+    </div>
+}
+
+

@@ -1,0 +1,133 @@
+﻿@model ManageGroupDto
+@{
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    ManageGroupDto Data = Model!;
+    List<ManageGroupPermissionDto> ManageGroupPermissionList = ViewBag.ManageGroupPermissionList ?? new List<ManageGroupPermissionDto>();
+    Dictionary<string, PermissionResourceInfo> ResourceDict = ViewBag.ResourceDict;
+    Dictionary<string, List<PermissionActionInfo>> ResourceActionListDict = ViewBag.ResourceActionListDict;
+
+    string PageTitle = Data.Id <= 0 ? GL.Get("AddAdminGroup", string.Empty)! : GL.GetText("EditTheAdminGroup", Data.Name);
+    ViewBag.PageTitle = PageTitle;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-admin.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-outline-secondary" href="~/Admin/Group_List"><i class="fa-solid fa-arrow-left me-1"></i>@(GL.Get("ReturnList"))</a>
+        @if (Data.Id > 0)
+        {
+            <a class="btn btn-primary" href="~/Admin/Group_Add"><i class="fa-solid fa-plus me-1"></i>@(GL.Get("AddAdminGroup"))</a>
+        }
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title">@PageTitle</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form id="GroupEditForm" action="~/api/admin/group/save" method="post">
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtName">@GL.Get("Name")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtName" name="Name" class="form-control" value="@Data.Name" />
+                    <div class="invalid-feedback" verify-name="Name"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtDescription">@GL.Get("Description")</label>
+                <div class="col-sm-10">
+                    <textarea id="txtDescription" name="Description" rows="4" class="form-control">@Data.Description</textarea>
+                    <div class="invalid-feedback" verify-name="Description"></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="col-form-label">@GL.Get("Permissions")</label>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="chkAllResourceIds" data-wrap="@ResourceActionListDict.Count" />
+                    <label class="form-check-label" for="chkAllResourceIds">@GL.Get("SelectAll")</label>
+                </div>
+                <div class="table-responsive">
+                    <table class="table admin-perm-table">
+                        @foreach (var item in ResourceActionListDict)
+                        {
+                            var actionList = item.Value;
+                            if (actionList == null || !actionList.Any()) { continue; }
+                            PermissionResourceInfo resourceInfo = ResourceDict[item.Key];
+                            bool isChecked = ManageGroupPermissionList.Any(p => StringTool.EqualsIgnoreCase(p.Resource, item.Key));
+                            <tr>
+                                <th style="width:22%;">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" value="@item.Key" id="chkResourceIds_@item.Key" name="ResourceIds" role="switch" @(isChecked ? "checked" : null) />
+                                        <label class="form-check-label" for="chkResourceIds_@item.Key">@resourceInfo.GetResourceText()</label>
+                                    </div>
+                                </th>
+                                <td>
+                                    @foreach (PermissionActionInfo actionInfo in actionList)
+                                    {
+                                        <span class="sp-tag">@actionInfo.GetTitle()</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@GL.Get("Status")</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<CommonStatus>{ FormItemId = "seltStatus", FormItemName = "Status", SelectedValue = Data.Status }' />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <input type="hidden" id="hdId" name="Id" value="@Data.Id" />
+                <button class="btn btn-primary px-5" type="submit">@(Data.Id <= 0 ? GL.Get("SubmitToAdd") : GL.Get("SubmitToSave"))</button>
+            </div>
+            <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        function handleAllCheckerStatus() {
+            var chkAll = $('#chkAllResourceIds');
+            var totalChecked = 0;
+            var tc = parseInt(chkAll.attr('data-wrap'), 10) || 0;
+            $('input[name=ResourceIds]').each(function () {
+                if ($(this).is(':checked')) totalChecked += 1;
+            });
+            chkAll.prop('checked', totalChecked >= tc && tc > 0);
+        }
+
+        $(function () {
+            RPG.FormSubmitter('GroupEditForm', {
+                completeHandler: function (jsonResult) {
+                    if (jsonResult.IsSuccess && parseInt($('#hdId').val(), 10) <= 0) {
+                        setTimeout(function () {
+                            location.href = '/Admin/Group_Modify?GroupId=' + jsonResult.Data.Id;
+                        }, 800);
+                    }
+                },
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+
+            $('#chkAllResourceIds').on('click', function () {
+                $('input[name=ResourceIds]').prop('checked', $(this).is(':checked'));
+            });
+            $('input[name=ResourceIds]').on('click', handleAllCheckerStatus);
+            handleAllCheckerStatus();
+        });
+    </script>
+}

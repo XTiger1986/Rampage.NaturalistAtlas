@@ -1,0 +1,101 @@
+@model ListViewData<Taxon, TaxonAdminFilter>
+@{
+    // 分类单元列表：只读检索（学名/中文名/英文名 + 类群/阶元/数据源/状态），行内进详情
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    List<Taxon> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    TaxonAdminFilter DataFilter = Model!.DataFilter;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-city.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-leaf me-2"></i>分类单元列表</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="setting-hint">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            分类档案由采集端每日刷新维护，此处仅作检索与查阅，不提供编辑。
+        </div>
+
+        <form class="sp-toolbar" action="~/Taxon/Taxon_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                <input type="search" name="Keywords" class="form-control" style="width:210px" placeholder="学名 / 中文名 / 英文名" value="@DataFilter.Keywords" />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<IconicTaxon> { FormItemId = "seltIconic", FormItemName = "IconicTaxon", Css = "form-select", Style = "width:130px", DefaultText = "全部类群", DefaultValue = "", SelectedValue = DataFilter.IconicTaxon }' />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<TaxonRank> { FormItemId = "seltRank", FormItemName = "Rank", Css = "form-select", Style = "width:120px", DefaultText = "全部阶元", DefaultValue = "", SelectedValue = DataFilter.Rank }' />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = DataFilter.Source }' />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                <select name="Threatened" class="form-select" style="width:140px">
+                    <option value="" selected="@(DataFilter.Threatened == null)">受威胁：全部</option>
+                    <option value="true" selected="@(DataFilter.Threatened == true)">仅受威胁</option>
+                    <option value="false" selected="@(DataFilter.Threatened == false)">非受威胁</option>
+                </select>
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>学名</th>
+                        <th>中文常用名</th>
+                        <th>类群</th>
+                        <th>阶元</th>
+                        <th>数据源</th>
+                        <th>源站ID</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td class="sp-mono">@item.ScientificName</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.CommonNameCn) ? "-" : item.CommonNameCn)</td>
+                            <td><span class="badge text-bg-light">@EnumReader.GetText(item.IconicTaxon)</span></td>
+                            <td>@EnumReader.GetText(item.Rank)</td>
+                            <td>@EnumReader.GetText(item.Source)</td>
+                            <td class="sp-mono">@item.SourceTaxonId</td>
+                            <td>
+                                <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-secondary")">@EnumReader.GetText(item.Status)</span>
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="~/Taxon/Taxon_Detail?TaxonId=@(item.Id)" class="btn btn-sm btn-info">
+                                    <i class="fa-solid fa-magnifying-glass me-1"></i>详情
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>

@@ -1,0 +1,85 @@
+﻿@model ListViewData<AdminOperationLogDto, AdminOperationLogFilter>
+@{
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    List<AdminOperationLogDto> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    AdminOperationLogFilter DataFilter = Model!.DataFilter;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-admin.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title">@GL.Get("AdministratorOperationRecordList")</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form class="sp-toolbar" action="~/Admin/AdminOperationLog_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                <input type="search" name="OperationName" class="form-control" style="width:240px" placeholder="@GL.Get("OperationName")" value="@DataFilter.OperationName" />
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>@GL.Get("Administrator")</th>
+                        <th>@GL.Get("OperationName")</th>
+                        <th>@GL.Get("Controller")</th>
+                        <th>@GL.Get("Action")</th>
+                        <th>@GL.Get("RequestAddress")</th>
+                        <th>@GL.Get("OperatorIP")</th>
+                        <th>@GL.Get("CreatedTime")/@GL.Get("UpdateTime")</th>
+                        <th>@GL.Get("Operations")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>@item.Id</td>
+                            <td>@(item.Admin != null ? item.Admin.DisplayName : item.AdminId.ToString())</td>
+                            <td>@item.OperationName</td>
+                            <td class="sp-mono">@item.ControllerName</td>
+                            <td class="sp-mono">@item.ActionName</td>
+                            <td class="sp-mono">@item.RawUrl</td>
+                            <td>@item.OperationIp</td>
+                            <td>
+                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, CTZ).ToCommonString()</div>
+                            </td>
+                            <td>
+                                <a href="~/Admin/AdminOperationLog_Detail?LogId=@(item.Id)" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fa-solid fa-eye me-1"></i>@GL.Get("View")
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="9" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>

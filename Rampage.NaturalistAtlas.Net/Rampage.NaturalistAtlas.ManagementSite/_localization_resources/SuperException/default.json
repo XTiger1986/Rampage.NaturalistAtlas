@@ -1,0 +1,10 @@
+{
+  "Illegal_ThemeViewName": "视图名称错误：{0}",
+  "SuperClient_BadRequest": "请求远程地址出错：{1}，返回状态码：{0}",
+
+  "SpecifiedManageGroup_NotFound": "指定的管理组不存在",
+  "SpecifiedAdministrator_NotFound": "指定的管理员不存在",
+  "SpecifiedManageMenu_NotFound": "指定的管理菜单不存在",
+  "SpecifiedAdminOperationLog_NotFound": "指定的管理操作日志不存在"
+
+}

@@ -1,0 +1,124 @@
+﻿@model ListViewData<AdminDto, AdminFilter>
+@{
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    CurrentAuthorizationInfo CurrentAuthorization = (CurrentAuthorizationInfo)ViewBag.CurrentAuthorization;
+    AdminDto CurrentAdmin = CurrentAuthorization.CurrentAdmin!;
+
+    List<AdminDto> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    AdminFilter DataFilter = Model!.DataFilter;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-admin.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-primary" href="~/Admin/Admin_Add"><i class="fa-solid fa-plus me-1"></i>@GL.Get("AddAdmin")</a>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title">@GL.Get("AdminList")</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form class="sp-toolbar" action="~/Admin/Admin_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="@GL.Get("Keywords")" value="@DataFilter.Keywords" />
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>@GL.Get("Username")</th>
+                        <th>@GL.Get("RealName")</th>
+                        <th>@GL.Get("MobileNumber")</th>
+                        <th>@GL.Get("Email")</th>
+                        <th>@GL.Get("Gender")</th>
+                        <th>@GL.Get("SuperAdministrator")</th>
+                        <th>@GL.Get("Status")</th>
+                        <th>@GL.Get("LastLogin")</th>
+                        <th>@GL.Get("CreatedTime")/@GL.Get("UpdateTime")</th>
+                        <th>@GL.Get("Operations")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    for (int i = 0; i < DataList.Count; i++)
+                    {
+                        var item = DataList[i];
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>@item.Id</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (!string.IsNullOrEmpty(item.AvatarUrl))
+                                    {
+                                        <img class="admin-avatar-sm" src="@item.AvatarUrl" alt="" />
+                                    }
+                                    <span>@item.Username</span>
+                                </div>
+                            </td>
+                            <td>@item.TrueName</td>
+                            <td>@item.Mobile</td>
+                            <td>@item.Email</td>
+                            <td>@EnumReader.GetText(item.Gender)</td>
+                            <td>@(GL.Get(item.IsMaster ? "Yes" : "No"))</td>
+                            <td>
+                                <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-danger")">@EnumReader.GetText(item.Status)</span>
+                            </td>
+                            <td>
+                                <div>@DateTimeTool.UtcToLocal(item.LoginTime, CTZ).ToCommonString()</div>
+                                <div class="text-muted small">(@item.LoginIp)</div>
+                            </td>
+                            <td>
+                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, CTZ).ToCommonString()</div>
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="~/Admin/Admin_Modify?AdminId=@(item.Id)" class="btn btn-sm btn-info">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                </a>
+                                @if (item.Id > 1 && CurrentAdmin.Id != item.Id)
+                                {
+                                    <button type="button" data-id="@item.Id" data-action="delete-admin" class="btn btn-sm btn-danger">
+                                        <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="11" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/js/admin-admin.js?v=@AppInfo.ResVer"></script>
+    <script>
+        AdminPages.bindDelete('[data-action=delete-admin]', function (id) {
+            return '/api/admin/delete/' + id;
+        }, '@(GL.Get("ConfirmDeleteAdminText"))');
+    </script>
+}

@@ -1,0 +1,84 @@
+@model AdminDto
+@{
+    // 个人中心 · 资料编辑：回显当前管理员基础资料，保存走框架 api/personal/profile/save
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    AdminDto Data = Model!;
+    ViewBag.PageTitle = GL.Get("EditMyProfile");
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-personal.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <div>
+        <h1 class="sp-page-title"><i class="fa-solid fa-id-card me-2"></i>@(GL.Get("EditMyProfile"))</h1>
+    </div>
+</div>
+
+<nav class="personal-nav">
+    <a class="active" href="~/Personal/EditProfile/"><i class="fa-solid fa-id-card"></i>@(GL.Get("EditMyProfile"))</a>
+    <a href="~/Personal/ChangePassword/"><i class="fa-solid fa-key"></i>@(GL.Get("ChangePassword"))</a>
+    <a href="~/Personal/AvatarSetting/"><i class="fa-solid fa-circle-user"></i>@(GL.Get("MyProfilePicture"))</a>
+</nav>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-user-pen me-2"></i>基础资料</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form id="PersonalProfileForm" action="~/api/personal/profile/save" method="post">
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtUsername">@GL.Get("Username")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtUsername" name="Username" class="form-control" value="@Data.Username" />
+                    <div class="invalid-feedback" verify-name="Username"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtTrueName">@GL.Get("RealName")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtTrueName" name="TrueName" class="form-control" value="@Data.TrueName" />
+                    <div class="invalid-feedback" verify-name="TrueName"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtMobile">@GL.Get("MobileNumber")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtMobile" name="Mobile" class="form-control" value="@Data.Mobile" />
+                    <div class="invalid-feedback" verify-name="Mobile"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtEmail">@GL.Get("Email")</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtEmail" name="Email" class="form-control" value="@Data.Email" />
+                    <div class="invalid-feedback" verify-name="Email"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@GL.Get("Gender")</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<UserGender> { FormItemId = "txtGender", FormItemName = "Gender", SelectedValue = Data.Gender }' />
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-primary px-5" type="submit"><i class="fa-solid fa-floppy-disk me-1"></i>@(GL.Get("SubmitToSave") ?? "保存")</button>
+            </div>
+            <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        $(function () {
+            RPG.FormSubmitter('PersonalProfileForm', {
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+        });
+    </script>
+}

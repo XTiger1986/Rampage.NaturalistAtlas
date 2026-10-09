@@ -1,0 +1,99 @@
+@{
+    // 登录页：独立布局（Layout=null），左侧品牌视觉 + 右侧登录表单
+    Layout = null;
+
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+}
+<!DOCTYPE html>
+<html lang="zh-CN" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@(GL.Get("Login")) - @AppInfo.Name</title>
+    <link rel="icon" type="image/svg+xml" href="~/assets/img/logo-mark.svg" />
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap5.3.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/assets/vendor/fontawesome.free.7.2.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/assets/css/admin-shell.css?v=@AppInfo.ResVer" />
+    <link rel="stylesheet" href="~/assets/css/admin-auth.css?v=@AppInfo.ResVer" />
+</head>
+<body class="sp-auth-body">
+    <div class="sp-auth">
+        <section class="sp-auth__visual">
+            <div class="sp-auth__brand">
+                <img class="sp-auth-logo" src="~/assets/img/logo-mark.svg" alt="自然地图志标志" />
+                <div class="sp-auth-badge"><i class="fa-solid fa-leaf"></i> Naturalist Atlas</div>
+                <h1>自然地图志</h1>
+                <p>自然探索观察地图的解读与治理入口——从 iNaturalist 与 GBIF 的全球观察资源起步，采集调度、内容审核与数据配置在此统一管理。请使用获授权的管理员账号登录。</p>
+            </div>
+        </section>
+        <section class="sp-auth__panel">
+            <div class="sp-auth__card">
+                <h2>@(GL.Get("Welcome"))</h2>
+                <p class="sp-auth-sub">@(GL.Get("PleaseLogin"))</p>
+                <form id="LoginForm" name="LoginForm" method="post" action="~/api/passport/login">
+                    <div class="mb-3">
+                        <label class="form-label" for="txtAccount">@(GL.Get("Account"))</label>
+                        <input class="form-control" id="txtAccount" name="Account" placeholder="@(GL.Get("Username"))/@(GL.Get("MobileNumber"))/@(GL.Get("Email"))" type="text" autocomplete="username" autofocus />
+                        <div class="invalid-feedback" verify-name="Account"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="txtPassword">@(GL.Get("Password"))</label>
+                        <div class="sp-auth-password">
+                            <input class="form-control" id="txtPassword" name="Password" placeholder="@(GL.Get("Password"))" type="password" autocomplete="current-password" />
+                            <button type="button" class="sp-auth-password__toggle" data-sp-password-toggle aria-label="显示或隐藏密码" tabindex="-1">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback" verify-name="Password"></div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" value="true" id="chkIsRemember" name="IsRemember" />
+                        <label class="form-check-label" for="chkIsRemember">@(GL.Get("RememberMe"))</label>
+                    </div>
+                    <button type="submit" id="btnLogin" class="btn btn-primary w-100"><i class="fa-solid fa-right-to-bracket me-1"></i>@GL.Get("SignIn")</button>
+                    <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <input type="hidden" id="hdReturnUrl" value="@Html.Encode(ViewBag.ReturnUrl ?? "/")" />
+
+    <script src="~/assets/vendor/jquery3.7.1/jquery-3.7.1.min.js"></script>
+    <script src="~/assets/vendor/bootstrap5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="~/assets/js/rpg-core.js?v=@AppInfo.ResVer"></script>
+    <script>
+        $(function () {
+            // 登录接口为 [FromBody]，须 JSON（useBody:true）；表单编码会 415
+            RPG.FormSubmitter('LoginForm', {
+                prepareHandler: function (data) {
+                    data.IsRemember = $('#chkIsRemember').is(':checked');
+                },
+                completeHandler: function (jsonResult) {
+                    // 登录成功：携带服务端校验过的本地 returnUrl 跳转
+                    var returnUrl = $('#hdReturnUrl').val() || '/';
+                    location.href = returnUrl;
+                },
+                failHandler: function () {
+                    // 失败后聚焦密码框并全选，减少管理员重复定位成本
+                    $('#txtPassword').trigger('focus').trigger('select');
+                },
+                useBody: true,
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+
+            // 密码可见切换：明文/密文互切，图标随状态切换
+            $('[data-sp-password-toggle]').on('click', function () {
+                var input = $('#txtPassword');
+                var icon = $(this).find('i');
+                var isText = input.attr('type') === 'text';
+                input.attr('type', isText ? 'password' : 'text');
+                icon.toggleClass('fa-eye', isText).toggleClass('fa-eye-slash', !isText);
+            });
+        });
+    </script>
+</body>
+</html>

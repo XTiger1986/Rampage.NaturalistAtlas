@@ -1,0 +1,21 @@
+﻿@{
+    var Selector = (BooleanSelector)Model!;
+    Selector.Init();
+}
+
+@if (Selector.UseDefault)
+{
+    <div class="form-check form-check-inline">
+        <input type="radio" id="@(Selector.FormItemId)" name="@(Selector.FormItemName)" value="@(Selector.DefaultValue)" class="form-check-input" />
+        <label for="@(Selector.FormItemId)" class="form-check-label @(Selector.Css)" style="@(Selector.Style)">@(Selector.DefaultText)</label>
+    </div>
+}
+<div class="form-check form-check-inline">
+    <input type="radio" id="@(Selector.FormItemId)_@(YesOrNoStatus.Yes)" name="@(Selector.FormItemName)" class="form-check-input" value="True" @Html.Raw(Selector.SelectedValue ? "checked=\"checked\"" : "") />
+    <label for="@(Selector.FormItemId)_@(YesOrNoStatus.Yes)" class="form-check-label @(Selector.Css)" style="@(Selector.Style)">@(EnumReader.GetText(YesOrNoStatus.Yes))</label>
+</div>
+<div class="form-check form-check-inline">
+    <input type="radio" id="@(Selector.FormItemId)_@(YesOrNoStatus.No)" name="@(Selector.FormItemName)" class="form-check-input" value="False" @Html.Raw(!Selector.SelectedValue ? "checked=\"checked\"" : "") />
+    <label for="@(Selector.FormItemId)_@(YesOrNoStatus.No)" class="form-check-label @(Selector.Css)" style="@(Selector.Style)">@(EnumReader.GetText(YesOrNoStatus.No))</label>
+</div>
+

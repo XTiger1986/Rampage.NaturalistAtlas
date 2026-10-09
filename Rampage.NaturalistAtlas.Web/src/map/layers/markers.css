@@ -1,0 +1,194 @@
+/*
+ * 地图 HTML Marker 样式（聚合簇 + 照片卡） / Styles for the map's HTML Markers (clusters + photo cards)
+ * 三套主题的差异全部由 [data-theme] 选择器 + 设计令牌控制： / The three themes differ only through [data-theme] selectors + design tokens:
+ * - journal：标本签——白纸框 + 墨线描边 + 硬投影，聚合簇为墨线圆章； / - journal: specimen label — white paper frame + ink outline + hard drop shadow; clusters as ink stamp rings;
+ * - night：发光——类群色光晕 + 呼吸动画，照片圆角； / - night: glow — taxon-colored halo + breathing animation; rounded photos;
+ * - spectrum：大卡片——白边 + 柔和阴影。 / - spectrum: big cards — white border + soft shadow.
+ */
+
+/* ========== 聚合簇 / Clusters ========== */
+.atlas-cluster {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  /* 外环：类群构成色环 / Outer ring: taxon composition color ring */
+  background: var(--ring);
+  padding: 4px;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.atlas-cluster:hover {
+  transform: scale(1.08);
+}
+.atlas-cluster::before {
+  /* 内圆：面板底色 / Inner disc: panel surface color */
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--c-surface);
+}
+.atlas-cluster__count {
+  position: relative;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme='night'] .atlas-cluster {
+  animation: firefly-breath 3.2s ease-in-out infinite;
+}
+[data-theme='night'] .atlas-cluster::before {
+  background: rgba(11, 21, 18, 0.88);
+}
+[data-theme='journal'] .atlas-cluster {
+  box-shadow: 0 0 0 1.5px var(--cluster-ring), 2px 2px 0 rgba(59, 47, 34, 0.25);
+}
+[data-theme='journal'] .atlas-cluster__count {
+  font-family: var(--font-serif);
+}
+[data-theme='spectrum'] .atlas-cluster {
+  box-shadow: 0 6px 16px -6px rgba(23, 32, 43, 0.45);
+}
+
+/* ========== 照片卡 / Photo cards ========== */
+.atlas-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out);
+  transform-origin: bottom center;
+}
+.atlas-card:hover,
+.atlas-card.is-active {
+  transform: scale(1.25);
+  z-index: 5;
+}
+.atlas-card__img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 2px solid var(--taxon);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+}
+.atlas-card__img--empty {
+  background: color-mix(in srgb, var(--taxon) 30%, var(--c-surface));
+}
+/* 远程图片加载反馈：未就绪时类群色脉冲底图（图未解码前 img 透明，底图透出）； / Remote image loading feedback: a pulsing taxon-colored base until ready (img is transparent before decode, so the base shows through);
+   加载完成由 load 事件加 atlas-img-ready 收尾；失败维持底图占位（alt 为空无破图图标） / on load the atlas-img-ready class finishes it; on failure the base stays as a placeholder (empty alt, no broken-image icon) */
+img.atlas-card__img:not(.atlas-img-ready):not(.atlas-img-error) {
+  background: color-mix(in srgb, var(--taxon) 30%, var(--c-surface));
+  animation: atlas-img-pulse 1.6s ease-in-out infinite;
+}
+@keyframes atlas-img-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+img.atlas-card__img.atlas-img-error {
+  background: color-mix(in srgb, var(--taxon) 30%, var(--c-surface));
+}
+/* 底部小三角：指向真实坐标 / Bottom pointer triangle: marks the true coordinate */
+.atlas-card__pin {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--taxon);
+}
+/* 版权协议微标：照片右上角小角标（产品文档 §9 署名要求；卡片为纵向布局、图在顶部， / License micro-badge: a small chip at the photo's top-right corner (product doc §9 attribution; the card is a column layout with the image on top,
+   锚定右上角不依赖图片实际高度） / anchoring to the top-right avoids depending on the image's actual height) */
+.atlas-card__lic {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  max-width: 68px;
+  padding: 0 4px;
+  font-size: 9px;
+  line-height: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 999px;
+  pointer-events: none;
+}
+.atlas-card__name {
+  max-width: 120px;
+  margin-top: 2px;
+  padding: 1px 6px;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--c-ink);
+  background: var(--c-surface-glass);
+  border-radius: var(--radius-sm);
+}
+
+/* 标签档：大卡片 / Label mode: large cards */
+.atlas-card--label .atlas-card__img {
+  width: 72px;
+  height: 72px;
+}
+
+/* 新建卡片入场：scale .6→1 + 淡入（设计文档 §5.1；reduced-motion 由 main.css 全局兜底） / New-card enter: scale .6→1 + fade-in (design doc §5.1; reduced-motion is covered globally by main.css) */
+@keyframes atlas-card-enter {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.atlas-card--enter {
+  animation: atlas-card-enter 180ms var(--ease-out);
+}
+
+/* 夜观：类群色光晕 / Night: taxon-colored glow */
+[data-theme='night'] .atlas-card__img {
+  border-radius: 10px;
+  box-shadow: 0 0 12px 1px var(--taxon);
+}
+
+/* 纸本：标本签——白纸框 + 墨线 + 硬投影 / Journal: specimen label — white paper frame + ink line + hard shadow */
+[data-theme='journal'] .atlas-card__img {
+  border: 3px solid #fffdf7;
+  outline: 1px solid var(--c-line-strong);
+  box-shadow: var(--card-shadow);
+  border-radius: 0;
+}
+[data-theme='journal'] .atlas-card__pin {
+  border-top-color: var(--c-line-strong);
+}
+[data-theme='journal'] .atlas-card__name {
+  font-family: var(--font-serif);
+  background: #fffdf7;
+  border: 1px solid var(--c-line-strong);
+  border-bottom: 2px solid var(--card-label-line);
+  border-radius: 0;
+}
+
+/* 光谱：白边 + 柔和阴影 / Spectrum: white border + soft shadow */
+[data-theme='spectrum'] .atlas-card__img {
+  border: 3px solid #fff;
+  box-shadow: 0 6px 14px -4px rgba(23, 32, 43, 0.4), 0 0 0 2px var(--taxon);
+  border-radius: 12px;
+}

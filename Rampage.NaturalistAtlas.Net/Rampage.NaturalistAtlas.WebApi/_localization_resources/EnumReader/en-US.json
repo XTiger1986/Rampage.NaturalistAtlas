@@ -1,0 +1,36 @@
+{
+  "Success": "Successful",
+  "Failure": "Failed",
+  "NotLoggedIn": "Not logged in",
+  "Unauthorized": "Unauthorized",
+  "PasswordIncorrect": "Incorrect Password",
+  "IncorrectAccount": "Incorrect username or password",
+  "InvalidAccount": "Account does not exist",
+  "DisabledAccount": "Account disabled",
+  "TokenExpired": "Token is expired",
+  "InvalidToken": "Invalid token",
+  "RefreshToken": "Token need refresh",
+  "IllegalArguments": "Illegal Arguments",
+  "DataVerificationFailed": "Fail to verify data",
+  "DataNotExists": "Data not exists",
+  "DataExists": "Data exists",
+  "ExistsAssociatedData": "Exists associated data",
+  "OperationTooFrequent": "Operation too Frequent",
+  "IncorrectVerificationCode": "Incorrect Verification Code",
+  "VerificationCodeExpired": "Verification Code Expired",
+
+  "ValidationResultCode.Success": "Verification successful",
+  "ValidationResultCode.Warning": "Verified, but warnings",
+  "ValidationResultCode.Failure": "Verification failed",
+
+  "CommonStatus.Enabled": "Enabled",
+  "CommonStatus.Disabled": "Disabled",
+  "UserGender.Unknown": "Unknown",
+  "UserGender.Male": "Male",
+  "UserGender.Female": "Female",
+  "YesOrNoStatus.Yes": "Yes",
+  "YesOrNoStatus.No": "No",
+  "RightOrWrongStatus.Correct": "Correct",
+  "RightOrWrongStatus.Incorrect": "Incorrect"
+
+}

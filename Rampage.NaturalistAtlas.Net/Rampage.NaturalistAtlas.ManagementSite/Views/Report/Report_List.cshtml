@@ -1,0 +1,162 @@
+@model ListViewData<ReportRowDto, ReportAdminFilter>
+@{
+    // 举报工单列表：待处理优先；待处理行进处理页，已处理行展示处理结论
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    List<ReportRowDto> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    ReportAdminFilter DataFilter = Model!.DataFilter;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-observation.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-flag me-2"></i>举报工单列表</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form class="sp-toolbar" action="~/Report/Report_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                @if (!string.IsNullOrEmpty(DataFilter.ObservationId))
+                {
+                    <!-- 观察详情跳入时携带的过滤上下文：保留在表单里，翻页/查询不丢失 -->
+                    <input type="hidden" name="ObservationId" value="@DataFilter.ObservationId" />
+                    <span class="badge text-bg-warning d-inline-flex align-items-center gap-1">
+                        <i class="fa-solid fa-crosshairs"></i>
+                        已按观察 <span class="sp-mono">@DataFilter.ObservationId</span> 过滤
+                        <a href="~/Report/Report_List" class="ms-1 text-decoration-none" title="清除该过滤">×</a>
+                    </span>
+                }
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<ReportStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<ReportReason> { FormItemId = "seltReason", FormItemName = "Reason", Css = "form-select", Style = "width:130px", DefaultText = "全部原因", DefaultValue = "", SelectedValue = DataFilter.Reason }' />
+                <span class="sp-toolbar__label">提交时间</span>
+                <input type="date" name="CreateTimeFrom" class="form-control" style="width:150px" value="@(DataFilter.CreateTimeFrom?.ToString("yyyy-MM-dd"))" />
+                <span class="sp-toolbar__label">至</span>
+                <input type="date" name="CreateTimeTo" class="form-control" style="width:150px" value="@(DataFilter.CreateTimeTo?.ToString("yyyy-MM-dd"))" />
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <button type="button" id="btnExportReportCsv" class="btn btn-outline-success" title="按当前筛选导出最多 5000 行 CSV">
+                    <i class="fa-solid fa-file-csv me-1"></i>导出 CSV
+                </button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>被举报观察</th>
+                        <th>原因</th>
+                        <th>补充说明</th>
+                        <th>联系方式</th>
+                        <th>观察当前状态</th>
+                        <th>提交时间</th>
+                        <th>工单状态</th>
+                        <th>处理信息</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if (!string.IsNullOrEmpty(item.ObservationPhotoSquareUrl))
+                                    {
+                                        <img class="obs-thumb" src="@item.ObservationPhotoSquareUrl" alt="" loading="lazy" referrerpolicy="no-referrer" />
+                                    }
+                                    else
+                                    {
+                                        <span class="obs-thumb obs-thumb--empty"><i class="fa-regular fa-image"></i></span>
+                                    }
+                                    <div>
+                                        <div class="sp-mono">@item.ObservationId</div>
+                                        <div class="text-muted small">@EnumReader.GetText(item.ObservationIconicTaxon ?? IconicTaxon.Unknown) · @item.ObservationUserLogin</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@EnumReader.GetText(item.Reason)</td>
+                            <td style="max-width:240px">@(string.IsNullOrWhiteSpace(item.Content) ? "-" : item.Content)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Contact) ? "-" : item.Contact)</td>
+                            <td>
+                                @if (item.ObservationStatus.HasValue)
+                                {
+                                    <span class="badge @(item.ObservationStatus == ObservationStatus.Normal ? "bg-success" : (item.ObservationStatus == ObservationStatus.Hidden ? "bg-warning" : "bg-secondary"))">@EnumReader.GetText(item.ObservationStatus.Value)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">观察已不存在</span>
+                                }
+                            </td>
+                            <td>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</td>
+                            <td>
+                                <span class="badge @(item.Status == ReportStatus.Pending ? "bg-warning" : (item.Status == ReportStatus.Hidden ? "bg-success" : "bg-secondary"))">@EnumReader.GetText(item.Status)</span>
+                            </td>
+                            <td>
+                                @if (item.Status != ReportStatus.Pending)
+                                {
+                                    <div>@DateTimeTool.UtcToLocal(item.HandleTime!.Value, CTZ).ToCommonString()</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.HandleRemark))
+                                    {
+                                        <div class="text-muted small">@item.HandleRemark</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="text-nowrap">
+                                @if (item.Status == ReportStatus.Pending)
+                                {
+                                    <a href="~/Report/Report_Handle?ReportId=@(item.Id)" class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-gavel me-1"></i>处理
+                                    </a>
+                                }
+                                @if (!string.IsNullOrEmpty(item.ObservationId))
+                                {
+                                    <a href="~/Observation/Observation_Detail?ObservationId=@(item.ObservationId)" class="btn btn-sm btn-info">
+                                        <i class="fa-solid fa-magnifying-glass me-1"></i>观察
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="9" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        $(function () {
+            $('#btnExportReportCsv').on('click', function () {
+                var q = $('form.sp-toolbar').serialize();
+                window.location.href = '/api/report/export' + (q ? '?' + q : '');
+            });
+        });
+    </script>
+}

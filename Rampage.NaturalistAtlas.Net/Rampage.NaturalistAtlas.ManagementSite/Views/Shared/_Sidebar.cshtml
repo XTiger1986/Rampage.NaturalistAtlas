@@ -1,0 +1,127 @@
+@{
+    // 侧栏：品牌区 + 动态授权菜单树 + 个人区（响应式下由遮罩控制开合）
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    CurrentAuthorizationInfo CurrentAuthorization = ViewBag.CurrentAuthorization;
+    ManageMenuDto? CurrentMenu = CurrentAuthorization.CurrentMenu;
+    List<ManageMenuDto> AuthorizedMenuList = CurrentAuthorization.AuthorizedMenuList ?? new List<ManageMenuDto>();
+
+    // 菜单图标解析：菜单记录自带 fa- 类则优先；否则按标题关键词映射自然志业务图标
+    string ResolveMenuIcon(ManageMenuDto menu)
+    {
+        if (!string.IsNullOrWhiteSpace(menu.Css) && menu.Css!.Contains("fa-", StringComparison.OrdinalIgnoreCase))
+        {
+            return menu.Css!;
+        }
+        var title = menu.Title ?? "";
+        if (title.Contains("管理员")) return "fa-solid fa-user-shield";
+        if (title.Contains("管理组")) return "fa-solid fa-users-gear";
+        if (title.Contains("菜单")) return "fa-solid fa-sitemap";
+        if (title.Contains("日志")) return "fa-solid fa-scroll";
+        if (title.Contains("设置") || title.Contains("配置")) return "fa-solid fa-sliders";
+        if (title.Contains("城市")) return "fa-solid fa-city";
+        if (title.Contains("分类") || title.Contains("类群") || title.Contains("物种")) return "fa-solid fa-leaf";
+        if (title.Contains("观察") || title.Contains("记录")) return "fa-solid fa-binoculars";
+        if (title.Contains("举报")) return "fa-solid fa-flag";
+        if (title.Contains("采集") || title.Contains("同步")) return "fa-solid fa-cloud-arrow-down";
+        if (title.Contains("物候") || title.Contains("统计")) return "fa-solid fa-chart-line";
+        return "fa-solid fa-seedling";
+    }
+
+    // 激活判定：当前菜单即自身，或为其直接父级
+    bool IsMenuActive(ManageMenuDto menu)
+    {
+        if (CurrentMenu == null) return false;
+        if (CurrentMenu.Id == menu.Id) return true;
+        if (CurrentMenu.ParentId == menu.Id) return true;
+        return false;
+    }
+
+    bool isPersonal = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Personal", StringComparison.OrdinalIgnoreCase);
+    bool isHome = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Home", StringComparison.OrdinalIgnoreCase);
+}
+
+<aside class="sp-sidebar" id="spSidebar">
+    <a class="sp-sidebar__brand" href="~/">
+        <img class="sp-sidebar__mark" src="~/assets/img/logo-mark.svg" alt="自然地图志" aria-hidden="true" />
+        <span class="sp-sidebar__title">
+            自然地图志
+            <small>Naturalist Atlas</small>
+        </span>
+    </a>
+
+    <nav class="sp-sidebar__nav" aria-label="主菜单">
+        <div class="sp-nav-cat"><i class="fa-solid fa-seedling me-1"></i> 概览</div>
+        <a class="sp-nav-link@(isHome ? " active" : "")" href="~/">
+            <i class="fa-solid fa-leaf"></i>
+            <span>@(GL.Get("Dashboard", "管理首页"))</span>
+        </a>
+
+        @foreach (var rootMenu in AuthorizedMenuList)
+        {
+            var menuList = rootMenu.MenuList;
+            if (menuList == null || menuList.Count == 0) { continue; }
+
+            <div class="sp-nav-cat @rootMenu.Css"><i class="fa-solid fa-leaf me-1"></i> @rootMenu.Title</div>
+
+            @foreach (var menu in menuList)
+            {
+                var childMenuList = menu.MenuList;
+                var hasChildren = childMenuList != null && childMenuList.Count > 0;
+                var active = IsMenuActive(menu) || (CurrentMenu != null && childMenuList != null && childMenuList.Any(c => c.Id == CurrentMenu.Id));
+                var icon = ResolveMenuIcon(menu);
+
+                if (hasChildren)
+                {
+                    <div class="sp-nav-group@(active ? " open" : "") @menu.Css">
+                        <a href="@(string.IsNullOrWhiteSpace(menu.Url) ? "javascript:void(0)" : menu.Url)"
+                           class="sp-nav-link@(active ? " active" : "")"
+                           data-sp-nav-toggle="1">
+                            <i class="@icon"></i>
+                            <span>@menu.Title</span>
+                            <i class="fa-solid fa-chevron-right sp-nav-caret"></i>
+                        </a>
+                        <ul class="sp-nav-sub">
+                            @foreach (var childMenu in childMenuList!)
+                            {
+                                <li>
+                                    <a class="sp-nav-link@(CurrentMenu != null && CurrentMenu.Id == childMenu.Id ? " active" : "")"
+                                       href="@(string.IsNullOrWhiteSpace(childMenu.Url) ? "javascript:void(0)" : childMenu.Url)">
+                                        <i class="fa-solid fa-caret-right"></i>
+                                        <span>@childMenu.Title</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <a class="sp-nav-link@(active ? " active" : "") @menu.Css"
+                       href="@(string.IsNullOrWhiteSpace(menu.Url) ? "javascript:void(0)" : menu.Url)">
+                        <i class="@icon"></i>
+                        <span>@menu.Title</span>
+                    </a>
+                }
+            }
+        }
+    </nav>
+
+    <div class="sp-sidebar__foot">
+        <div class="sp-nav-cat"><i class="fa-solid fa-user-gear me-1"></i> 个人</div>
+        <a class="sp-nav-link@(isPersonal && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "EditProfile", StringComparison.OrdinalIgnoreCase) ? " active" : "")" href="~/Personal/EditProfile/">
+            <i class="fa-solid fa-id-card"></i>
+            <span>@(GL.Get("EditMyProfile"))</span>
+        </a>
+        <a class="sp-nav-link@(isPersonal && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "ChangePassword", StringComparison.OrdinalIgnoreCase) ? " active" : "")" href="~/Personal/ChangePassword/">
+            <i class="fa-solid fa-key"></i>
+            <span>@(GL.Get("ChangePassword"))</span>
+        </a>
+        <a class="sp-nav-link@(isPersonal && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "AvatarSetting", StringComparison.OrdinalIgnoreCase) ? " active" : "")" href="~/Personal/AvatarSetting/">
+            <i class="fa-solid fa-circle-user"></i>
+            <span>@(GL.Get("MyProfilePicture"))</span>
+        </a>
+    </div>
+</aside>
+<div class="sp-sidebar-backdrop" data-sp-toggle-sidebar></div>

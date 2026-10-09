@@ -1,0 +1,3 @@
+﻿注意：
+- 目前仅MemoryCacheOperationJob、MemoryCacheQueueCleanJob、MemoryCacheRecordCleanJob设计为在Web程序中运行，作为自动清理程序级内存缓存用；
+- 其它自动作业服务，在各自控制台程序执行，如数据采集程序：Rampage.NaturalistAtlas.Collector。

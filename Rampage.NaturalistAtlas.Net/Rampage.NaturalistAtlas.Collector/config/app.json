@@ -1,0 +1,31 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "DatabaseFactory": {
+    "DataAccessTypeName": "Rampage.Dapper.DapperDataAccessor, Rampage.Dapper",
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "Type": "PostgreSQL",
+        "ConnectionString": "Host=127.0.0.1;Port=5432;Database=naturalist;Username=rampage;Password=rampage;Timeout=15;Command Timeout=30;"
+      }
+    ]
+  },
+  "RedisFactory": {
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "ConnectionString": "127.0.0.1:6379,connectTimeout=3000,syncTimeout=5000,abortConnect=false",
+        "PrefixKey": "NaturalistAtlas"
+      }
+    ]
+  },
+  "Collector": {
+    "WorkerId": 1
+  }
+}

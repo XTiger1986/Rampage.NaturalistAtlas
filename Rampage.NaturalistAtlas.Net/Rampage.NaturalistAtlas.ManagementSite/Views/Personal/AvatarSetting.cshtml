@@ -1,0 +1,67 @@
+@{
+    // 个人中心 · 头像设置：选择图片即自动上传（admin-personal.js），成功后本地即时预览
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    CurrentAuthorizationInfo CurrentAuthorization = ViewBag.CurrentAuthorization;
+    AdminDto CurrentAdmin = CurrentAuthorization.CurrentAdmin!;
+    ViewBag.PageTitle = GL.Get("MyProfilePicture");
+    string? avatarUrl = CurrentAdmin.AvatarUrl;
+    string initial = !string.IsNullOrWhiteSpace(CurrentAdmin.DisplayName)
+        ? CurrentAdmin.DisplayName!.Substring(0, 1).ToUpperInvariant()
+        : (CurrentAdmin.Username ?? "A").Substring(0, 1).ToUpperInvariant();
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-personal.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <div>
+        <h1 class="sp-page-title"><i class="fa-solid fa-circle-user me-2"></i>@(GL.Get("MyProfilePicture"))</h1>
+    </div>
+</div>
+
+<nav class="personal-nav">
+    <a href="~/Personal/EditProfile/"><i class="fa-solid fa-id-card"></i>@(GL.Get("EditMyProfile"))</a>
+    <a href="~/Personal/ChangePassword/"><i class="fa-solid fa-key"></i>@(GL.Get("ChangePassword"))</a>
+    <a class="active" href="~/Personal/AvatarSetting/"><i class="fa-solid fa-circle-user"></i>@(GL.Get("MyProfilePicture"))</a>
+</nav>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-camera me-2"></i>头像上传</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="d-flex flex-column flex-md-row align-items-center gap-4">
+            <div class="text-center">
+                @if (!string.IsNullOrEmpty(avatarUrl))
+                {
+                    <img id="avatarPreview" class="personal-avatar-preview" src="@avatarUrl" alt="avatar" />
+                    <div id="avatarPlaceholder" class="personal-avatar-placeholder" style="display:none;">@initial</div>
+                }
+                else
+                {
+                    <img id="avatarPreview" class="personal-avatar-preview" src="" alt="avatar" style="display:none;" />
+                    <div id="avatarPlaceholder" class="personal-avatar-placeholder">@initial</div>
+                }
+            </div>
+            <div class="flex-grow-1">
+                <p class="text-muted mb-3">上传正方形头像效果最佳。选择文件后自动提交至 <code class="sp-mono">/api/personal/avatar/upload</code>。</p>
+                <label class="btn btn-primary">
+                    <i class="fa-solid fa-cloud-arrow-up me-1"></i>选择图片
+                    <input type="file" id="avatarFile" name="avatarFile" accept="image/*" hidden />
+                </label>
+                <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/js/admin-personal.js?v=@AppInfo.ResVer"></script>
+    <script>
+        $(function () {
+            PersonalPages.bindAvatarUpload();
+        });
+    </script>
+}

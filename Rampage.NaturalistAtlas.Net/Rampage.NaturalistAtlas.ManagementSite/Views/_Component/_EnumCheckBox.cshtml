@@ -1,0 +1,26 @@
+﻿@{
+    var Selector = Model!;
+    Selector.Init();
+}
+
+@if (Selector.UseDefault)
+{
+    <div class="form-check form-check-inline">
+        <input type="checkbox" id="@(Selector.FormItemId)" name="@(Selector.FormItemName)" value="@(Selector.DefaultValue)" class="form-check-input" />
+        <label for="@(Selector.FormItemId)" class="form-check form-check-inline @(Selector.Css)" style="@(Selector.Style)">@(Selector.DefaultText)</label>
+    </div>
+}
+@foreach (var item in Selector.Items)
+{
+    <div class="form-check form-check-inline">
+        @if (Selector.UseStringValue)
+        {
+            <input type="checkbox" id="@(Selector.FormItemId)_@(item.IntValue)" name="@(Selector.FormItemName)" value="@(item.StringValue)" class="form-check-input" @Html.Raw(Selector.IsSelected(item.StringValue) ? "checked=\"checked\"" : "") />
+        }
+        else
+        {
+            <input type="checkbox" id="@(Selector.FormItemId)_@(item.IntValue)" name="@(Selector.FormItemName)" value="@(item.IntValue)" class="form-check-input" @Html.Raw(Selector.IsSelected(item.IntValue) ? "checked=\"checked\"" : "") />
+        }
+        <label for="@(Selector.FormItemId)_@(item.IntValue)" class="form-check form-check-inline @(Selector.Css)" style="@(Selector.Style)">@(item.Text)</label>
+    </div>
+}

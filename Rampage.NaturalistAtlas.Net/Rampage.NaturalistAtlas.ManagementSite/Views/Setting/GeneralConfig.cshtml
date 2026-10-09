@@ -1,0 +1,219 @@
+@model GeneralSetting
+@{
+    // 系统设置 · 常规设置：站点信息 / 业务参数 / 数据源占位，保存走 api/setting/general/save
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    GeneralSetting Data = Model!;
+    ViewBag.PageTitle = "常规设置";
+    var CityList = ViewBag.CityList as List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-setting.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-sliders me-2"></i>常规设置</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="setting-hint">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            此处保存全站级配置；业务参数即时生效，数据源配置（iNaturalist + GBIF 双源并行采集）由采集端（Collector）定时读取。
+        </div>
+
+        <form id="GeneralSettingForm" action="~/api/setting/general/save" method="post">
+            <div class="setting-section-title"><i class="fa-solid fa-globe"></i>站点信息</div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtSiteName">网站名称</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtSiteName" name="SiteName" class="form-control" value="@Data.SiteName" />
+                    <div class="invalid-feedback" verify-name="SiteName"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtSiteKeywords">网站关键词</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtSiteKeywords" name="SiteKeywords" class="form-control" value="@Data.SiteKeywords" />
+                    <div class="invalid-feedback" verify-name="SiteKeywords"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtSiteDescription">网站描述</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtSiteDescription" name="SiteDescription" class="form-control" value="@Data.SiteDescription" />
+                    <div class="invalid-feedback" verify-name="SiteDescription"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtCopyright">版权所有</label>
+                <div class="col-sm-10">
+                    <textarea id="txtCopyright" name="Copyright" class="form-control" rows="2">@Html.Raw(Data.Copyright)</textarea>
+                    <div class="invalid-feedback" verify-name="Copyright"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtCopyrightEnglish">英文版权</label>
+                <div class="col-sm-10">
+                    <textarea id="txtCopyrightEnglish" name="CopyrightEnglish" class="form-control" rows="2">@Html.Raw(Data.CopyrightEnglish)</textarea>
+                    <div class="invalid-feedback" verify-name="CopyrightEnglish"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtInternetInformation">备案信息</label>
+                <div class="col-sm-10">
+                    <textarea id="txtInternetInformation" name="InternetInformation" class="form-control" rows="2">@Html.Raw(Data.InternetInformation)</textarea>
+                    <div class="invalid-feedback" verify-name="InternetInformation"></div>
+                </div>
+            </div>
+
+            <div class="setting-section-title"><i class="fa-solid fa-city"></i>业务参数</div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="seltDefaultCityId">默认城市</label>
+                <div class="col-sm-10">
+                    <select id="seltDefaultCityId" name="DefaultCityId" class="form-select" style="max-width:420px">
+                        @foreach (var city in CityList)
+                        {
+                            <option value="@city.Id" selected="@(city.Id == Data.DefaultCityId)">@city.DisplayName</option>
+                        }
+                    </select>
+                    <div class="form-text">主站默认展示城市与看板口径城市（保存时校验存在性）。</div>
+                    <div class="invalid-feedback" verify-name="DefaultCityId"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtHiddenObservationCacheTtlSeconds">隐藏内容缓存TTL(秒)</label>
+                <div class="col-sm-10">
+                    <input type="number" id="txtHiddenObservationCacheTtlSeconds" name="HiddenObservationCacheTtlSeconds" class="form-control" value="@Data.HiddenObservationCacheTtlSeconds" min="0" max="3600" />
+                    <div class="form-text">运营隐藏观察后，主站须在该时限内不再展示（产品验收要求 5 分钟内不可见，默认 300）。</div>
+                    <div class="invalid-feedback" verify-name="HiddenObservationCacheTtlSeconds"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="seltCollectionCities">采集城市清单</label>
+                <div class="col-sm-10">
+                    <!-- 已选城市摘要：chips 即所见即所得，× 可单个移除（多选框里几百个城市难辨已选） -->
+                    <div id="collectionCitySummary" class="mb-2 d-flex flex-wrap gap-1" style="max-width:640px">
+                        <span class="text-muted small">加载中…</span>
+                    </div>
+                    <div class="mb-2 d-flex align-items-center gap-2">
+                        <button type="button" id="btnSelectAllCities" class="btn btn-sm btn-outline-success">全选</button>
+                        <button type="button" id="btnClearCities" class="btn btn-sm btn-outline-secondary">清空</button>
+                        <span id="collectionCityCount" class="small text-muted"></span>
+                    </div>
+                    <!-- 多选列表 + 隐藏字段：提交时 join 成逗号串（原裸 Id 手填易错且无校验） -->
+                    @{ var selectedIds = (Data.CollectionCityIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet(); }
+                    <select id="seltCollectionCities" class="form-select" size="10" multiple style="max-width:420px" aria-label="采集城市清单（按住 Ctrl 多选）">
+                        @foreach (var city in CityList)
+                        {
+                            <option value="@city.Id" selected="@(selectedIds.Contains(city.Id.ToString()))">@city.DisplayName</option>
+                        }
+                    </select>
+                    <input type="hidden" name="CollectionCityIds" id="txtCollectionCityIds" value="@Data.CollectionCityIds" />
+                    <div class="form-text">按住 Ctrl（mac：Cmd）多选或用上方快捷键；采集端（Collector）的增量/回补/对账按此清单迭代城市。未选择任何城市时采集端回退默认城市。</div>
+                    <div class="invalid-feedback" verify-name="CollectionCityIds"></div>
+                </div>
+            </div>
+
+            <div class="setting-section-title"><i class="fa-solid fa-cloud-arrow-down"></i>数据源配置</div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtInatApiBaseUrl">iNaturalist API基址</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtInatApiBaseUrl" name="InatApiBaseUrl" class="form-control" value="@Data.InatApiBaseUrl" placeholder="https://api.inaturalist.org/v2" />
+                    <div class="form-text">iNaturalist v2 API（主数据源），由采集端（Collector）读取。</div>
+                    <div class="invalid-feedback" verify-name="InatApiBaseUrl"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtInatRateLimitPerMinute">采集节流(次/分钟)</label>
+                <div class="col-sm-10">
+                    <input type="number" id="txtInatRateLimitPerMinute" name="InatRateLimitPerMinute" class="form-control" value="@Data.InatRateLimitPerMinute" min="1" max="60" />
+                    <div class="form-text">iNaturalist 官方硬限 60 次/分钟，内置节流建议不超过 30。</div>
+                    <div class="invalid-feedback" verify-name="InatRateLimitPerMinute"></div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtGbifApiBaseUrl">GBIF API基址</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtGbifApiBaseUrl" name="GbifApiBaseUrl" class="form-control" value="@Data.GbifApiBaseUrl" placeholder="https://api.gbif.org/v1" />
+                    <div class="form-text">GBIF Occurrence API（双源并行采集的第二数据源），由采集端（Collector）读取。</div>
+                    <div class="invalid-feedback" verify-name="GbifApiBaseUrl"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtGbifRateLimitPerMinute">GBIF节流(次/分钟)</label>
+                <div class="col-sm-10">
+                    <input type="number" id="txtGbifRateLimitPerMinute" name="GbifRateLimitPerMinute" class="form-control" value="@Data.GbifRateLimitPerMinute" min="1" max="120" />
+                    <div class="form-text">GBIF 无硬性限额，建议保持克制（默认 60）。</div>
+                    <div class="invalid-feedback" verify-name="GbifRateLimitPerMinute"></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-primary px-5" type="submit"><i class="fa-solid fa-floppy-disk me-1"></i>保存设置</button>
+            </div>
+            <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        $(function () {
+            // ==== 采集城市清单：chips 摘要 + 快捷键 ====
+            var $citySelect = $('#seltCollectionCities');
+
+            function refreshCitySummary() {
+                var picked = $citySelect.val() || [];
+                var $box = $('#collectionCitySummary');
+                $box.empty();
+                if (picked.length === 0) {
+                    $box.append('<span class="text-muted small">未选择（保存后采集端回退默认城市）</span>');
+                } else {
+                    picked.forEach(function (id) {
+                        var $opt = $citySelect.find('option[value="' + id + '"]');
+                        var name = $opt.length ? $opt.text() : ('#' + id);
+                        var $chip = $('<span class="badge text-bg-light d-inline-flex align-items-center gap-1"></span>')
+                            .css({ 'font-size': '.78rem', 'padding': '.3em .5em' })
+                            .text(name)
+                            .attr('data-city-id', id);
+                        $('<a href="javascript:void(0)" class="ms-1 text-decoration-none text-danger" title="移除">×</a>')
+                            .on('click', function () {
+                                $opt.prop('selected', false);
+                                refreshCitySummary();
+                            })
+                            .appendTo($chip);
+                        $box.append($chip);
+                    });
+                }
+                $('#collectionCityCount').text('已选 ' + picked.length + ' 城');
+            }
+
+            $citySelect.on('change', refreshCitySummary);
+            $('#btnSelectAllCities').on('click', function () {
+                $citySelect.find('option').prop('selected', true);
+                refreshCitySummary();
+            });
+            $('#btnClearCities').on('click', function () {
+                $citySelect.find('option').prop('selected', false);
+                refreshCitySummary();
+            });
+            refreshCitySummary();
+
+            RPG.FormSubmitter('GeneralSettingForm', {
+                prepareHandler: function (data) {
+                    // 采集城市多选 → 逗号串（隐藏字段承载提交值；清空选择时提交空串走默认城市回退）
+                    var picked = $('#seltCollectionCities').val() || [];
+                    data.CollectionCityIds = picked.join(',');
+                },
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+        });
+    </script>
+}

@@ -1,0 +1,114 @@
+@model ListViewData<Province, ProvinceAdminFilter>
+@{
+    // 省份列表：国家筛选 + 区划码/中英文名关键字 + 状态；行内编辑/启停/删除
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    List<Province> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    ProvinceAdminFilter DataFilter = Model!.DataFilter;
+    List<Country> CountryList = ViewBag.CountryList ?? new List<Country>();
+    Dictionary<int, string> CountryNameDict = ViewBag.CountryNameDict ?? new Dictionary<int, string>();
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-city.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-primary" href="~/Province/Province_Add"><i class="fa-solid fa-plus me-1"></i>添加省份</a>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-map me-2"></i>省份列表</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="setting-hint">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            「省份」泛指国家一级区划（省/州/都道府县/大区等）；区划码采用 ISO 3166-2，同一国家内唯一。
+        </div>
+
+        <form class="sp-toolbar" action="~/Province/Province_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                <select name="CountryId" class="form-select" style="width:160px">
+                    <option value="">全部国家</option>
+                    @foreach (var country in CountryList)
+                    {
+                        <option value="@country.Id" selected="@(DataFilter.CountryId == country.Id)">@country.Name</option>
+                    }
+                </select>
+                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="区划码 / 中文名 / 英文名" value="@DataFilter.Keywords" />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>国家</th>
+                        <th>区划码</th>
+                        <th>中文名</th>
+                        <th>英文名</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>@item.Id</td>
+                            <td>@(CountryNameDict.TryGetValue(item.CountryId, out string? countryName) ? countryName : item.CountryId.ToString())</td>
+                            <td><code class="sp-mono">@(string.IsNullOrWhiteSpace(item.Code) ? "-" : item.Code)</code></td>
+                            <td>@item.Name</td>
+                            <td>@item.NameEn</td>
+                            <td>
+                                <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-danger")">@EnumReader.GetText(item.Status)</span>
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="~/Province/Province_Edit?ProvinceId=@(item.Id)" class="btn btn-sm btn-info">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                </a>
+                                <button type="button" data-id="@item.Id"
+                                        data-status="@(item.Status == CommonStatus.Enabled ? 0 : 1)"
+                                        data-api="/api/province"
+                                        data-action="geo-status"
+                                        class="btn btn-sm @(item.Status == CommonStatus.Enabled ? "btn-outline-secondary" : "btn-success")">
+                                    <i class="fa-solid @(item.Status == CommonStatus.Enabled ? "fa-ban" : "fa-circle-check") me-1"></i>@(item.Status == CommonStatus.Enabled ? "停用" : "启用")
+                                </button>
+                                <button type="button" data-id="@item.Id" data-api="/api/province" data-action="geo-delete" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="7" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/js/admin-geo.js?v=@AppInfo.ResVer"></script>
+}

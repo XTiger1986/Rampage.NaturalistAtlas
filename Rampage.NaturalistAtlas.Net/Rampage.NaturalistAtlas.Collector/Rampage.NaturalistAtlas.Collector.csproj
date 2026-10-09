@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="config\app.Development.json" />
+    <None Remove="config\app.json" />
+    <None Remove="config\app.Production.json" />
+    <None Remove="config\log4net.config" />
+    <None Remove="config\log4net.Development.config" />
+    <None Remove="config\log4net.Production.config" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FluentScheduler" Version="5.5.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <Content Include="config\app.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\app.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\app.Production.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\log4net.Development.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\log4net.Production.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Rampage\Distributed\Rampage.RedisLibrary\Rampage.RedisLibrary.csproj" />
+    <ProjectReference Include="..\..\..\Rampage\Rampage\Rampage.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.BLL\Rampage.NaturalistAtlas.BLL.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.Common\Rampage.NaturalistAtlas.Common.csproj" />
+    <ProjectReference Include="..\Rampage.NaturalistAtlas.Model\Rampage.NaturalistAtlas.Model.csproj" />
+  </ItemGroup>
+
+</Project>

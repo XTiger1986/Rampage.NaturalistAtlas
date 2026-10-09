@@ -1,0 +1,137 @@
+@model ListViewData<City, CityAdminFilter>
+@{
+    // 城市列表：国家/省份/关键字/状态筛选；行内编辑/启停/删除
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    List<City> DataList = Model!.DataList;
+    DataPager DataPager = Model!.DataPager!;
+    CityAdminFilter DataFilter = Model!.DataFilter;
+    List<Country> CountryList = ViewBag.CountryList ?? new List<Country>();
+    Dictionary<int, string> CountryNameDict = ViewBag.CountryNameDict ?? new Dictionary<int, string>();
+    Dictionary<int, string> ProvinceNameDict = ViewBag.ProvinceNameDict ?? new Dictionary<int, string>();
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-city.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-primary" href="~/City/City_Add"><i class="fa-solid fa-plus me-1"></i>添加城市</a>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-city me-2"></i>城市列表</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form class="sp-toolbar" action="~/City/City_List" method="get">
+            <div class="sp-toolbar__filters">
+                <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
+                <select name="CountryId" class="form-select" style="width:160px">
+                    <option value="">全部国家</option>
+                    @foreach (var country in CountryList)
+                    {
+                        <option value="@country.Id" selected="@(DataFilter.CountryId == country.Id)">@country.Name</option>
+                    }
+                </select>
+                <input type="search" name="Keywords" class="form-control" style="width:200px" placeholder="名称 / 英文名 / URL标识" value="@DataFilter.Keywords" />
+                <partial name="~/Views/_Component/_EnumSelector.cshtml"
+                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+            </div>
+        </form>
+
+        <div class="sp-table-wrap">
+            <table class="table table-hover sp-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>城市名称</th>
+                        <th>国家 / 省份</th>
+                        <th>URL标识</th>
+                        <th>bbox 四至（西南 → 东北）</th>
+                        <th>源站档案</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if (DataList.Count > 0)
+                {
+                    foreach (var item in DataList)
+                    {
+                        <tr id="trDataItem_@(item.Id)">
+                            <td>@item.Id</td>
+                            <td>
+                                <div>@item.Name</div>
+                                @if (!string.IsNullOrWhiteSpace(item.NameEn))
+                                {
+                                    <div class="text-muted small">@item.NameEn</div>
+                                }
+                            </td>
+                            <td>
+                                <div>@(CountryNameDict.TryGetValue(item.CountryId, out string? countryName) ? countryName : item.CountryId.ToString())</div>
+                                <div class="text-muted small">
+                                    @(item.ProvinceId.HasValue && ProvinceNameDict.TryGetValue(item.ProvinceId.Value, out string? provinceName) ? provinceName : "—")
+                                </div>
+                            </td>
+                            <td><code class="sp-mono">@item.Slug</code></td>
+                            <td class="sp-mono small">
+                                @item.SwLng.ToString("0.######"), @item.SwLat.ToString("0.######") → @item.NeLng.ToString("0.######"), @item.NeLat.ToString("0.######")
+                            </td>
+                            <td class="small" title="iNat place id / 边界 WKT 归档状态">
+                                @if (item.InatPlaceId.HasValue)
+                                {
+                                    <span class="badge text-bg-light sp-mono">place @item.InatPlaceId</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">无 place</span>
+                                }
+                                @if (!string.IsNullOrEmpty(item.BoundaryWkt))
+                                {
+                                    <i class="fa-solid fa-draw-polygon text-success ms-1" title="已归档边界 WKT"></i>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-danger")">@EnumReader.GetText(item.Status)</span>
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="~/City/City_Edit?CityId=@(item.Id)" class="btn btn-sm btn-info">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                </a>
+                                <button type="button" data-id="@item.Id"
+                                        data-status="@(item.Status == CommonStatus.Enabled ? 0 : 1)"
+                                        data-action="city-status"
+                                        class="btn btn-sm @(item.Status == CommonStatus.Enabled ? "btn-outline-secondary" : "btn-success")">
+                                    <i class="fa-solid @(item.Status == CommonStatus.Enabled ? "fa-ban" : "fa-circle-check") me-1"></i>@(item.Status == CommonStatus.Enabled ? "停用" : "启用")
+                                </button>
+                                <button type="button" data-id="@item.Id" data-action="city-delete" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="8" class="sp-empty">@GL.Get("NoData")</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <partial name="~/Views/_Component/_Pager.cshtml" for="@DataPager" />
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/js/admin-city.js?v=@AppInfo.ResVer"></script>
+}

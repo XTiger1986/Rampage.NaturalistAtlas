@@ -1,0 +1,16 @@
+﻿@{
+    var Selector = Model!;
+    Selector.Init();
+}
+
+<select name="@(Selector.FormItemName)" id="@(Selector.FormItemId)" @Html.Raw(Selector.Multiple ? "multiple=\"multiple\"" : "") class="form-select @(Selector.Css)" style="@(Selector.Style)">
+    @if (Selector.UseDefault)
+    {
+        <option value="@(Selector.DefaultValue)">@(Selector.DefaultText)</option>
+    }
+    
+    @foreach (var item in Selector.Items)
+    {
+        @Html.Raw("<option" + (Selector.IsSelected(item.Key) ? " selected=\"selected\"" : "") + " value=\"" + item.Key +"\">" + item.Value + "</option>")
+    }
+</select>

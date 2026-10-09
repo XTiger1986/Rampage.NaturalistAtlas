@@ -1,0 +1,97 @@
+@model Country
+@{
+    // 国家编辑：新增/编辑共用（Id<=0 为新增）；保存走 api/country/save
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    Country Data = Model!;
+    bool IsCreate = Data.Id <= 0;
+    ViewBag.PageTitle = IsCreate ? "添加国家" : "编辑国家";
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-city.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-outline-secondary" href="~/Country/Country_List"><i class="fa-solid fa-arrow-left me-1"></i>返回列表</a>
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title"><i class="fa-solid fa-earth-asia me-2"></i>@(IsCreate ? "添加国家" : $"编辑国家 - {Data.Name}")</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <div class="setting-hint">
+            <i class="fa-solid fa-circle-info me-1"></i>
+            国家代码采用 ISO 3166-1 alpha-2（2 位小写字母，全站唯一）；种子已内置全量清单，通常只需增补个别条目。
+        </div>
+
+        <form id="CountryForm" action="~/api/country/save" method="post">
+            <input type="hidden" name="Id" value="@Data.Id" />
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtCode">国家代码</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtCode" name="Code" class="form-control sp-mono" style="max-width:120px" maxlength="2" value="@Data.Code" placeholder="如 cn" />
+                    <div class="form-text">ISO 3166-1 alpha-2，2 位小写字母。</div>
+                    <div class="invalid-feedback" verify-name="Code"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtName">中文名</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtName" name="Name" class="form-control" style="max-width:320px" value="@Data.Name" placeholder="如 中国" />
+                    <div class="invalid-feedback" verify-name="Name"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtNameEn">英文名</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtNameEn" name="NameEn" class="form-control" style="max-width:320px" value="@Data.NameEn" placeholder="如 China" />
+                    <div class="invalid-feedback" verify-name="NameEn"></div>
+                </div>
+            </div>
+            <div class="setting-section-title"><i class="fa-solid fa-location-crosshairs"></i>定位中心点（前端地点搜索定位用）</div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtLng">经度 / 纬度</label>
+                <div class="col-sm-10">
+                    <div class="city-bbox-pair">
+                        <input type="number" step="0.000001" id="txtLng" name="Lng" class="form-control sp-mono" value="@Data.Lng" placeholder="经度 -180 ~ 180" />
+                        <input type="number" step="0.000001" name="Lat" class="form-control sp-mono" value="@Data.Lat" placeholder="纬度 -90 ~ 90" />
+                    </div>
+                    <div class="form-text">国家地图定位的中心点（近似值即可，精确到 0.1° 量级）。</div>
+                    <div class="invalid-feedback" verify-name="Lng"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">状态</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml"
+                             model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", SelectedValue = Data.Status == CommonStatus.Enabled ? CommonStatus.Enabled : CommonStatus.Disabled }' />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-primary px-5" type="submit"><i class="fa-solid fa-floppy-disk me-1"></i>@GL.Get("SubmitToSave")</button>
+            </div>
+            <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        $(function () {
+            RPG.FormSubmitter('CountryForm', {
+                completeHandler: function (jsonResult) {
+                    window.location.href = '/Country/Country_List';
+                },
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+        });
+    </script>
+}

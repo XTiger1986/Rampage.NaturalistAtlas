@@ -1,0 +1,182 @@
+@{
+    // 运营看板首页：指标卡 + 三张 Chart.js 图表 + 同步健康度（数据由 admin-dashboard.js 异步加载）
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    CurrentAuthorizationInfo CurrentAuthorization = ViewBag.CurrentAuthorization;
+    AdminDto CurrentAdmin = CurrentAuthorization.CurrentAdmin!;
+    ViewBag.PageTitle = GL.Get("Dashboard");
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-dashboard.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-home-hero">
+    <h1><i class="fa-solid fa-leaf me-2"></i>自然地图志 · 管理控制台</h1>
+    <p>自然探索观察数据的解读与治理入口 —— 口径城市：<strong id="dashCity">…</strong>；观察统计均取「正常展示」状态的记录。</p>
+    <p class="small text-muted mb-0">指标卡 / 类群构成 / 入库趋势 / 月度分布按口径城市过滤；城市排行、采集失败、举报趋势与同步健康度为全站口径。</p>
+</div>
+
+<div class="row g-3 sp-home-cards mb-3">
+    <div class="col-6 col-lg-2">
+        <div class="dash-card">
+            <span class="dash-card__icon"><i class="fa-solid fa-binoculars"></i></span>
+            <div>
+                <div class="dash-card__num" id="dashTotal">—</div>
+                <div class="dash-card__label">观察总量</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2">
+        <div class="dash-card">
+            <span class="dash-card__icon"><i class="fa-solid fa-microscope"></i></span>
+            <div>
+                <div class="dash-card__num" id="dashResearch">—</div>
+                <div class="dash-card__label">研究级占比</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2">
+        <div class="dash-card">
+            <span class="dash-card__icon dash-card__icon--amber"><i class="fa-solid fa-seedling"></i></span>
+            <div>
+                <div class="dash-card__num" id="dashMonthInsert">—</div>
+                <div class="dash-card__label">本月入库</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="dash-card">
+            <span class="dash-card__icon dash-card__icon--berry"><i class="fa-solid fa-flag"></i></span>
+            <div>
+                <div class="dash-card__num" id="dashPendingReport">—</div>
+                <div class="dash-card__label">待处理举报</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-3">
+        <div class="dash-card">
+            <span class="dash-card__icon dash-card__icon--amber"><i class="fa-solid fa-clock"></i></span>
+            <div>
+                <div class="dash-card__num" id="dashFreshness">—</div>
+                <div class="dash-card__label">数据新鲜度（最新观察源站发布）</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-5">
+        <div class="sp-panel dash-chart-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-leaf me-2"></i>类群构成</h2>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="dash-chart-wrap">
+                    <canvas id="chartIconic"></canvas>
+                </div>
+                <div id="chartIconicEmpty" class="sp-empty" style="display:none">暂无观察数据</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="sp-panel dash-chart-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-chart-line me-2"></i>近 30 天入库趋势</h2>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="dash-chart-wrap">
+                    <canvas id="chartTrend"></canvas>
+                </div>
+                <div id="chartTrendEmpty" class="sp-empty" style="display:none">暂无观察数据</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-4">
+        <div class="sp-panel dash-chart-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-city me-2"></i>活跃城市 Top 10</h2>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="dash-chart-wrap">
+                    <canvas id="chartCityTop"></canvas>
+                </div>
+                <div id="chartCityTopEmpty" class="sp-empty" style="display:none">暂无观察数据</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="sp-panel dash-chart-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-triangle-exclamation me-2"></i>近 30 天采集失败</h2>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="dash-chart-wrap">
+                    <canvas id="chartSyncFail"></canvas>
+                </div>
+                <div id="chartSyncFailEmpty" class="sp-empty" style="display:none">近 30 天无失败/熔断</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="sp-panel dash-chart-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-flag me-2"></i>近 30 天举报量</h2>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="dash-chart-wrap">
+                    <canvas id="chartReport"></canvas>
+                </div>
+                <div id="chartReportEmpty" class="sp-empty" style="display:none">近 30 天无举报</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="sp-panel dash-chart-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-chart-column me-2"></i>近 12 个月观察分布</h2>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="dash-chart-wrap">
+                    <canvas id="chartMonthly"></canvas>
+                </div>
+                <div id="chartMonthlyEmpty" class="sp-empty" style="display:none">暂无观察数据</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="sp-panel h-100">
+            <div class="sp-panel__hd">
+                <h2 class="sp-panel__title"><i class="fa-solid fa-cloud-arrow-down me-2"></i>同步健康度</h2>
+            </div>
+            <div class="sp-panel__bd">
+                <div class="sp-table-wrap">
+                    <table class="table table-hover sp-table">
+                        <thead>
+                            <tr>
+                                <th>任务</th>
+                                <th>上次状态</th>
+                                <th>上次运行</th>
+                                <th>摘要</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashHealthBody">
+                            <tr><td colspan="4" class="sp-empty">加载中…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Foot {
+    <script src="~/assets/vendor/chartjs4.4.9/chart.umd.min.js"></script>
+    <script src="~/assets/js/admin-dashboard.js?v=@AppInfo.ResVer"></script>
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="night">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="自然地图志：打开地图，探索任何地方最近被记录到的自然事物" />
+    <meta name="theme-color" content="#0b1512" />
+    <title>自然地图志</title>
+    <!-- 字体：思源宋体（纸本主题标题）+ 思源黑体（正文）。 / Fonts: Noto Serif SC (journal-theme headings) + Noto Sans SC (body).
+         非阻塞加载（media=print + onload 切换）：fonts.googleapis.com 在大陆可能长时间挂起， / Non-blocking load (media=print + onload switch): fonts.googleapis.com can hang for long stretches in mainland China,
+         阻塞式 stylesheet 会拖垮首屏；此法挂起时页面立即以系统字体渲染，字体到达后再换装。 / and a blocking stylesheet would drag down first paint; this way the page renders immediately in system fonts and swaps in once fonts arrive.
+         正式上线建议替换为自托管 woff2（动态中文物种名需全集 CJK，子集化不适用） / For production, replace with self-hosted woff2 (dynamic Chinese species names need the full CJK set; subsetting does not apply) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all';this.onload=null"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;700&display=swap"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;700&display=swap"
+      />
+    </noscript>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

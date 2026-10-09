@@ -1,0 +1,82 @@
+/* =====================================================================
+   admin-dashboard.css — 运营看板（首页）专属样式
+   主题：神秘自然（蕨绿/苔藓/琥珀数据色板）
+   ===================================================================== */
+
+/* --- 指标卡（数字 + 图标 + 标签） --- */
+.dash-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1px solid var(--sp-line, rgba(178, 226, 194, .1));
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse 120% 140% at 100% 0%, rgba(63, 191, 127, .07), transparent 60%),
+        rgba(190, 240, 205, .02);
+}
+
+.dash-card__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex: 0 0 auto;
+    background: rgba(63, 191, 127, .12);
+    color: var(--sp-primary, #3fbf7f);
+}
+
+.dash-card__icon--amber {
+    background: rgba(232, 180, 90, .12);
+    color: var(--sp-amber, #e8b45a);
+}
+
+.dash-card__icon--berry {
+    background: rgba(232, 112, 127, .12);
+    color: var(--sp-danger, #e8707f);
+}
+
+.dash-card__num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--sp-text, #e9f4ec);
+}
+
+.dash-card__label {
+    font-size: .78rem;
+    color: var(--sp-text-secondary, #93b3a0);
+}
+
+/* --- 图表面板：等高画布 --- */
+.dash-chart-panel {
+    min-height: 320px;
+}
+
+.dash-chart-wrap {
+    position: relative;
+    height: 260px;
+}
+
+/* --- 同步健康度状态点 --- */
+.dash-health-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    background: var(--sp-text-secondary, #93b3a0);
+}
+
+.dash-health-dot--ok {
+    background: var(--sp-primary, #3fbf7f);
+    box-shadow: 0 0 6px rgba(63, 191, 127, .6);
+}
+
+.dash-health-dot--bad {
+    background: var(--sp-danger, #e8707f);
+    box-shadow: 0 0 6px rgba(232, 112, 127, .6);
+}

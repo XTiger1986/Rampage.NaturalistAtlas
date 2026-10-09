@@ -1,0 +1,856 @@
+/* =====================================================================
+   admin-shell.css — 自然地图志管理后台全站外壳样式
+   主题：神秘自然 · 生机活力（深林夜色 / 苔藓绿 / 晨光琥珀）
+   覆盖：布局骨架 / 侧栏 / 顶栏 / 面板 / 工具栏 / 表格 / 提示 / 分页
+   基于 Bootstrap 5.3.2（暗色主题定制）
+   ===================================================================== */
+
+/* --- 全局变量（自然色板） ---
+   --sp-bg        深林夜色（页面底）
+   --sp-bg-2      苔藓深绿（背景光晕）
+   --sp-panel     面板底（微透明叶绿）
+   --sp-line      分隔线（叶脉微光）
+   --sp-text      正文（薄荷白）
+   --sp-text-secondary 辅助文字（鼠尾草绿灰）
+   --sp-primary   生机蕨绿（主操作色）
+   --sp-amber     晨光琥珀（点缀/警示暖色） */
+:root {
+    color-scheme: dark;
+    --sp-bg: #08120c;
+    --sp-bg-2: #0e2117;
+    --sp-panel: rgba(190, 240, 205, .03);
+    --sp-line: rgba(178, 226, 194, .1);
+    --sp-text: #e9f4ec;
+    --sp-text-secondary: #93b3a0;
+    --sp-primary: #3fbf7f;
+    --sp-success: #55d68d;
+    --sp-danger: #e8707f;
+    --sp-warning: #eec25f;
+    --sp-amber: #e8b45a;
+    --sp-sidebar-w: 248px;
+    --sp-header-h: 56px;
+}
+
+/* --- 页面基础：林间夜色底 + 苔藓光晕 + 远处晨光 --- */
+.sp-body {
+    margin: 0;
+    background:
+        radial-gradient(ellipse 60% 40% at 88% 105%, rgba(232, 180, 90, .05), transparent 60%),
+        radial-gradient(ellipse at 15% 0%, var(--sp-bg-2) 0%, var(--sp-bg) 55%);
+    color: var(--sp-text);
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+/* --- 表单/文本辅助类（Bootstrap 暗色补丁） --- */
+.sp-body .form-text {
+    color: var(--sp-text-secondary);
+    font-size: .82rem;
+    margin-top: .35rem;
+}
+
+/* .text-muted 在暗底上对比度不足，统一提亮 */
+.sp-body .text-muted {
+    color: var(--sp-text-secondary) !important;
+}
+
+.sp-app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sp-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sp-content {
+    flex: 1 1 auto;
+    padding: 20px 24px 32px;
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.sp-footer {
+    padding: 12px 24px;
+    color: var(--sp-text-secondary);
+    font-size: .78rem;
+    border-top: 1px solid var(--sp-line);
+    text-align: center;
+}
+
+/* --- 顶栏：悬浮苔原玻璃 --- */
+.sp-header {
+    height: var(--sp-header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--sp-line);
+    background: rgba(8, 18, 12, .82);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.sp-header__left,
+.sp-header__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sp-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--sp-line);
+    background: rgba(190, 240, 205, .04);
+    color: var(--sp-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.sp-icon-btn:hover {
+    background: rgba(190, 240, 205, .09);
+    border-color: rgba(63, 191, 127, .35);
+}
+
+/* --- 管理员菜单（顶栏右侧） --- */
+.sp-admin-menu {
+    position: relative;
+}
+
+.sp-admin-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 4px 4px;
+    border-radius: 999px;
+    border: 1px solid var(--sp-line);
+    background: rgba(190, 240, 205, .04);
+    color: var(--sp-text);
+    cursor: pointer;
+}
+
+.sp-admin-chip:hover {
+    background: rgba(190, 240, 205, .09);
+    border-color: rgba(63, 191, 127, .35);
+}
+
+/* 头像底：苔藓到蕨绿的渐变 */
+.sp-admin-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sp-primary), #2c8f5d);
+    color: #06130c;
+    font-size: .8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex: 0 0 auto;
+}
+
+.sp-admin-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sp-admin-name {
+    font-size: .88rem;
+}
+
+.sp-admin-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 180px;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid var(--sp-line);
+    background: #0d1f15;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+    display: none;
+}
+
+.sp-admin-menu.open .sp-admin-dropdown {
+    display: block;
+}
+
+.sp-admin-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: var(--sp-text);
+    text-decoration: none;
+    font-size: .88rem;
+}
+
+.sp-admin-dropdown a:hover {
+    background: rgba(63, 191, 127, .12);
+}
+
+.sp-drop-sep {
+    height: 1px;
+    margin: 6px 4px;
+    background: var(--sp-line);
+}
+
+/* --- 侧栏：深苔纵列 --- */
+.sp-sidebar {
+    width: var(--sp-sidebar-w);
+    flex: 0 0 var(--sp-sidebar-w);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--sp-line);
+    background: linear-gradient(180deg, #0d2015 0%, #091710 100%);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    transition: margin-left .2s ease;
+    z-index: 30;
+}
+
+/* 侧栏滚动条：苔绿细条 */
+.sp-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sp-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(147, 179, 160, .22);
+    border-radius: 4px;
+}
+
+/* 桌面端收合：按钮切换 body.sp-sidebar-open，侧栏滑出屏外 */
+@media (min-width: 992px) {
+    .sp-body.sp-sidebar-open .sp-sidebar {
+        margin-left: calc(-1 * var(--sp-sidebar-w));
+    }
+}
+
+.sp-sidebar__brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    text-decoration: none;
+    color: var(--sp-text);
+    border-bottom: 1px solid var(--sp-line);
+}
+
+/* 品牌标志：叶形徽记带生机辉光 */
+.sp-sidebar__mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 4px 14px rgba(63, 191, 127, .35);
+    flex: 0 0 auto;
+}
+
+.sp-sidebar__title {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: .03em;
+}
+
+.sp-sidebar__title small {
+    font-weight: 400;
+    font-size: .68rem;
+    color: var(--sp-amber);
+    letter-spacing: .18em;
+}
+
+.sp-sidebar__nav {
+    flex: 1 1 auto;
+    padding: 10px 10px 16px;
+}
+
+.sp-sidebar__foot {
+    border-top: 1px solid var(--sp-line);
+    padding: 10px 10px 16px;
+}
+
+.sp-nav-cat {
+    padding: 14px 10px 6px;
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--sp-text-secondary);
+}
+
+.sp-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    color: var(--sp-text);
+    text-decoration: none;
+    font-size: .9rem;
+    transition: background .15s ease, color .15s ease;
+}
+
+.sp-nav-link i {
+    width: 18px;
+    text-align: center;
+    flex: 0 0 auto;
+}
+
+.sp-nav-link:hover {
+    background: rgba(190, 240, 205, .07);
+}
+
+/* 激活态：蕨绿光带 + 左缘叶脉亮线 */
+.sp-nav-link.active {
+    background: linear-gradient(90deg, rgba(63, 191, 127, .22), rgba(63, 191, 127, .04));
+    color: #dff5e6;
+    box-shadow: inset 2px 0 0 var(--sp-primary);
+}
+
+/* 可折叠子菜单 */
+.sp-nav-sub {
+    list-style: none;
+    margin: 2px 0 4px;
+    padding: 0 0 0 28px;
+    display: none;
+}
+
+.sp-nav-group.open .sp-nav-sub {
+    display: block;
+}
+
+.sp-nav-group .sp-nav-caret {
+    margin-left: auto;
+    font-size: .7rem;
+    transition: transform .18s ease;
+    color: var(--sp-text-secondary);
+}
+
+.sp-nav-group.open .sp-nav-caret {
+    transform: rotate(90deg);
+}
+
+.sp-sidebar-backdrop {
+    display: none;
+}
+
+/* --- 页头（面包屑 + 操作区） --- */
+.sp-page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.sp-page-head-main {
+    min-width: 0;
+}
+
+.sp-page-title {
+    margin: 0 0 6px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+/* 面包屑（_BreadCrumb.cshtml） */
+.sp-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: .82rem;
+    color: var(--sp-text-secondary);
+}
+
+.sp-breadcrumb > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 分隔箭头（Font Awesome 7，回退 6） */
+.sp-breadcrumb > li + li::before {
+    content: '\f105';
+    font-family: 'Font Awesome 7 Free', 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-right: 4px;
+    opacity: .45;
+    font-size: .72rem;
+}
+
+.sp-breadcrumb a {
+    color: var(--sp-text-secondary);
+    text-decoration: none;
+}
+
+.sp-breadcrumb a:hover {
+    color: var(--sp-primary);
+}
+
+.sp-breadcrumb .active {
+    color: var(--sp-text);
+}
+
+/* --- 全局链接（Bootstrap 暗色下补默认色） --- */
+.sp-body a:not(.btn):not(.page-link):not(.sp-nav-link):not(.sp-admin-dropdown a) {
+    color: #6fd6a0;
+    text-decoration: none;
+}
+
+.sp-body a:not(.btn):not(.page-link):not(.sp-nav-link):not(.sp-admin-dropdown a):hover {
+    color: #9ce8bd;
+    text-decoration: underline;
+}
+
+/* --- 分页（_Pager.cshtml，dataTable 风格） --- */
+.dataTables_info {
+    color: var(--sp-text-secondary);
+    font-size: .85rem;
+    padding-top: 8px;
+}
+
+.dataTables_paginate {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dataTables_paginate .pagination {
+    margin: 0;
+    --bs-pagination-bg: transparent;
+    --bs-pagination-color: var(--sp-text);
+    --bs-pagination-border-color: var(--sp-line);
+    --bs-pagination-hover-bg: rgba(190, 240, 205, .07);
+    --bs-pagination-hover-color: var(--sp-text);
+    --bs-pagination-hover-border-color: var(--sp-line);
+    --bs-pagination-focus-color: var(--sp-text);
+    --bs-pagination-focus-bg: rgba(190, 240, 205, .1);
+    --bs-pagination-focus-box-shadow: 0 0 0 .2rem rgba(63, 191, 127, .18);
+    --bs-pagination-active-bg: var(--sp-primary);
+    --bs-pagination-active-color: #06130c;
+    --bs-pagination-active-border-color: var(--sp-primary);
+    --bs-pagination-disabled-bg: transparent;
+    --bs-pagination-disabled-color: rgba(147, 179, 160, .4);
+    --bs-pagination-disabled-border-color: var(--sp-line);
+}
+
+.dataTables_paginate .page-link {
+    font-size: .85rem;
+}
+
+/* --- 页面操作区 --- */
+.sp-page-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* --- 面板 --- */
+.sp-panel {
+    background: var(--sp-panel);
+    border: 1px solid var(--sp-line);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.sp-panel__hd {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--sp-line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.sp-panel__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.sp-panel__bd {
+    padding: 16px 18px;
+}
+
+/* --- 工具栏（筛选表单） --- */
+.sp-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.sp-toolbar__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.sp-toolbar__field {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sp-toolbar__label {
+    color: var(--sp-text-secondary);
+    font-size: .82rem;
+    white-space: nowrap;
+}
+
+/* --- 表格 --- */
+.sp-table-wrap {
+    overflow-x: auto;
+}
+
+/* 粘性表头：长表滚动时列头保持可见（不透明底遮住滚过的行；面板底为微透明色，混一层底色加固） */
+.sp-table-wrap .sp-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #12241c;
+}
+
+.sp-table {
+    margin-bottom: 0;
+    color: var(--sp-text);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--sp-text);
+    --bs-table-hover-color: var(--sp-text);
+    --bs-table-hover-bg: rgba(190, 240, 205, .04);
+    --bs-table-striped-color: var(--sp-text);
+    --bs-table-striped-bg: rgba(190, 240, 205, .02);
+}
+
+.sp-table thead th {
+    color: var(--sp-text-secondary);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--sp-line);
+    white-space: nowrap;
+    padding: 10px 12px;
+}
+
+.sp-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(178, 226, 194, .05);
+    vertical-align: middle;
+}
+
+.sp-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.sp-empty {
+    text-align: center;
+    padding: 28px 0;
+    color: var(--sp-text-secondary);
+}
+
+/* --- 统计卡 --- */
+.sp-stat {
+    padding: 10px 8px;
+    border: 1px solid var(--sp-line);
+    border-radius: 8px;
+    background: rgba(190, 240, 205, .03);
+}
+
+.sp-stat__num {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.sp-stat__label {
+    font-size: .75rem;
+    color: var(--sp-text-secondary);
+}
+
+/* --- 首页英雄区（Home/Index） --- */
+.sp-home-hero {
+    padding: 28px 26px;
+    margin-bottom: 18px;
+    border: 1px solid var(--sp-line);
+    border-radius: 14px;
+    background:
+        radial-gradient(ellipse 70% 120% at 100% 0%, rgba(232, 180, 90, .07), transparent 55%),
+        radial-gradient(ellipse 60% 140% at 0% 100%, rgba(63, 191, 127, .1), transparent 60%),
+        rgba(190, 240, 205, .02);
+}
+
+.sp-home-hero h1 {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--sp-text);
+}
+
+.sp-home-hero h1 i {
+    color: var(--sp-primary);
+}
+
+.sp-home-hero p {
+    margin: 0;
+    color: var(--sp-text-secondary);
+    font-size: .92rem;
+    line-height: 1.8;
+}
+
+.sp-home-cards {
+    margin-bottom: 18px;
+}
+
+/* --- 提示条 / 气泡 --- */
+.sp-tip {
+    margin-top: 10px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    font-size: .85rem;
+    background: rgba(190, 240, 205, .05);
+}
+
+.sp-tip--ok {
+    color: var(--sp-success);
+    border: 1px solid rgba(85, 214, 141, .3);
+}
+
+.sp-tip--error {
+    color: var(--sp-danger);
+    border: 1px solid rgba(232, 112, 127, .3);
+}
+
+.sp-floating-tip {
+    position: fixed;
+    top: 68px;
+    right: 24px;
+    z-index: 1080;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: .88rem;
+    background: #0d1f15;
+    border: 1px solid var(--sp-line);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
+    animation: sp-tip-in .18s ease;
+}
+
+.sp-floating-tip--ok {
+    color: var(--sp-success);
+}
+
+.sp-floating-tip--error {
+    color: var(--sp-danger);
+}
+
+@keyframes sp-tip-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 按钮加载态 --- */
+.sp-btn-loading {
+    opacity: .7;
+    pointer-events: none;
+}
+
+/* --- 等宽字体 --- */
+.sp-mono {
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* --- Bootstrap 暗色适配（按钮/表单/徽章） --- */
+.sp-body .btn-outline-secondary {
+    --bs-btn-color: var(--sp-text-secondary);
+    --bs-btn-border-color: var(--sp-line);
+    --bs-btn-hover-bg: rgba(190, 240, 205, .09);
+    --bs-btn-hover-border-color: var(--sp-line);
+    --bs-btn-hover-color: var(--sp-text);
+}
+
+/* 主按钮：蕨绿渐变（覆盖 Bootstrap 暗色默认蓝） */
+.sp-body .btn-primary {
+    --bs-btn-bg: #3fbf7f;
+    --bs-btn-border-color: #3fbf7f;
+    --bs-btn-color: #06130c;
+    --bs-btn-hover-bg: #55d68d;
+    --bs-btn-hover-border-color: #55d68d;
+    --bs-btn-hover-color: #06130c;
+    --bs-btn-active-bg: #2fa968;
+    --bs-btn-active-border-color: #2fa968;
+    --bs-btn-active-color: #06130c;
+    --bs-btn-disabled-bg: #2c7d55;
+    --bs-btn-disabled-border-color: #2c7d55;
+    --bs-btn-disabled-color: rgba(6, 19, 12, .6);
+    background: linear-gradient(135deg, #3fbf7f, #2f9663);
+    border: none;
+    font-weight: 600;
+}
+
+.sp-body .form-control,
+.sp-body .form-select {
+    background: rgba(190, 240, 205, .05);
+    border-color: var(--sp-line);
+    color: var(--sp-text);
+}
+
+/* 原生下拉项：继承暗色（配 :root 的 color-scheme:dark，option 在各浏览器均为暗底亮字） */
+.sp-body select option,
+.sp-body .form-select option {
+    background: #0e2117;
+    color: var(--sp-text);
+}
+
+/* --- 颜色选择器组件（_ColorPicker.cshtml） --- */
+.sp-colorpicker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 取色块：固定尺寸、圆角，与文本框等高 */
+.sp-colorpicker__swatch {
+    width: 42px;
+    height: 38px;
+    padding: 3px;
+    border: 1px solid var(--sp-line);
+    border-radius: 8px;
+    background: rgba(190, 240, 205, .05);
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+.sp-colorpicker__swatch::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.sp-colorpicker__swatch::-webkit-color-swatch {
+    border: none;
+    border-radius: 5px;
+}
+
+.sp-colorpicker__swatch::-moz-color-swatch {
+    border: none;
+    border-radius: 5px;
+}
+
+.sp-colorpicker__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-transform: uppercase;
+}
+
+.sp-body .form-control:focus,
+.sp-body .form-select:focus {
+    background: rgba(190, 240, 205, .08);
+    border-color: var(--sp-primary);
+    color: var(--sp-text);
+    box-shadow: 0 0 0 .2rem rgba(63, 191, 127, .18);
+}
+
+.sp-body .form-control::placeholder {
+    color: rgba(147, 179, 160, .55);
+}
+
+.sp-body .form-label {
+    color: var(--sp-text-secondary);
+    font-size: .85rem;
+}
+
+.sp-body .form-check-label {
+    color: var(--sp-text-secondary);
+}
+
+.sp-body .form-check-input {
+    background-color: rgba(190, 240, 205, .08);
+    border-color: var(--sp-line);
+}
+
+.sp-body .form-check-input:checked {
+    background-color: var(--sp-primary);
+    border-color: var(--sp-primary);
+}
+
+.sp-body .modal-content {
+    background: #0d1f15;
+    border: 1px solid var(--sp-line);
+    color: var(--sp-text);
+}
+
+.sp-body .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.sp-body .alert-warning {
+    background: rgba(238, 194, 95, .08);
+    border-color: rgba(238, 194, 95, .3);
+    color: #f4d27a;
+}
+
+/* --- 响应式 --- */
+@media (max-width: 991px) {
+    .sp-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        margin-left: calc(-1 * var(--sp-sidebar-w));
+    }
+
+    .sp-body.sp-sidebar-open .sp-sidebar {
+        margin-left: 0;
+    }
+
+    .sp-sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(3, 8, 5, .6);
+        z-index: 25;
+    }
+
+    .sp-body.sp-sidebar-open .sp-sidebar-backdrop {
+        display: block;
+    }
+
+    .sp-content {
+        padding: 16px 14px 24px;
+    }
+}
+
+/* --- RPG.confirm 模态（Bootstrap modal 暗色适配） --- */
+.sp-modal-content {
+    background: #0d1f15;
+    border: 1px solid var(--sp-line);
+    color: var(--sp-text);
+}
+.sp-modal-content .modal-title {
+    font-size: .95rem;
+}
+.sp-modal-content .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}

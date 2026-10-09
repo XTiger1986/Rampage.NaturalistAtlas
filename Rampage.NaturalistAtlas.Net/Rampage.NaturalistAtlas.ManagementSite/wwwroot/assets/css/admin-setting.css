@@ -1,0 +1,47 @@
+/* =====================================================================
+   admin-setting.css — 系统设置页专属样式
+   主题：神秘自然（蕨绿点缀 / 苔藓提示条）
+   ===================================================================== */
+
+/* --- 提示行：页面顶部的说明条 --- */
+.setting-hint {
+    margin: 0 0 14px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    border: 1px solid rgba(63, 191, 127, .25);
+    background: rgba(63, 191, 127, .07);
+    color: var(--sp-text-secondary, #93b3a0);
+    font-size: .85rem;
+    line-height: 1.7;
+}
+
+.setting-hint i {
+    color: var(--sp-primary, #3fbf7f);
+}
+
+/* --- 分区小标题（同一面板内的多组配置） --- */
+.setting-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 26px 0 14px;
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--sp-text, #e9f4ec);
+}
+
+.setting-section-title:first-child {
+    margin-top: 0;
+}
+
+/* 分区标题下的叶脉分隔线 */
+.setting-section-title::after {
+    content: '';
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(90deg, var(--sp-line, rgba(178, 226, 194, .1)), transparent);
+}
+
+.setting-section-title i {
+    color: var(--sp-primary, #3fbf7f);
+}

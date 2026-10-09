@@ -1,0 +1,4 @@
+{
+  "Illegal_ThemeViewName": "视图名称错误：{0}",
+  "SuperClient_BadRequest": "请求远程地址出错：{1}，返回状态码：{0}"
+}

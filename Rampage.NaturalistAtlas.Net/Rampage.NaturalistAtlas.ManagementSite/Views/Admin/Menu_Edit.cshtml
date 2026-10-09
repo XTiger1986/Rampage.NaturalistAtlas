@@ -1,0 +1,139 @@
+﻿@model ManageMenuDto
+@{
+    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
+    LocalizationModule GL = ViewInfo.GlobalLanguage;
+
+    ManageMenuDto Data = Model!;
+    List<ManageMenuDto> TreeManageMenuList = ViewBag.TreeManageMenuList!;
+    Dictionary<string, List<PermissionActionInfo>> ResourceActionListDict = ViewBag.ResourceActionListDict;
+
+    string PageTitle = Data.Id <= 0 ? GL.Get("AddManageMenu", string.Empty)! : GL.GetText("EditTheManageMenu", Data.Title);
+    ViewBag.PageTitle = PageTitle;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/assets/css/admin-admin.css?v=@AppInfo.ResVer" />
+}
+
+<div class="sp-page-head">
+    <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
+    <div class="sp-page-actions">
+        <a class="btn btn-outline-secondary" href="~/Admin/Menu_List"><i class="fa-solid fa-arrow-left me-1"></i>@(GL.Get("ReturnList"))</a>
+        @if (Data.Id > 0)
+        {
+            <a class="btn btn-primary" href="~/Admin/Menu_Add"><i class="fa-solid fa-plus me-1"></i>@GL.Get("AddManageMenu")</a>
+        }
+    </div>
+</div>
+
+<div class="sp-panel">
+    <div class="sp-panel__hd">
+        <h2 class="sp-panel__title">@PageTitle</h2>
+    </div>
+    <div class="sp-panel__bd">
+        <form id="ManageMenuEditForm" action="~/api/admin/menu/save" method="post">
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtTitle">@(GL.Get("Name"))</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtTitle" name="Title" class="form-control" value="@Data.Title" />
+                    <div class="invalid-feedback" verify-name="Title"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtCss">Css</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtCss" name="Css" class="form-control" value="@Data.Css" />
+                    <div class="invalid-feedback" verify-name="Css"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtStyle">@(GL.Get("CustomStyle"))</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtStyle" name="Style" class="form-control" value="@Data.Style" />
+                    <div class="invalid-feedback" verify-name="Style"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="seltParentId">@(GL.Get("ParentMenu"))</label>
+                <div class="col-sm-10">
+                    <select name="ParentId" id="seltParentId" class="form-select">
+                        <option value="0">@(GL.Get("NotBelongToAnyMenu"))</option>
+                        @WebLogicUtility.RenderMenuTreeSelectorHtml(TreeManageMenuList, GL, CTZ, Data.ParentId, Data.Id > 0 ? Data.Depth : ManagementVars.ManageMenuMaxDepth, Data.Id)
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="seltActionId">@(GL.Get("RelatedFunction"))</label>
+                <div class="col-sm-10">
+                    <select name="ActionId" id="seltActionId" class="form-select">
+                        <option value="">@(GL.Get("NotRelated"))</option>
+                        @foreach (var item in ResourceActionListDict)
+                        {
+                            var actionList = item.Value;
+                            <optgroup label="@item.Key">
+                                @foreach (var action in actionList)
+                                {
+                                    if (StringTool.EqualsIgnoreCase(action.ActionId, Data.ActionId))
+                                    {
+                                        <option value="@action.ActionId" selected="selected">@action.GetTitle()</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@action.ActionId">@action.GetTitle()</option>
+                                    }
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtUrl">@(GL.Get("Path"))</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtUrl" name="Url" class="form-control" value="@Data.Url" />
+                    <div class="invalid-feedback" verify-name="Url"></div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">@(GL.Get("Status"))</label>
+                <div class="col-sm-10">
+                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<CommonStatus>{ FormItemId = "seltStatus", FormItemName = "Status", SelectedValue = Data.Status }' />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="txtSortOrder">@(GL.Get("SortValue"))</label>
+                <div class="col-sm-10">
+                    <input type="text" id="txtSortOrder" name="SortOrder" class="form-control" value="@Data.SortOrder" />
+                    <div class="invalid-feedback" verify-name="SortOrder"></div>
+                    <div class="form-text">@GL.Get("SortValueDescText")</div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <input type="hidden" id="hdId" name="Id" value="@Data.Id" />
+                <button class="btn btn-primary px-5" type="submit">@(Data.Id <= 0 ? GL.Get("SubmitToAdd") : GL.Get("SubmitToSave"))</button>
+            </div>
+            <div id="tipMessage" class="sp-tip" style="display:none;"></div>
+        </form>
+    </div>
+</div>
+
+@section Foot {
+    <script>
+        $(function () {
+            RPG.FormSubmitter('ManageMenuEditForm', {
+                completeHandler: function (jsonResult) {
+                    if (jsonResult.IsSuccess && parseInt($('#hdId').val(), 10) <= 0) {
+                        setTimeout(function () {
+                            location.href = '/Admin/Menu_Modify?MenuId=' + jsonResult.Data.Id;
+                        }, 800);
+                    }
+                },
+                tipContainerId: 'tipMessage',
+                tipAutoHidden: 1,
+                verifyFeedback: 1
+            });
+        });
+    </script>
+}

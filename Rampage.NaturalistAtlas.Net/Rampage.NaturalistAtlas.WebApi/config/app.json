@@ -1,0 +1,68 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "SecurityUtility": {
+    "AES_KEY": "xtiger1986_rampage__naturalist__"
+  },
+  "ForwardedHeaders": {
+    "Enabled": false,
+    "KnownProxies": [ "127.0.0.1" ],
+    "KnownNetworks": [],
+    "ForwardLimit": 1,
+    "ClientIpMode": "Connection"
+  },
+  "DatabaseFactory": {
+    "DataAccessTypeName": "Rampage.Dapper.DapperDataAccessor, Rampage.Dapper",
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "Type": "PostgreSQL",
+        "ConnectionString": "Host=127.0.0.1;Port=5432;Database=naturalist;Username=rampage;Password=rampage;Timeout=15;Command Timeout=30;"
+      }
+    ]
+  },
+  "RedisFactory": {
+    "Clients": [
+      {
+        "Name": "NaturalistAtlas",
+        "ConnectionString": "127.0.0.1:6379,connectTimeout=3000,syncTimeout=5000,abortConnect=false",
+        "PrefixKey": "NaturalistAtlas"
+      }
+    ]
+  },
+  "SignalR": {
+    "UseRedisBackplane": false
+  },
+  "Cors": {
+    "AllowLocalhost": true,
+    "AllowedOrigins": []
+  },
+  "RedisResilience": {
+    "RequireLockForCriticalWrites": true,
+    "IdempotencySoftFail": true
+  },
+  "JwtAuthenticationConfig": {
+    "Rampage.NaturalistAtlas": {
+      "SecretKey": "4864c5bd161099f39fa2570fc0085b0cc7cb6463f53f3f61f8444af5c5ab5bb4a15622cc3b317a30523838388d92f4be8d0c292ccf2e0e8913d92b0f5cfc23a9",
+      "Issuer": "NaturalistAtlas",
+      "Audience": "NaturalistAtlas.Client",
+      "ExpiredSeconds": 300,
+      "RefreshExpiredSeconds": 86400
+    },
+    "Rampage.NaturalistAtlas.Api": {
+      "SecretKey": "92699009548f7b0025ffd755a91918985649708f236637d9e0f8522d97b02a0b8f746b75894355c7bf774d6f2f7d0882a7b98121c1207ff371f349a013f607a0",
+      "Issuer": "NaturalistAtlas.WebApi",
+      "Audience": "NaturalistAtlas.WebApi.Client",
+      "ExpiredSeconds": 300,
+      "RefreshExpiredSeconds": 86400
+    }
+  },
+  "WebApi": {
+    "WorkerId": 2
+  }
+}

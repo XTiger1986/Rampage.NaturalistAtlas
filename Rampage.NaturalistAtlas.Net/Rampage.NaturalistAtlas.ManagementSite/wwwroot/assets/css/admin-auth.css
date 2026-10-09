@@ -1,0 +1,266 @@
+/* =====================================================================
+   admin-auth.css — 自然地图志登录页（Passport/SignIn）专属样式
+   主题：神秘自然 · 生机活力（林间夜色 / 萤火微粒 / 晨光琥珀）
+   独立于 admin-shell.css（本页 Layout=null，不加载外壳样式）
+   ===================================================================== */
+
+/* --- 基础变量（与外壳体系保持一致的自明兜底值） --- */
+:root {
+    --auth-bg: #08120c;
+    --auth-bg-2: #0e2117;
+    --auth-line: rgba(178, 226, 194, .1);
+    --auth-text: #e9f4ec;
+    --auth-text-dim: #93b3a0;
+    --auth-accent: #3fbf7f;
+    --auth-accent-2: #e8b45a;
+}
+
+/* --- 页面骨架：深林夜色底 + 远处晨光 --- */
+.sp-auth-body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse 50% 35% at 85% 100%, rgba(232, 180, 90, .06), transparent 60%),
+        radial-gradient(ellipse at 20% 0%, var(--auth-bg-2) 0%, var(--auth-bg) 60%);
+    color: var(--auth-text);
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+.sp-auth {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- 左侧品牌视觉区：林冠之下 --- */
+.sp-auth__visual {
+    flex: 1 1 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(63, 191, 127, .1), transparent 55%),
+                radial-gradient(ellipse at 70% 80%, rgba(232, 180, 90, .07), transparent 60%);
+}
+
+/* 视觉区纹理：萤火微粒 + 叶隙斜光 */
+.sp-auth__visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(rgba(140, 232, 178, .1) 1px, transparent 1.6px),
+        radial-gradient(rgba(232, 180, 90, .08) 1px, transparent 1.6px),
+        linear-gradient(115deg, transparent 40%, rgba(190, 240, 205, .03) 42%, transparent 44%);
+    background-size: 46px 46px, 64px 64px, 100% 100%;
+    pointer-events: none;
+}
+
+/* 品牌徽记：呼应侧栏 logo 的大号叶标 */
+.sp-auth__visual .sp-auth-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 28px rgba(63, 191, 127, .3);
+}
+
+.sp-auth__brand {
+    position: relative;
+    max-width: 460px;
+}
+
+.sp-auth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border: 1px solid var(--auth-line);
+    border-radius: 999px;
+    background: rgba(190, 240, 205, .04);
+    color: var(--auth-accent);
+    font-size: .78rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+}
+
+.sp-auth__brand h1 {
+    margin: 0 0 14px;
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.sp-auth__brand p {
+    margin: 0;
+    color: var(--auth-text-dim);
+    line-height: 1.8;
+    max-width: 400px;
+}
+
+/* --- 右侧登录面板 --- */
+.sp-auth__panel {
+    flex: 0 0 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 40px;
+    background: rgba(190, 240, 205, .02);
+    border-left: 1px solid var(--auth-line);
+    backdrop-filter: blur(6px);
+}
+
+.sp-auth__card {
+    width: 100%;
+    max-width: 360px;
+}
+
+.sp-auth__card h2 {
+    margin: 0 0 6px;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.sp-auth-sub {
+    margin: 0 0 26px;
+    color: var(--auth-text-dim);
+    font-size: .9rem;
+}
+
+/* --- 表单控件（覆盖 Bootstrap 默认浅色主题） --- */
+.sp-auth__card .form-label {
+    color: var(--auth-text-dim);
+    font-size: .85rem;
+}
+
+.sp-auth__card .form-control {
+    background: rgba(190, 240, 205, .05);
+    border: 1px solid var(--auth-line);
+    color: var(--auth-text);
+    border-radius: 8px;
+    padding: .65rem .85rem;
+}
+
+.sp-auth__card .form-control:focus {
+    background: rgba(190, 240, 205, .08);
+    border-color: var(--auth-accent);
+    color: var(--auth-text);
+    box-shadow: 0 0 0 .2rem rgba(63, 191, 127, .18);
+}
+
+.sp-auth__card .form-control::placeholder {
+    color: rgba(147, 179, 160, .55);
+}
+
+.sp-auth__card .form-check-input {
+    background-color: rgba(190, 240, 205, .08);
+    border-color: var(--auth-line);
+}
+
+.sp-auth__card .form-check-input:checked {
+    background-color: var(--auth-accent);
+    border-color: var(--auth-accent);
+}
+
+.sp-auth__card .form-check-label {
+    color: var(--auth-text-dim);
+    font-size: .88rem;
+}
+
+/* 登录按钮：蕨绿渐变，注入生机 */
+.sp-auth__card .btn-primary {
+    background: linear-gradient(135deg, #3fbf7f, #2f9663);
+    border: none;
+    border-radius: 8px;
+    padding: .65rem 1rem;
+    color: #06130c;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.sp-auth__card .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+/* 验证错误反馈（rpg-core 回填） */
+.sp-auth__card .invalid-feedback {
+    color: #e8707f;
+    font-size: .8rem;
+}
+
+/* --- 密码可见切换 --- */
+.sp-auth-password {
+    position: relative;
+}
+
+.sp-auth-password .form-control {
+    padding-right: 44px;
+}
+
+.sp-auth-password__toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--auth-text-dim);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.sp-auth-password__toggle:hover {
+    color: var(--auth-text);
+    background: rgba(190, 240, 205, .07);
+}
+
+/* --- 提示条（rpg-core 联动） --- */
+.sp-tip {
+    margin-top: 14px;
+    padding: 9px 13px;
+    border-radius: 8px;
+    font-size: .85rem;
+    background: rgba(190, 240, 205, .05);
+}
+
+.sp-tip--ok {
+    color: #55d68d;
+    border: 1px solid rgba(85, 214, 141, .3);
+}
+
+.sp-tip--error {
+    color: #e8707f;
+    border: 1px solid rgba(232, 112, 127, .3);
+}
+
+/* --- 提交中加载态 --- */
+.sp-btn-loading {
+    opacity: .7;
+    pointer-events: none;
+}
+
+/* --- 窄屏适配：隐藏视觉区装饰，面板铺满 --- */
+@media (max-width: 860px) {
+    .sp-auth {
+        flex-direction: column;
+    }
+
+    .sp-auth__visual {
+        flex: 0 0 auto;
+        padding: 36px 28px 20px;
+    }
+
+    .sp-auth__brand h1 {
+        font-size: 1.8rem;
+    }
+
+    .sp-auth__panel {
+        flex: 1 1 auto;
+        border-left: none;
+        border-top: 1px solid var(--auth-line);
+    }
+}

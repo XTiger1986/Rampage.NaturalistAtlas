@@ -1,0 +1,55 @@
+/* =====================================================================
+   admin-admin.css — 后台账号/管理组/菜单 页专属样式
+   （外壳组件已在 admin-shell.css，这里仅补本模块差异）
+   ===================================================================== */
+
+/* 列表头像 */
+.admin-avatar-sm {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 auto;
+}
+
+/* 权限树（Group_Edit / Admin_Edit 的权限勾选区） */
+.admin-perm-table {
+    border: 1px solid var(--sp-line, rgba(255, 255, 255, .08));
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+    /* 覆盖 Bootstrap 表格默认变量：透明底 + 亮色文字 */
+    color: var(--sp-text, #e8eefc);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--sp-text, #e8eefc);
+    --bs-table-border-color: rgba(255, 255, 255, .08);
+}
+
+.admin-perm-table > tbody > tr + tr > th,
+.admin-perm-table > tbody > tr + tr > td {
+    border-top: 1px solid var(--sp-line, rgba(255, 255, 255, .06));
+}
+
+.admin-perm-table th {
+    background: rgba(255, 255, 255, .03);
+    vertical-align: middle;
+    font-weight: 600;
+    color: var(--sp-text, #e8eefc);
+}
+
+.admin-perm-table td {
+    vertical-align: middle;
+    color: var(--sp-text, #e8eefc);
+}
+
+/* 菜单管理树形行缩进（Menu_List 由服务端渲染嵌套结构） */
+.menu-tree-indent {
+    display: inline-block;
+    width: 1.2em;
+    color: var(--sp-text-secondary, #8b9bb4);
+}
+
+/* 状态徽章组（启用/停用切换显示） */
+.menu-status-disabled {
+    display: none;
+}
