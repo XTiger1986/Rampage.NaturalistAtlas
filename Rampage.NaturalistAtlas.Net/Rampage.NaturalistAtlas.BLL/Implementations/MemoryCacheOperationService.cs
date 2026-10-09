@@ -13,7 +13,7 @@ namespace Rampage.NaturalistAtlas.BLL.Implementations
 
         protected RedisHelper RedisClient;
 
-        protected static readonly object _operationLocker = new object();
+        protected static readonly object OPERATION_LOCKER = new object();
         protected static readonly string REDIS_KEY_MEMORY_CACHE_OPERATION = "MEMORY_CACHE_OPERATION";
         protected static readonly string REDIS_FIELD_KEY_OPERATION_QUEUE = "QUEUE_LIST";
         protected static readonly string REDIS_FIELD_KEY_OPERATION_RECORD = "RECORD_LIST";
@@ -36,7 +36,7 @@ namespace Rampage.NaturalistAtlas.BLL.Implementations
                 }
                 if (existsQueue == null)
                 {
-                    lock (_operationLocker)
+                    lock (OPERATION_LOCKER)
                     {
                         list = RedisClient.HashGet<List<MemoryCacheOperationQueue>>(REDIS_KEY_MEMORY_CACHE_OPERATION, REDIS_FIELD_KEY_OPERATION_QUEUE);
                         if (list != null)
@@ -129,7 +129,7 @@ namespace Rampage.NaturalistAtlas.BLL.Implementations
                 }
                 if (exists)
                 {
-                    lock (_operationLocker)
+                    lock (OPERATION_LOCKER)
                     {
                         list = RedisClient.HashGet<List<MemoryCacheOperationQueue>>(REDIS_KEY_MEMORY_CACHE_OPERATION, REDIS_FIELD_KEY_OPERATION_QUEUE);
                         if (list != null && list.Any(d => idList.Contains(d.Id)))
@@ -185,7 +185,7 @@ namespace Rampage.NaturalistAtlas.BLL.Implementations
                 }
                 if (existsRecord == null)
                 {
-                    lock (_operationLocker)
+                    lock (OPERATION_LOCKER)
                     {
                         list = RedisClient.HashGet<List<MemoryCacheOperationRecord>>(REDIS_KEY_MEMORY_CACHE_OPERATION, REDIS_FIELD_KEY_OPERATION_RECORD);
                         if (list != null)
@@ -236,7 +236,7 @@ namespace Rampage.NaturalistAtlas.BLL.Implementations
                 }
                 if (exists)
                 {
-                    lock (_operationLocker)
+                    lock (OPERATION_LOCKER)
                     {
                         list = RedisClient.HashGet<List<MemoryCacheOperationRecord>>(REDIS_KEY_MEMORY_CACHE_OPERATION, REDIS_FIELD_KEY_OPERATION_RECORD);
                         if (list != null && list.Any(d => idList.Contains(d.Id)))

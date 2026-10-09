@@ -14,7 +14,7 @@ namespace Rampage.NaturalistAtlas.WebApi
 {
     public class NaturalistAtlasApplication : RampageWebApplication
     {
-        public const string CorsPolicyName = "AllowSpecificOrigin";
+        public const string CORS_POLICY_NAME = "AllowSpecificOrigin";
 
         public NaturalistAtlasApplication() : base()
         {
@@ -53,7 +53,7 @@ namespace Rampage.NaturalistAtlas.WebApi
                                 .AllowAnyMethod()
                                 .AllowCredentials();
                         };
-                        options.AddPolicy(CorsPolicyName, configure);
+                        options.AddPolicy(CORS_POLICY_NAME, configure);
                         options.AddDefaultPolicy(configure);
                     });
                 }
@@ -64,7 +64,7 @@ namespace Rampage.NaturalistAtlas.WebApi
                 app.UseRampageCorrelationId();
                 if (Rampage.Web.Cors.CorsOptions.Load().Enabled)
                 {
-                    app.UseCors(CorsPolicyName);
+                    app.UseCors(CORS_POLICY_NAME);
                 }
             };
 

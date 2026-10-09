@@ -74,7 +74,7 @@ namespace Rampage.NaturalistAtlas.SchedulerJob
 
                     List<DatabaseClient> databaseClientList = ServiceLocator.GetList<DatabaseClient>();
 
-                    MainDb = databaseClientList.Find(dc => dc.Name == GlobalVars.MainDbName)!;
+                    MainDb = databaseClientList.Find(dc => dc.Name == GlobalVars.MAIN_DB_NAME)!;
                     MemoryCache = SingletonServiceLocator.GetService<IStandAloneCache>();
                     RedisClient = RedisFactory.GetClient()!;
 

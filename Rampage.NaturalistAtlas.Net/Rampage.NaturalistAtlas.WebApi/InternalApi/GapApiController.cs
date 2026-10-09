@@ -35,7 +35,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<List<WantedTaxonItemDto>>.Failure(UnexpectedFailureMessage);
+                return R<List<WantedTaxonItemDto>>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
     }

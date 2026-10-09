@@ -17,7 +17,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// 源站 iconic_taxon_id → 本库类群枚举（源站数字≠本库代码；映射表经 /v1/taxa/iconic 权威清单核对）
         /// Source iconic_taxon_id → our iconic enum (source numbers differ from our codes; verified against the authoritative /v1/taxa/iconic list)
         /// </summary>
-        private static readonly Dictionary<int, IconicTaxon> IconicMap = new Dictionary<int, IconicTaxon>
+        private static readonly Dictionary<int, IconicTaxon> ICONIC_MAP = new Dictionary<int, IconicTaxon>
         {
             { 3, IconicTaxon.Birds },
             { 40151, IconicTaxon.Mammals },
@@ -38,12 +38,12 @@ namespace Rampage.NaturalistAtlas.Collection
         /// 13 个 iconic 类群的源站分类 id（集邮缺口 wanted 按祖先分类逐群拉取）
         /// Source taxon ids of the 13 iconic groups (collection-gap wanted fetches per ancestor)
         /// </summary>
-        public static readonly int[] IconicSourceTaxonIds = IconicMap.Keys.ToArray();
+        public static readonly int[] ICONIC_SOURCE_TAXON_IDS = ICONIC_MAP.Keys.ToArray();
 
         /// <summary>
         /// 源站 license_code → 本库授权枚举（源站无 PDM）/ Source license_code → our license enum (no PDM on this source)
         /// </summary>
-        private static readonly Dictionary<string, AtlasLicense> LicenseMap = new Dictionary<string, AtlasLicense>
+        private static readonly Dictionary<string, AtlasLicense> LICENSE_MAP = new Dictionary<string, AtlasLicense>
         {
             ["cc0"] = AtlasLicense.Cc0,
             ["cc-by"] = AtlasLicense.CcBy,
@@ -188,7 +188,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// <summary>源站类群代码换算，无匹配归未知 / Translate the source iconic code; unmatched falls back to Unknown</summary>
         public static IconicTaxon MapIconic(int? iconicTaxonId)
         {
-            if (iconicTaxonId != null && IconicMap.TryGetValue(iconicTaxonId.Value, out IconicTaxon iconic))
+            if (iconicTaxonId != null && ICONIC_MAP.TryGetValue(iconicTaxonId.Value, out IconicTaxon iconic))
             {
                 return iconic;
             }
@@ -210,7 +210,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// <summary>授权代码换算，未知/空为保留所有权利 / Translate the license code; unknown or null means all rights reserved</summary>
         public static AtlasLicense MapLicense(string? licenseCode)
         {
-            if (licenseCode != null && LicenseMap.TryGetValue(licenseCode, out AtlasLicense license))
+            if (licenseCode != null && LICENSE_MAP.TryGetValue(licenseCode, out AtlasLicense license))
             {
                 return license;
             }

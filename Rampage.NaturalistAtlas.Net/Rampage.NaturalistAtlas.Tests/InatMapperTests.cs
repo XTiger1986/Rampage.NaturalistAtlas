@@ -11,7 +11,7 @@ namespace Rampage.NaturalistAtlas.Tests
     /// </summary>
     public class InatMapperTests
     {
-        private static readonly DateTime Now = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly DateTime NOW = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         [Fact]
         public void MapIconic_KnownAuthorityIds()
@@ -47,7 +47,7 @@ namespace Rampage.NaturalistAtlas.Tests
                 Ancestry = "48460/1/47120/3",
                 PreferredCommonName = "Oriental Magpie"
             };
-            Taxon t = InatMapper.MapTaxon(dto, Now);
+            Taxon t = InatMapper.MapTaxon(dto, NOW);
             Assert.Equal("12345", t.SourceTaxonId);
             Assert.Equal("48460-1-47120-3", t.Ancestry);
             // 中文名首采留空（批次1 口径决策：英文暂存会被刷新逻辑永久固化）

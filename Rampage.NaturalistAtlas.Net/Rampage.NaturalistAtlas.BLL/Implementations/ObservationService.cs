@@ -183,7 +183,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// </summary>
         protected void InvalidatePublicCaches()
         {
-            RemoveWebCacheByPrefix(Rampage.NaturalistAtlas.Common.CacheKeys.PublicPrefix);
+            RemoveWebCacheByPrefix(Rampage.NaturalistAtlas.Common.CacheKeys.PUBLIC_PREFIX);
         }
     }
 }

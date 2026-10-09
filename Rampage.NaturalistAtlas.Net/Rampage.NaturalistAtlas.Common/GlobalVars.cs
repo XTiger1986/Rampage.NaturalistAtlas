@@ -4,7 +4,7 @@ namespace Rampage.NaturalistAtlas.Common
 {
     public class GlobalVars
     {
-        public static readonly string MainDbName = "NaturalistAtlas";
+        public static readonly string MAIN_DB_NAME = "NaturalistAtlas";
 
     }
 }

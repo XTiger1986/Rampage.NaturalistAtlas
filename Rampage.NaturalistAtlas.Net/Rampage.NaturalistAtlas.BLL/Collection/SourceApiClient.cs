@@ -33,14 +33,14 @@ namespace Rampage.NaturalistAtlas.Collection
     public abstract class SourceApiClient
     {
         /// <summary>单次调用总尝试次数（1 次首发 + 3 次重试）/ Total attempts per call (1 + 3 retries)</summary>
-        private const int MaxAttempts = 4;
+        private const int MAX_ATTEMPTS = 4;
 
         /// <summary>基础退避（秒），按尝试次数线性放大 / Base backoff in seconds, scaled linearly by attempt</summary>
-        private const int BackoffBaseSeconds = 2;
+        private const int BACKOFF_BASE_SECONDS = 2;
 
-        private static readonly ConcurrentDictionary<string, HttpClient> _httpClients = new ConcurrentDictionary<string, HttpClient>();
+        private static readonly ConcurrentDictionary<string, HttpClient> HTTP_CLIENTS = new ConcurrentDictionary<string, HttpClient>();
 
-        private static readonly MemoryRateLimiter RateLimiter = new MemoryRateLimiter();
+        private static readonly MemoryRateLimiter RATE_LIMITER = new MemoryRateLimiter();
 
         private readonly string _sourceName;
         private readonly string _baseUrl;
@@ -94,7 +94,7 @@ namespace Rampage.NaturalistAtlas.Collection
             }
 
             Exception? lastError = null;
-            for (int attempt = 1; attempt <= MaxAttempts; attempt++)
+            for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++)
             {
                 await WaitForQuotaAsync();
                 RequestCount++;
@@ -113,7 +113,7 @@ namespace Rampage.NaturalistAtlas.Collection
                 {
                     lastError = ex;
                     response?.Dispose();
-                    if (attempt < MaxAttempts)
+                    if (attempt < MAX_ATTEMPTS)
                     {
                         await Task.Delay(GetBackoffSeconds(attempt) * 1000);
                         continue;
@@ -126,7 +126,7 @@ namespace Rampage.NaturalistAtlas.Collection
                     if ((int)response.StatusCode == 429 || (int)response.StatusCode >= 500)
                     {
                         lastError = new HttpRequestException($"HTTP {(int)response.StatusCode}");
-                        if (attempt < MaxAttempts)
+                        if (attempt < MAX_ATTEMPTS)
                         {
                             await Task.Delay(GetRetryAfterMs(response) ?? GetBackoffSeconds(attempt) * 1000);
                             continue;
@@ -152,7 +152,7 @@ namespace Rampage.NaturalistAtlas.Collection
                     {
                         // 响应体形态漂移也按源站不稳处理（本周期跳过该源）
                         lastError = ex;
-                        if (attempt < MaxAttempts)
+                        if (attempt < MAX_ATTEMPTS)
                         {
                             await Task.Delay(GetBackoffSeconds(attempt) * 1000);
                             continue;
@@ -171,12 +171,12 @@ namespace Rampage.NaturalistAtlas.Collection
         /// </summary>
         private static int GetBackoffSeconds(int attempt)
         {
-            double jitter = 0.8 + (JitterRandom.Value.NextDouble() * 0.4);
-            return Math.Max(1, (int)Math.Round(BackoffBaseSeconds * attempt * jitter));
+            double jitter = 0.8 + (JITTER_RANDOM.Value.NextDouble() * 0.4);
+            return Math.Max(1, (int)Math.Round(BACKOFF_BASE_SECONDS * attempt * jitter));
         }
 
         /// <summary>抖动随机源（线程安全）/ Thread-safe jitter random source</summary>
-        private static readonly System.Threading.ThreadLocal<System.Random> JitterRandom = new(() => new Random());
+        private static readonly System.Threading.ThreadLocal<System.Random> JITTER_RANDOM = new(() => new Random());
 
         /// <summary>读 Retry-After 响应头（秒数或 HTTP 日期），读不到返回 null / Read the Retry-After header (seconds or HTTP-date); null when absent</summary>
         private static int? GetRetryAfterMs(HttpResponseMessage response)
@@ -209,7 +209,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// <summary>限流等待：窗口内超限则睡到最早释放时刻 / Throttle wait: sleep until a slot frees when the window is full</summary>
         private async Task WaitForQuotaAsync()
         {
-            RateLimitResult decision = RateLimiter.Limit(_rateKey, _ratePerMinute, TimeSpan.FromMinutes(1));
+            RateLimitResult decision = RATE_LIMITER.Limit(_rateKey, _ratePerMinute, TimeSpan.FromMinutes(1));
             while (!decision.Allowed)
             {
                 long waitMs = decision.ResetAtUnixMs - DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -217,7 +217,7 @@ namespace Rampage.NaturalistAtlas.Collection
                 {
                     await Task.Delay((int)Math.Min(waitMs + 50, 61000));
                 }
-                decision = RateLimiter.Limit(_rateKey, _ratePerMinute, TimeSpan.FromMinutes(1));
+                decision = RATE_LIMITER.Limit(_rateKey, _ratePerMinute, TimeSpan.FromMinutes(1));
             }
         }
 
@@ -262,7 +262,7 @@ namespace Rampage.NaturalistAtlas.Collection
             // 键含超时：同 host 不同超时配置的客户端不得共享首个实例
             // The key includes the timeout: same-host clients with different timeouts must not share
             string key = uri.Scheme + Uri.SchemeDelimiter + uri.Host + (uri.IsDefaultPort ? string.Empty : ":" + uri.Port) + "|t" + Math.Max(_timeoutSeconds, 5);
-            return _httpClients.GetOrAdd(key, _ => new HttpClient(new SocketsHttpHandler
+            return HTTP_CLIENTS.GetOrAdd(key, _ => new HttpClient(new SocketsHttpHandler
             {
                 PooledConnectionLifetime = TimeSpan.FromMinutes(5),
                 AutomaticDecompression = DecompressionMethods.All

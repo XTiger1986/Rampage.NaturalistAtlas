@@ -13,7 +13,7 @@ namespace Rampage.NaturalistAtlas.DAL
     public class CityWantedTaxonDao : SuperDao<CityWantedTaxon>, ICityWantedTaxonDao
     {
         /// <summary>单语句插入行数（参数个数 = 行数 × 列数，需低于 PG 65535 上限）/ Rows per INSERT statement</summary>
-        private const int InsertBatchSize = 100;
+        private const int INSERT_BATCH_SIZE = 100;
 
         /// <inheritdoc/>
         public int ReplaceAll(int cityId, List<CityWantedTaxon> rows)
@@ -23,9 +23,9 @@ namespace Rampage.NaturalistAtlas.DAL
             {
                 DatabaseClient.Execute("DELETE FROM city_wanted_taxon WHERE city_id = @CityId", new { CityId = cityId });
                 int written = 0;
-                for (int start = 0; start < rows.Count; start += InsertBatchSize)
+                for (int start = 0; start < rows.Count; start += INSERT_BATCH_SIZE)
                 {
-                    List<CityWantedTaxon> batch = rows.GetRange(start, System.Math.Min(InsertBatchSize, rows.Count - start));
+                    List<CityWantedTaxon> batch = rows.GetRange(start, System.Math.Min(INSERT_BATCH_SIZE, rows.Count - start));
                     Dictionary<string, object?> param = new Dictionary<string, object?> { ["CityId"] = cityId };
                     StringBuilder values = new StringBuilder();
                     for (int i = 0; i < batch.Count; i++)

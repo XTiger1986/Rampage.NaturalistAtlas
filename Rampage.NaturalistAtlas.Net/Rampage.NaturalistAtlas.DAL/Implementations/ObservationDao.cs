@@ -37,7 +37,7 @@ namespace Rampage.NaturalistAtlas.DAL
         /// upsert 列规格：(列名, 取值)。枚举显式转 short，避免驱动枚举映射歧义
         /// Upsert column spec: (column, value getter); enums cast to short explicitly to avoid driver enum-mapping ambiguity
         /// </summary>
-        private static readonly (string Column, Func<Observation, object?>)[] UpsertColumns =
+        private static readonly (string Column, Func<Observation, object?>)[] UPSERT_COLUMNS =
         {
             ("id", r => r.Id),
             ("source", r => (short)r.Source),
@@ -72,7 +72,7 @@ namespace Rampage.NaturalistAtlas.DAL
         /// DO UPDATE 覆盖的业务列：status/create_time 与身份列不覆盖（不冲掉运营隐藏与源站已删除态）
         /// Business columns overwritten by DO UPDATE: status/create_time and identity columns excluded (never clobber operator-hidden or source-deleted state)
         /// </summary>
-        private static readonly string[] UpsertUpdateColumns =
+        private static readonly string[] UPSERT_UPDATE_COLUMNS =
         {
             "taxon_id", "iconic_taxon", "quality_grade", "observed_on", "observed_at", "lng", "lat",
             "positional_accuracy", "geoprivacy", "photo_square_url", "photo_medium_url", "photo_large_url",
@@ -80,7 +80,7 @@ namespace Rampage.NaturalistAtlas.DAL
             "source_created_at", "source_updated_at", "update_time"
         };
 
-        private const int UpsertSqlBatchSize = 200;
+        private const int UPSERT_SQL_BATCH_SIZE = 200;
 
 
         /// <summary>
@@ -180,14 +180,14 @@ namespace Rampage.NaturalistAtlas.DAL
                 return result;
             }
 
-            string columnList = string.Join(", ", UpsertColumns.Select(c => c.Column));
-            string conflictSet = string.Join(", ", UpsertUpdateColumns.Select(c => $"{c} = EXCLUDED.{c}"));
+            string columnList = string.Join(", ", UPSERT_COLUMNS.Select(c => c.Column));
+            string conflictSet = string.Join(", ", UPSERT_UPDATE_COLUMNS.Select(c => $"{c} = EXCLUDED.{c}"));
             string sqlPrefix = $"INSERT INTO observation ({columnList}) VALUES ";
             string sqlSuffix = $" ON CONFLICT (source, source_observation_id) DO UPDATE SET {conflictSet} RETURNING (xmax = 0) AS IsInsert";
 
-            for (int start = 0; start < rows.Count; start += UpsertSqlBatchSize)
+            for (int start = 0; start < rows.Count; start += UPSERT_SQL_BATCH_SIZE)
             {
-                List<Observation> batch = rows.Skip(start).Take(UpsertSqlBatchSize).ToList();
+                List<Observation> batch = rows.Skip(start).Take(UPSERT_SQL_BATCH_SIZE).ToList();
                 Dictionary<string, object?> param = new Dictionary<string, object?>();
                 StringBuilder values = new StringBuilder();
                 for (int i = 0; i < batch.Count; i++)
@@ -196,10 +196,10 @@ namespace Rampage.NaturalistAtlas.DAL
                     {
                         values.Append(", ");
                     }
-                    values.Append('(').Append(string.Join(", ", UpsertColumns.Select((c, j) => $"@r{i}_c{j}"))).Append(')');
-                    for (int j = 0; j < UpsertColumns.Length; j++)
+                    values.Append('(').Append(string.Join(", ", UPSERT_COLUMNS.Select((c, j) => $"@r{i}_c{j}"))).Append(')');
+                    for (int j = 0; j < UPSERT_COLUMNS.Length; j++)
                     {
-                        param[$"r{i}_c{j}"] = UpsertColumns[j].Item2(batch[i]);
+                        param[$"r{i}_c{j}"] = UPSERT_COLUMNS[j].Item2(batch[i]);
                     }
                 }
 

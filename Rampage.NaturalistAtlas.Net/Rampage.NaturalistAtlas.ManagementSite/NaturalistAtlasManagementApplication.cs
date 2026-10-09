@@ -9,7 +9,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite
 {
     public class NaturalistAtlasManagementApplication : RampageManagementApplication
     {
-        public const string CorsPolicyName = "AllowSpecificOrigin";
+        public const string CORS_POLICY_NAME = "AllowSpecificOrigin";
 
         public NaturalistAtlasManagementApplication() : base()
         {
@@ -37,7 +37,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite
                                 .AllowAnyMethod()
                                 .AllowCredentials();
                         };
-                        options.AddPolicy(CorsPolicyName, configure);
+                        options.AddPolicy(CORS_POLICY_NAME, configure);
                         options.AddDefaultPolicy(configure);
                     });
                 }

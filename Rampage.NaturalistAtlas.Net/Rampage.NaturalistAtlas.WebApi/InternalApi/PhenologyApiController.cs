@@ -33,7 +33,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<PhenologyMatrixDto>.Failure(UnexpectedFailureMessage);
+                return R<PhenologyMatrixDto>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
     }

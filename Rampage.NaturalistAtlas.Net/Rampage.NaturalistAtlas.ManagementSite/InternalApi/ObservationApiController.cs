@@ -25,7 +25,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
     public class ObservationApiController : NaturalistAtlasManagementApiController
     {
         /// <summary>导出上限（运营归档场景足够；更大规模走数据库工具）/ Export cap (enough for ops archiving; larger sets belong to db tooling)</summary>
-        private const int ExportLimit = 5000;
+        private const int EXPORT_LIMIT = 5000;
 
         [Auto]
         protected IObservationService ObservationService = default!;
@@ -66,7 +66,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
             try
             {
                 var rows = ObservationService.GetObservationPageList(
-                    filter, new PagerInfo { PageIndex = 1, PageSize = ExportLimit }, sort);
+                    filter, new PagerInfo { PageIndex = 1, PageSize = EXPORT_LIMIT }, sort);
                 string csv = CsvTool.Build(
                     new[] { "观察Id", "数据源", "源站观察ID", "城市", "学名", "中文名", "类群", "鉴定级别", "观察日期", "经度", "纬度", "观察者", "状态", "入库时间(UTC)" },
                     rows.ConvertAll(r => new object?[]

@@ -22,7 +22,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// 国家代码合法格式：2 位小写字母（ISO 3166-1 alpha-2）
         /// Legal country code: 2 lowercase letters (ISO 3166-1 alpha-2)
         /// </summary>
-        private static readonly Regex CountryCodePattern = new("^[a-z]{2}$", RegexOptions.Compiled);
+        private static readonly Regex COUNTRY_CODE_PATTERN = new("^[a-z]{2}$", RegexOptions.Compiled);
 
         [Auto]
         protected ICountryDao CountryDao = default!;
@@ -64,7 +64,7 @@ namespace Rampage.NaturalistAtlas.BLL
             {
                 return R.Failure("状态取值无效");
             }
-            if (!CountryCodePattern.IsMatch(input.Code ?? string.Empty))
+            if (!COUNTRY_CODE_PATTERN.IsMatch(input.Code ?? string.Empty))
             {
                 return R.Failure("国家代码须为 2 位小写字母（ISO 3166-1 alpha-2，如 cn）");
             }
@@ -165,7 +165,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// 区划码合法格式：ISO 3166-2 风格（大写字母与数字、连字符，如 CN-BJ / JP-13）
         /// Legal subdivision code: ISO 3166-2 style (uppercase letters, digits, hyphen)
         /// </summary>
-        private static readonly Regex ProvinceCodePattern = new("^[A-Z]{2}-[A-Z0-9]{1,3}$", RegexOptions.Compiled);
+        private static readonly Regex PROVINCE_CODE_PATTERN = new("^[A-Z]{2}-[A-Z0-9]{1,3}$", RegexOptions.Compiled);
 
         [Auto]
         protected IProvinceDao ProvinceDao = default!;
@@ -220,7 +220,7 @@ namespace Rampage.NaturalistAtlas.BLL
             {
                 return R.Failure("状态取值无效");
             }
-            if (!string.IsNullOrWhiteSpace(input.Code) && !ProvinceCodePattern.IsMatch(input.Code))
+            if (!string.IsNullOrWhiteSpace(input.Code) && !PROVINCE_CODE_PATTERN.IsMatch(input.Code))
             {
                 return R.Failure("区划码须为 ISO 3166-2 风格（如 CN-BJ / JP-13），或留空");
             }

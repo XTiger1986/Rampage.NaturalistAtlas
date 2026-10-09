@@ -39,7 +39,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<PageData<SpeciesRankItemDto>>.Failure(UnexpectedFailureMessage);
+                return R<PageData<SpeciesRankItemDto>>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<SpeciesDetailDto>.Failure(UnexpectedFailureMessage);
+                return R<SpeciesDetailDto>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
 
@@ -80,7 +80,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<List<SpeciesRankItemDto>>.Failure(UnexpectedFailureMessage);
+                return R<List<SpeciesRankItemDto>>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<EmergenceResultDto>.Failure(UnexpectedFailureMessage);
+                return R<EmergenceResultDto>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
     }

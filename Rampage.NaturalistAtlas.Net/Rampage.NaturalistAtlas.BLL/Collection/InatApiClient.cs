@@ -11,7 +11,7 @@ namespace Rampage.NaturalistAtlas.Collection
     public class InatApiClient : SourceApiClient
     {
         /// <summary>合规 UA（源站建议附联系渠道）/ Compliance UA (the source suggests a contact channel)</summary>
-        public const string ClientUserAgent = "NaturalistAtlas-Collector/1.0 (+https://1986z.com)";
+        public const string CLIENT_USER_AGENT = "NaturalistAtlas-Collector/1.0 (+https://1986z.com)";
 
         /// <summary>
         /// v2 显式字段清单（v2 默认最小响应必须显式要字段；不用 fields=all——all 与 order_by+d1 组合会触发源站 500，
@@ -19,7 +19,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// v2 explicit field list (v2 defaults to a minimal response; fields=all is avoided — it triggers a
         /// source-side 500 combined with order_by + d1 — and the explicit list is lighter; nested fields use dot paths)
         /// </summary>
-        public const string FieldsList =
+        public const string FIELDS_LIST =
             "id,uuid,observed_on,time_observed_at,time_observed_at_utc,created_at,updated_at,quality_grade,geojson," +
             "latitude,longitude,positional_accuracy,public_positional_accuracy,geoprivacy,taxon_geoprivacy," +
             "identifications_count,user.login,taxon.id,taxon.name,taxon.rank,taxon.iconic_taxon_id,taxon.ancestry," +
@@ -31,7 +31,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// <param name="baseUrl">v2 基址 / v2 base url</param>
         /// <param name="ratePerMinute">节流上限（次/分钟）/ Throttle cap (requests/minute)</param>
         public InatApiClient(string baseUrl, int ratePerMinute)
-            : base("iNaturalist", baseUrl, ClientUserAgent, ratePerMinute)
+            : base("iNaturalist", baseUrl, CLIENT_USER_AGENT, ratePerMinute)
         {
         }
 
@@ -45,7 +45,7 @@ namespace Rampage.NaturalistAtlas.Collection
         {
             Dictionary<string, object?> full = new Dictionary<string, object?>(query)
             {
-                ["fields"] = FieldsList
+                ["fields"] = FIELDS_LIST
             };
             return GetJsonAsync<InatObservationsResponse>("/observations", full);
         }

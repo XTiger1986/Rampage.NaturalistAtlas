@@ -141,7 +141,7 @@ namespace Rampage.NaturalistAtlas.BLL
 
                     CommitTransaction();
                     // 隐藏落地即失效公开站缓存前缀（验收"5 分钟内不可见"，缓存 TTL 本身 10 分钟）
-                    RemoveWebCacheByPrefix(Rampage.NaturalistAtlas.Common.CacheKeys.PublicPrefix);
+                    RemoveWebCacheByPrefix(Rampage.NaturalistAtlas.Common.CacheKeys.PUBLIC_PREFIX);
                     return R.Success();
                 }
                 catch (Exception)

@@ -19,8 +19,8 @@ namespace Rampage.NaturalistAtlas.WebApi.Internal
     /// </summary>
     public class ReportRateLimitActionFilter : IAsyncActionFilter
     {
-        private const int MinuteLimit = 3;
-        private const int HourLimit = 20;
+        private const int MINUTE_LIMIT = 3;
+        private const int HOUR_LIMIT = 20;
 
         /// <inheritdoc/>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -29,8 +29,8 @@ namespace Rampage.NaturalistAtlas.WebApi.Internal
             {
                 string ip = Rampage.Web.Utilities.WebTool.GetClientIP(context.HttpContext.Request) ?? "unknown";
                 RedisHelper redis = RedisFactory.GetClient()!;
-                if (await ExceedsAsync(redis, $"na:rl:report:min:{ip}", MinuteLimit, TimeSpan.FromMinutes(1))
-                    || await ExceedsAsync(redis, $"na:rl:report:hour:{ip}", HourLimit, TimeSpan.FromHours(1)))
+                if (await ExceedsAsync(redis, $"na:rl:report:min:{ip}", MINUTE_LIMIT, TimeSpan.FromMinutes(1))
+                    || await ExceedsAsync(redis, $"na:rl:report:hour:{ip}", HOUR_LIMIT, TimeSpan.FromHours(1)))
                 {
                     context.Result = new JsonResult(R.Create(ResultCode.OperationTooFrequent, "举报提交过于频繁，请稍后再试"));
                     return;

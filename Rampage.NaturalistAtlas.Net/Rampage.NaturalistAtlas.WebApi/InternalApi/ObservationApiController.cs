@@ -36,7 +36,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<ObservationPointResultDto>.Failure(UnexpectedFailureMessage);
+                return R<ObservationPointResultDto>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
 
@@ -57,7 +57,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<PageData<ObservationCardDto>>.Failure(UnexpectedFailureMessage);
+                return R<PageData<ObservationCardDto>>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
 
@@ -78,7 +78,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<ObservationDetailDto>.Failure(UnexpectedFailureMessage);
+                return R<ObservationDetailDto>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
     }

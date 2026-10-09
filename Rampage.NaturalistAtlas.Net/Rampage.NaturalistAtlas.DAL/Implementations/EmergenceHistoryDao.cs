@@ -13,7 +13,7 @@ namespace Rampage.NaturalistAtlas.DAL
     public class EmergenceHistoryDao : SuperDao<EmergenceHistory>, IEmergenceHistoryDao
     {
         /// <summary>批量插入的每块行数 / Rows per bulk-insert chunk</summary>
-        private const int InsertChunkSize = 100;
+        private const int INSERT_CHUNK_SIZE = 100;
 
         /// <summary>单值字符串行（SQL 投影）/ Single string-value row (SQL projection)</summary>
         private class StringRow
@@ -44,9 +44,9 @@ namespace Rampage.NaturalistAtlas.DAL
                 DatabaseClient.Execute(
                     "DELETE FROM emergence_history WHERE city_id = @CityId AND taxon_id = @TaxonId",
                     new { CityId = cityId, TaxonId = taxonId });
-                for (int start = 0; start < rows.Count; start += InsertChunkSize)
+                for (int start = 0; start < rows.Count; start += INSERT_CHUNK_SIZE)
                 {
-                    List<EmergenceHistory> chunk = rows.Skip(start).Take(InsertChunkSize).ToList();
+                    List<EmergenceHistory> chunk = rows.Skip(start).Take(INSERT_CHUNK_SIZE).ToList();
                     List<string> values = new List<string>();
                     for (int i = 0; i < chunk.Count; i++)
                     {

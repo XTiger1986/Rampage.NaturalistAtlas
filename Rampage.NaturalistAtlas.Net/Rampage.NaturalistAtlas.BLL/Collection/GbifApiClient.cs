@@ -10,13 +10,13 @@ namespace Rampage.NaturalistAtlas.Collection
     public class GbifApiClient : SourceApiClient
     {
         /// <summary>合规 UA / Compliance UA</summary>
-        public const string ClientUserAgent = "NaturalistAtlas-Collector/1.0 (+https://1986z.com)";
+        public const string CLIENT_USER_AGENT = "NaturalistAtlas-Collector/1.0 (+https://1986z.com)";
 
         /// <summary>单查询 offset+limit 上限（超出须时间窗切片）/ offset+limit ceiling per query (slicing required beyond it)</summary>
-        public const long MaxQueryRecords = 100000;
+        public const long MAX_QUERY_RECORDS = 100000;
 
         /// <summary>单页上限（GBIF 300）/ Page ceiling (GBIF allows 300)</summary>
-        public const int MaxPageSize = 300;
+        public const int MAX_PAGE_SIZE = 300;
 
         /// <summary>
         /// 构造 GBIF 客户端 / Construct the GBIF client
@@ -24,7 +24,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// <param name="baseUrl">v1 基址 / v1 base url</param>
         /// <param name="ratePerMinute">节流上限（次/分钟）/ Throttle cap (requests/minute)</param>
         public GbifApiClient(string baseUrl, int ratePerMinute)
-            : base("GBIF", baseUrl, ClientUserAgent, ratePerMinute, 60)
+            : base("GBIF", baseUrl, CLIENT_USER_AGENT, ratePerMinute, 60)
         {
         }
 

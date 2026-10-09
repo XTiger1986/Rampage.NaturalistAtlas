@@ -32,7 +32,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<List<CityItemDto>>.Failure(UnexpectedFailureMessage);
+                return R<List<CityItemDto>>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<List<GeoSearchItemDto>>.Failure(UnexpectedFailureMessage);
+                return R<List<GeoSearchItemDto>>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
     }

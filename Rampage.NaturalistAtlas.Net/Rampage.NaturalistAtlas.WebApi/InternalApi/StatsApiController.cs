@@ -36,7 +36,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<CityOverviewDto>.Failure(UnexpectedFailureMessage);
+                return R<CityOverviewDto>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
     }

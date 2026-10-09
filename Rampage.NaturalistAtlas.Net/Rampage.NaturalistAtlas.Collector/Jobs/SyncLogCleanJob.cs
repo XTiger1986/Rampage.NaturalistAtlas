@@ -15,7 +15,7 @@ namespace Rampage.NaturalistAtlas.Collector.Jobs
     public class SyncLogCleanJob : SchedulerJobBase
     {
         /// <summary>成功日志保留天数 / Days to retain success log rows</summary>
-        private const int SuccessRetentionDays = 30;
+        private const int SUCCESS_RETENTION_DAYS = 30;
 
         [Auto]
         protected ISyncLogDao SyncLogDao = default!;
@@ -23,11 +23,11 @@ namespace Rampage.NaturalistAtlas.Collector.Jobs
         /// <inheritdoc/>
         protected override void ExecuteJob()
         {
-            DateTime threshold = DateTime.UtcNow.AddDays(-SuccessRetentionDays);
+            DateTime threshold = DateTime.UtcNow.AddDays(-SUCCESS_RETENTION_DAYS);
             int deleted = SyncLogDao.DeleteOldSuccessLogs(threshold);
             if (deleted > 0)
             {
-                LogInfo($"[日志清理] 删除{deleted}条{SuccessRetentionDays}天前的成功日志");
+                LogInfo($"[日志清理] 删除{deleted}条{SUCCESS_RETENTION_DAYS}天前的成功日志");
             }
         }
     }

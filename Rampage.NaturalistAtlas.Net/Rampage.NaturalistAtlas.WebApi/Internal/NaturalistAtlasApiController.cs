@@ -18,7 +18,7 @@ namespace Rampage.NaturalistAtlas.WebApi.Internal
         /// strings, table names or stack frames) stay in the server log and never reach public
         /// clients; business failures belong in the service layer's R.Failure(text), not in throws
         /// </summary>
-        protected const string UnexpectedFailureMessage = "服务繁忙，请稍后再试 / The service is busy, please try again later";
+        protected const string UNEXPECTED_FAILURE_MESSAGE = "服务繁忙，请稍后再试 / The service is busy, please try again later";
 
         [Auto]
         protected ISettingService SettingService = default!;

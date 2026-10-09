@@ -22,7 +22,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// slug 合法格式：小写字母/数字段以连字符相连（如 beijing、xi-an、new-york）
         /// Legal slug format: lowercase alphanumeric segments joined by hyphens
         /// </summary>
-        private static readonly Regex SlugPattern = new("^[a-z0-9]+(-[a-z0-9]+)*$", RegexOptions.Compiled);
+        private static readonly Regex SLUG_PATTERN = new("^[a-z0-9]+(-[a-z0-9]+)*$", RegexOptions.Compiled);
 
         [Auto]
         protected ICityDao CityDao = default!;
@@ -98,7 +98,7 @@ namespace Rampage.NaturalistAtlas.BLL
             {
                 return R.Failure("状态取值无效");
             }
-            if (!SlugPattern.IsMatch(input.Slug ?? string.Empty))
+            if (!SLUG_PATTERN.IsMatch(input.Slug ?? string.Empty))
             {
                 return R.Failure("URL标识仅允许小写字母、数字与连字符（如 beijing）");
             }

@@ -15,13 +15,13 @@ namespace Rampage.NaturalistAtlas.Collection
     public static class GbifMapper
     {
         /// <summary>iNaturalist 转发数据集 key（采集时跳过，避免与 iNat 源重复）/ The iNaturalist republish dataset key (skipped at ingest to avoid duplicating the iNat source)</summary>
-        public const string InatRepublishDatasetKey = "50c9509d-22c7-4a22-a47d-8c48425ef4a7";
+        public const string INAT_REPUBLISH_DATASET_KEY = "50c9509d-22c7-4a22-a47d-8c48425ef4a7";
 
         /// <summary>IUCN 受威胁等级集合（保守口径）/ Threatened IUCN categories (conservative scope)</summary>
-        private static readonly HashSet<string> ThreatenedIucnCategories = new HashSet<string> { "VU", "EN", "CR" };
+        private static readonly HashSet<string> THREATENED_IUCN_CATEGORIES = new HashSet<string> { "VU", "EN", "CR" };
 
         /// <summary>纲名 → 类群（判不了的按界回退）/ Class name → iconic (falls back by kingdom when unmatched)</summary>
-        private static readonly Dictionary<string, IconicTaxon> ClassIconicMap = new Dictionary<string, IconicTaxon>
+        private static readonly Dictionary<string, IconicTaxon> CLASS_ICONIC_MAP = new Dictionary<string, IconicTaxon>
         {
             ["Aves"] = IconicTaxon.Birds,
             ["Mammalia"] = IconicTaxon.Mammals,
@@ -34,7 +34,7 @@ namespace Rampage.NaturalistAtlas.Collection
         };
 
         /// <summary>界名 → 类群 / Kingdom name → iconic</summary>
-        private static readonly Dictionary<string, IconicTaxon> KingdomIconicMap = new Dictionary<string, IconicTaxon>
+        private static readonly Dictionary<string, IconicTaxon> KINGDOM_ICONIC_MAP = new Dictionary<string, IconicTaxon>
         {
             ["Plantae"] = IconicTaxon.Plants,
             ["Fungi"] = IconicTaxon.Fungi,
@@ -61,7 +61,7 @@ namespace Rampage.NaturalistAtlas.Collection
             {
                 return null;
             }
-            if (string.Equals(dto.DatasetKey, InatRepublishDatasetKey, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(dto.DatasetKey, INAT_REPUBLISH_DATASET_KEY, StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
@@ -166,12 +166,12 @@ namespace Rampage.NaturalistAtlas.Collection
             if (!string.IsNullOrEmpty(dto.Kingdom))
             {
                 // 仅当原本推断失准时重判（避免覆盖更精确的已有归类）
-                if (KingdomIconicMap.TryGetValue(dto.Kingdom, out IconicTaxon kingdomIconic) && existing.IconicTaxon == IconicTaxon.Unknown)
+                if (KINGDOM_ICONIC_MAP.TryGetValue(dto.Kingdom, out IconicTaxon kingdomIconic) && existing.IconicTaxon == IconicTaxon.Unknown)
                 {
                     existing.IconicTaxon = kingdomIconic;
                 }
             }
-            existing.Threatened = dto.IucnRedListCategory != null && ThreatenedIucnCategories.Contains(dto.IucnRedListCategory);
+            existing.Threatened = dto.IucnRedListCategory != null && THREATENED_IUCN_CATEGORIES.Contains(dto.IucnRedListCategory);
             existing.Status = CommonStatus.Enabled;
             existing.UpdateTime = now;
             return existing;
@@ -180,7 +180,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// <summary>iNat 对账用：该记录是否为 iNat 转发 / Deletion-reconcile helper: whether this row is an iNat republish</summary>
         public static bool IsInatRepublish(string? datasetKey)
         {
-            return string.Equals(datasetKey, InatRepublishDatasetKey, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(datasetKey, INAT_REPUBLISH_DATASET_KEY, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -256,11 +256,11 @@ namespace Rampage.NaturalistAtlas.Collection
         /// <summary>类群推断：先纲后界，均无匹配归未知 / Iconic inference: class first, then kingdom, else Unknown</summary>
         public static IconicTaxon InferIconic(GbifOccurrenceDto dto)
         {
-            if (dto.ClassName != null && ClassIconicMap.TryGetValue(dto.ClassName, out IconicTaxon byClass))
+            if (dto.ClassName != null && CLASS_ICONIC_MAP.TryGetValue(dto.ClassName, out IconicTaxon byClass))
             {
                 return byClass;
             }
-            if (dto.Kingdom != null && KingdomIconicMap.TryGetValue(dto.Kingdom, out IconicTaxon byKingdom))
+            if (dto.Kingdom != null && KINGDOM_ICONIC_MAP.TryGetValue(dto.Kingdom, out IconicTaxon byKingdom))
             {
                 return byKingdom;
             }

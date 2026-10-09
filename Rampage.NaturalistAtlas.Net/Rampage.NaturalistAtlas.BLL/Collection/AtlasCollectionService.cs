@@ -26,28 +26,28 @@ namespace Rampage.NaturalistAtlas.Collection
     public class AtlasCollectionService : SuperService<SyncLog, ISyncLogDao>, IAtlasCollectionService
     {
         /// <summary>iNat 单周期页数上限（预算封顶 50×200 条/周期）/ iNat page cap per cycle (budget: 50×200 rows)</summary>
-        private const int MaxPagesPerRun = 50;
+        private const int MAX_PAGES_PER_RUN = 50;
 
         /// <summary>iNat 对账单批 id 数 / iNat deletion-check ids per batch call</summary>
-        private const int InatIdBatchSize = 100;
+        private const int INAT_ID_BATCH_SIZE = 100;
 
         /// <summary>GBIF 单查询条数上限（超出必须切片）/ GBIF per-query record ceiling (slicing mandatory beyond it)</summary>
-        private const long GbifQueryCeiling = 100000;
+        private const long GBIF_QUERY_CEILING = 100000;
 
         /// <summary>分类刷新每批条数 / Taxon refresh batch size</summary>
-        private const int TaxonRefreshBatchSize = 100;
+        private const int TAXON_REFRESH_BATCH_SIZE = 100;
 
         /// <summary>iNat 增量水位回退安全窗（分钟）：吸收排序乱序与边界抖动 / iNat watermark safety pullback in minutes (absorbs ordering jitter)</summary>
-        private const int WatermarkSafetyMinutes = 5;
+        private const int WATERMARK_SAFETY_MINUTES = 5;
 
         /// <summary>iNat 增量首跑回看时长（小时）/ iNat increment look-back hours on first run</summary>
-        private const int FirstRunLookbackHours = 2;
+        private const int FIRST_RUN_LOOKBACK_HOURS = 2;
 
         /// <summary>集邮缺口单轮请求预算（每城至少 13 请求，翻页时更多；城市多时靠 CityIndex 轮转续跑）/ Collection-gap request budget per run (≥13 per city with paging; rotation continues larger sets)</summary>
-        private const int WantedRequestBudget = 91;
+        private const int WANTED_REQUEST_BUDGET = 91;
 
         /// <summary>wanted 端点单页条数（v1 显式 per_page=100；源站若压得更低则按短页判停）/ wanted endpoint page size (explicit v1 per_page=100; a lower server-side cap stops paging via short-page detection)</summary>
-        private const int WantedPageSize = 100;
+        private const int WANTED_PAGE_SIZE = 100;
 
         [Auto]
         protected ISyncLogDao SyncLogDao = default!;
@@ -80,7 +80,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// find-or-insert (unique-key violation); serializing per source removes the race while
         /// keeping different sources parallel
         /// </summary>
-        private static readonly Dictionary<AtlasSource, SemaphoreSlim> SourceLocks = new Dictionary<AtlasSource, SemaphoreSlim>
+        private static readonly Dictionary<AtlasSource, SemaphoreSlim> SOURCE_LOCKS = new Dictionary<AtlasSource, SemaphoreSlim>
         {
             [AtlasSource.INaturalist] = new SemaphoreSlim(1, 1),
             [AtlasSource.Gbif] = new SemaphoreSlim(1, 1)
@@ -204,14 +204,14 @@ namespace Rampage.NaturalistAtlas.Collection
             InatApiClient api = new InatApiClient(ctx.Setting.InatApiBaseUrl, ctx.Setting.InatRateLimitPerMinute);
             long lastId = ReadConfigLong(ctx.Config, "IncLastId", 0);
             DateTime? resumeSince = ReadConfigDateTime(ctx.Config, "IncSince");
-            DateTime since = resumeSince ?? ctx.Cursor.Watermark ?? UtcNow.AddHours(-FirstRunLookbackHours);
+            DateTime since = resumeSince ?? ctx.Cursor.Watermark ?? UtcNow.AddHours(-FIRST_RUN_LOOKBACK_HOURS);
             bool resumed = resumeSince.HasValue;
             DateTime? maxUpdated = null;
             int batchSize = ReadConfigInt(ctx.Config, "BatchSize", 200);
             DateTime now = UtcNow;
             bool windowSwept = false;
 
-            for (int page = 1; page <= MaxPagesPerRun; page++)
+            for (int page = 1; page <= MAX_PAGES_PER_RUN; page++)
             {
                 Dictionary<string, object?> query = BuildInatBaseQuery(ctx.City!, batchSize);
                 query["updated_since"] = since.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
@@ -257,7 +257,7 @@ namespace Rampage.NaturalistAtlas.Collection
                 RemoveConfigKey(ctx.Config, "IncSince");
                 if (maxUpdated.HasValue)
                 {
-                    DateTime candidate = maxUpdated.Value.AddMinutes(-WatermarkSafetyMinutes);
+                    DateTime candidate = maxUpdated.Value.AddMinutes(-WATERMARK_SAFETY_MINUTES);
                     if (ctx.Cursor.Watermark == null || candidate > ctx.Cursor.Watermark)
                     {
                         result.NewWatermark = candidate;
@@ -294,7 +294,7 @@ namespace Rampage.NaturalistAtlas.Collection
             GbifApiClient api = new GbifApiClient(ctx.Setting.GbifApiBaseUrl, ctx.Setting.GbifRateLimitPerMinute);
             int windowDays = ReadConfigInt(ctx.Config, "WindowDays", 45);
             int maxPages = ReadConfigInt(ctx.Config, "MaxPagesPerRun", 20);
-            int pageSize = Math.Min(ReadConfigInt(ctx.Config, "BatchSize", GbifApiClient.MaxPageSize), GbifApiClient.MaxPageSize);
+            int pageSize = Math.Min(ReadConfigInt(ctx.Config, "BatchSize", GbifApiClient.MAX_PAGE_SIZE), GbifApiClient.MAX_PAGE_SIZE);
             DateTime now = UtcNow;
             // 窗口终点锚定：无锚时取今天并写入 config；有锚（断点续扫中）沿用，保证 offset 语义一致
             // Window-end anchoring: today when unanchored (then persisted); reused while resuming so the offset stays meaningful
@@ -366,7 +366,7 @@ namespace Rampage.NaturalistAtlas.Collection
             long lastId = window.ResumeId;
             bool windowExhausted = false;
 
-            for (int page = 1; page <= MaxPagesPerRun; page++)
+            for (int page = 1; page <= MAX_PAGES_PER_RUN; page++)
             {
                 Dictionary<string, object?> query = BuildInatBaseQuery(ctx.City!, batchSize);
                 query["d1"] = window.SliceStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -418,17 +418,17 @@ namespace Rampage.NaturalistAtlas.Collection
             }
 
             GbifApiClient api = new GbifApiClient(ctx.Setting.GbifApiBaseUrl, ctx.Setting.GbifRateLimitPerMinute);
-            int pageSize = Math.Min(ReadConfigInt(ctx.Config, "BatchSize", GbifApiClient.MaxPageSize), GbifApiClient.MaxPageSize);
+            int pageSize = Math.Min(ReadConfigInt(ctx.Config, "BatchSize", GbifApiClient.MAX_PAGE_SIZE), GbifApiClient.MAX_PAGE_SIZE);
             DateTime now = UtcNow;
             string eventDate = $"{window.SliceStart:yyyy-MM-dd},{window.SliceEnd:yyyy-MM-dd}";
             int offset = window.ResumeOffset;
             long? totalCount = null;
 
-            for (int page = 1; page <= MaxPagesPerRun; page++)
+            for (int page = 1; page <= MAX_PAGES_PER_RUN; page++)
             {
                 GbifSearchResponse? response = await api.SearchOccurrencesAsync(BuildGbifQuery(ctx.City!, eventDate, pageSize, offset));
                 result.RequestCount = api.RequestCount;
-                if (response?.Count > GbifQueryCeiling)
+                if (response?.Count > GBIF_QUERY_CEILING)
                 {
                     // 单窗超限：对半缩窗留给下个节拍重试（同窗断点作废）
                     int halved = Math.Max(window.SliceDays / 2, 1);
@@ -477,9 +477,9 @@ namespace Rampage.NaturalistAtlas.Collection
             }
 
             int deletedCount = 0;
-            for (int start = 0; start < sampleIds.Count; start += InatIdBatchSize)
+            for (int start = 0; start < sampleIds.Count; start += INAT_ID_BATCH_SIZE)
             {
-                List<string> batch = sampleIds.Skip(start).Take(InatIdBatchSize).ToList();
+                List<string> batch = sampleIds.Skip(start).Take(INAT_ID_BATCH_SIZE).ToList();
                 InatObservationsResponse? response = await api.FetchObservationsByIdsAsync(batch);
                 result.RequestCount = api.RequestCount;
                 int returnedCount = response?.Results?.Count ?? 0;
@@ -488,7 +488,7 @@ namespace Rampage.NaturalistAtlas.Collection
                     // 响应被截断（per_page 之外仍有结果）：缺席判定不可信，跳过本批下线——宁可少删不可误删
                     // Truncated response (more hits beyond per_page): absence is unreliable, skip marking
                     // this batch — better to under-delete than to falsely mark live rows
-                    LogInfo($"[iNat对账] 城市{ctx.Cursor.CityId} 批{start / InatIdBatchSize + 1} 响应截断(命中{total}/返回{returnedCount})，跳过缺席判定");
+                    LogInfo($"[iNat对账] 城市{ctx.Cursor.CityId} 批{start / INAT_ID_BATCH_SIZE + 1} 响应截断(命中{total}/返回{returnedCount})，跳过缺席判定");
                     continue;
                 }
                 HashSet<string> present = new HashSet<string>(
@@ -550,7 +550,7 @@ namespace Rampage.NaturalistAtlas.Collection
             TaskRunResult result = new TaskRunResult();
             // v1 客户端（wanted 端点仅 v1 提供）
             InatApiClient api = new InatApiClient(ctx.Setting.InatV1ApiBaseUrl, ctx.Setting.InatRateLimitPerMinute);
-            int budget = WantedRequestBudget;
+            int budget = WANTED_REQUEST_BUDGET;
 
             List<City> cities = ParseCollectionCities(ctx.Setting);
             List<City> wantedCities = cities.FindAll(c => c.InatPlaceId.HasValue && c.Status == CommonStatus.Enabled);
@@ -565,14 +565,14 @@ namespace Rampage.NaturalistAtlas.Collection
             int processed = 0;
             int totalRows = 0;
 
-            while (processed < wantedCities.Count && budget >= InatMapper.IconicSourceTaxonIds.Length)
+            while (processed < wantedCities.Count && budget >= InatMapper.ICONIC_SOURCE_TAXON_IDS.Length)
             {
                 City city = wantedCities[cityIndex];
                 List<CityWantedTaxon> rows = new List<CityWantedTaxon>();
                 bool cityComplete = true;
-                for (int a = 0; a < InatMapper.IconicSourceTaxonIds.Length; a++)
+                for (int a = 0; a < InatMapper.ICONIC_SOURCE_TAXON_IDS.Length; a++)
                 {
-                    int ancestorId = InatMapper.IconicSourceTaxonIds[a];
+                    int ancestorId = InatMapper.ICONIC_SOURCE_TAXON_IDS[a];
                     // 翻页直到短页/命中总数/批上限；预算按请求计（每页 1 个）
                     // Page until a short page / the hit total / the batch cap; the budget counts requests
                     int page = 1;
@@ -611,7 +611,7 @@ namespace Rampage.NaturalistAtlas.Collection
                                 break;
                             }
                         }
-                        else if (response.Results.Count < WantedPageSize)
+                        else if (response.Results.Count < WANTED_PAGE_SIZE)
                         {
                             // 无命中总数时按短页判停（源站把 per_page 压到更低则提前停，宁少勿重）
                             // Without a hit total, stop on a short page (a lower server-side cap stops early)
@@ -619,7 +619,7 @@ namespace Rampage.NaturalistAtlas.Collection
                         }
                         page++;
                     }
-                    if (budget <= 0 && a < InatMapper.IconicSourceTaxonIds.Length - 1)
+                    if (budget <= 0 && a < InatMapper.ICONIC_SOURCE_TAXON_IDS.Length - 1)
                     {
                         // 预算耗尽且仍有祖先未取：本城不完整
                         // Budget exhausted with ancestors remaining: the city list is incomplete
@@ -825,7 +825,7 @@ namespace Rampage.NaturalistAtlas.Collection
         {
             TaskRunResult result = new TaskRunResult();
             InatApiClient api = new InatApiClient(ctx.Setting.InatApiBaseUrl, ctx.Setting.InatRateLimitPerMinute);
-            List<Taxon> batch = TaxonDao.SelectRefreshBatch(AtlasSource.INaturalist, TaxonRefreshBatchSize);
+            List<Taxon> batch = TaxonDao.SelectRefreshBatch(AtlasSource.INaturalist, TAXON_REFRESH_BATCH_SIZE);
             if (batch.Count == 0)
             {
                 result.Message = "无待刷新分类 / nothing to refresh";
@@ -867,7 +867,7 @@ namespace Rampage.NaturalistAtlas.Collection
         {
             TaskRunResult result = new TaskRunResult();
             GbifApiClient api = new GbifApiClient(ctx.Setting.GbifApiBaseUrl, ctx.Setting.GbifRateLimitPerMinute);
-            List<Taxon> batch = TaxonDao.SelectRefreshBatch(AtlasSource.Gbif, TaxonRefreshBatchSize);
+            List<Taxon> batch = TaxonDao.SelectRefreshBatch(AtlasSource.Gbif, TAXON_REFRESH_BATCH_SIZE);
             if (batch.Count == 0)
             {
                 result.Message = "无待刷新分类 / nothing to refresh";
@@ -1127,7 +1127,7 @@ namespace Rampage.NaturalistAtlas.Collection
                 LogInfo($"[开始] {source} {task} 城市{cityId}" + (ctx.Cursor.Watermark.HasValue ? $" 水位{ctx.Cursor.Watermark.Value:MM-dd HH:mm}" : string.Empty));
 
                 // 同源串行化：执行体含"先查后插"入库编排，防止增量/回补并发时撞唯一键
-                SemaphoreSlim sourceLock = SourceLocks[source];
+                SemaphoreSlim sourceLock = SOURCE_LOCKS[source];
                 TaskRunResult result;
                 await sourceLock.WaitAsync();
                 try

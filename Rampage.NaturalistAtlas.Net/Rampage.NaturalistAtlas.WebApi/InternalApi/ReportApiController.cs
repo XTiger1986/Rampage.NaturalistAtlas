@@ -40,7 +40,7 @@ namespace Rampage.NaturalistAtlas.WebApi.InternalApi
             catch (Exception ex)
             {
                 LogError(ex);
-                return R<string>.Failure(UnexpectedFailureMessage);
+                return R<string>.Failure(UNEXPECTED_FAILURE_MESSAGE);
             }
         }
     }

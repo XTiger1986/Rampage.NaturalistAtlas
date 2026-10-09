@@ -25,7 +25,7 @@ namespace Rampage.NaturalistAtlas.DAL
         /// upsert 列规格：(列名, 取值)。枚举显式转 short，避免驱动枚举映射歧义
         /// Upsert column spec: (column, value getter); enums cast to short explicitly to avoid driver enum-mapping ambiguity
         /// </summary>
-        private static readonly (string Column, Func<Taxon, object?>)[] UpsertColumns =
+        private static readonly (string Column, Func<Taxon, object?>)[] UPSERT_COLUMNS =
         {
             ("id", r => r.Id),
             ("source", r => (short)r.Source),
@@ -45,15 +45,15 @@ namespace Rampage.NaturalistAtlas.DAL
         /// <summary>
         /// DO UPDATE 覆盖列（含 status：被观察引用即活跃）/ Columns overwritten by DO UPDATE (status included: referenced by an observation implies active)
         /// </summary>
-        private static readonly string[] UpsertUpdateColumns =
+        private static readonly string[] UPSERT_UPDATE_COLUMNS =
         {
             "rank", "scientific_name", "common_name_cn", "common_name_en", "iconic_taxon",
             "threatened", "ancestry", "status", "update_time"
         };
 
-        private const int UpsertSqlBatchSize = 200;
+        private const int UPSERT_SQL_BATCH_SIZE = 200;
 
-        private const string SelectColumnSql =
+        private const string SELECT_COLUMN_SQL =
             "id AS Id, source AS Source, source_taxon_id AS SourceTaxonId, rank AS Rank, scientific_name AS ScientificName, " +
             "common_name_cn AS CommonNameCn, common_name_en AS CommonNameEn, iconic_taxon AS IconicTaxon, " +
             "threatened AS Threatened, ancestry AS Ancestry, status AS Status, create_time AS CreateTime, update_time AS UpdateTime";
@@ -77,14 +77,14 @@ namespace Rampage.NaturalistAtlas.DAL
                 return result;
             }
 
-            string columnList = string.Join(", ", UpsertColumns.Select(c => c.Column));
-            string conflictSet = string.Join(", ", UpsertUpdateColumns.Select(c => $"{c} = EXCLUDED.{c}"));
+            string columnList = string.Join(", ", UPSERT_COLUMNS.Select(c => c.Column));
+            string conflictSet = string.Join(", ", UPSERT_UPDATE_COLUMNS.Select(c => $"{c} = EXCLUDED.{c}"));
             string sqlPrefix = $"INSERT INTO taxon ({columnList}) VALUES ";
             string sqlSuffix = $" ON CONFLICT (source, source_taxon_id) DO UPDATE SET {conflictSet} RETURNING (xmax = 0) AS IsInsert";
 
-            for (int start = 0; start < rows.Count; start += UpsertSqlBatchSize)
+            for (int start = 0; start < rows.Count; start += UPSERT_SQL_BATCH_SIZE)
             {
-                List<Taxon> batch = rows.Skip(start).Take(UpsertSqlBatchSize).ToList();
+                List<Taxon> batch = rows.Skip(start).Take(UPSERT_SQL_BATCH_SIZE).ToList();
                 Dictionary<string, object?> param = new Dictionary<string, object?>();
                 StringBuilder values = new StringBuilder();
                 for (int i = 0; i < batch.Count; i++)
@@ -93,10 +93,10 @@ namespace Rampage.NaturalistAtlas.DAL
                     {
                         values.Append(", ");
                     }
-                    values.Append('(').Append(string.Join(", ", UpsertColumns.Select((c, j) => $"@r{i}_c{j}"))).Append(')');
-                    for (int j = 0; j < UpsertColumns.Length; j++)
+                    values.Append('(').Append(string.Join(", ", UPSERT_COLUMNS.Select((c, j) => $"@r{i}_c{j}"))).Append(')');
+                    for (int j = 0; j < UPSERT_COLUMNS.Length; j++)
                     {
-                        param[$"r{i}_c{j}"] = UpsertColumns[j].Item2(batch[i]);
+                        param[$"r{i}_c{j}"] = UPSERT_COLUMNS[j].Item2(batch[i]);
                     }
                 }
 
@@ -116,7 +116,7 @@ namespace Rampage.NaturalistAtlas.DAL
                 return new List<Taxon>();
             }
             return DatabaseClient.SelectList<Taxon>(
-                $"SELECT {SelectColumnSql} FROM taxon WHERE source = @Source AND source_taxon_id = ANY(@Ids)",
+                $"SELECT {SELECT_COLUMN_SQL} FROM taxon WHERE source = @Source AND source_taxon_id = ANY(@Ids)",
                 new { Source = (short)source, Ids = sourceTaxonIds.ToArray() });
         }
 
@@ -124,7 +124,7 @@ namespace Rampage.NaturalistAtlas.DAL
         public List<Taxon> SelectRefreshBatch(AtlasSource source, int limit)
         {
             return DatabaseClient.SelectList<Taxon>(
-                $"SELECT {SelectColumnSql} FROM taxon WHERE source = @Source ORDER BY update_time ASC LIMIT @Limit",
+                $"SELECT {SELECT_COLUMN_SQL} FROM taxon WHERE source = @Source ORDER BY update_time ASC LIMIT @Limit",
                 new { Source = (short)source, Limit = limit });
         }
     }
