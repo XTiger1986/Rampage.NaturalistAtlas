@@ -171,7 +171,7 @@ namespace Rampage.NaturalistAtlas.Collection
         /// </summary>
         private static int GetBackoffSeconds(int attempt)
         {
-            double jitter = 0.8 + (JITTER_RANDOM.Value.NextDouble() * 0.4);
+            double jitter = 0.8 + (JITTER_RANDOM.Value!.NextDouble() * 0.4);
             return Math.Max(1, (int)Math.Round(BACKOFF_BASE_SECONDS * attempt * jitter));
         }
 
