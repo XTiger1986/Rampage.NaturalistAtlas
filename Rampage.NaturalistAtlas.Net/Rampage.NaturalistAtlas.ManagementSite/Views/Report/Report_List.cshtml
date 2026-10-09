@@ -1,13 +1,13 @@
 @model ListViewData<ReportRowDto, ReportAdminFilter>
 @{
     // 举报工单列表：待处理优先；待处理行进处理页，已处理行展示处理结论
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<ReportRowDto> DataList = Model!.DataList;
+    List<ReportRowDto> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    ReportAdminFilter DataFilter = Model!.DataFilter;
+    ReportAdminFilter dataFilter = Model!.DataFilter;
 }
 
 @section Head {
@@ -26,25 +26,25 @@
         <form class="sp-toolbar" action="~/Report/Report_List" method="get">
             <div class="sp-toolbar__filters">
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
-                @if (!string.IsNullOrEmpty(DataFilter.ObservationId))
+                @if (!string.IsNullOrEmpty(dataFilter.ObservationId))
                 {
                     <!-- 观察详情跳入时携带的过滤上下文：保留在表单里，翻页/查询不丢失 -->
-                    <input type="hidden" name="ObservationId" value="@DataFilter.ObservationId" />
+                    <input type="hidden" name="ObservationId" value="@dataFilter.ObservationId" />
                     <span class="badge text-bg-warning d-inline-flex align-items-center gap-1">
                         <i class="fa-solid fa-crosshairs"></i>
-                        已按观察 <span class="sp-mono">@DataFilter.ObservationId</span> 过滤
+                        已按观察 <span class="sp-mono">@dataFilter.ObservationId</span> 过滤
                         <a href="~/Report/Report_List" class="ms-1 text-decoration-none" title="清除该过滤">×</a>
                     </span>
                 }
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<ReportStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                         model='new EnumSelector<ReportStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = dataFilter.Status }' />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<ReportReason> { FormItemId = "seltReason", FormItemName = "Reason", Css = "form-select", Style = "width:130px", DefaultText = "全部原因", DefaultValue = "", SelectedValue = DataFilter.Reason }' />
+                         model='new EnumSelector<ReportReason> { FormItemId = "seltReason", FormItemName = "Reason", Css = "form-select", Style = "width:130px", DefaultText = "全部原因", DefaultValue = "", SelectedValue = dataFilter.Reason }' />
                 <span class="sp-toolbar__label">提交时间</span>
-                <input type="date" name="CreateTimeFrom" class="form-control" style="width:150px" value="@(DataFilter.CreateTimeFrom?.ToString("yyyy-MM-dd"))" />
+                <input type="date" name="CreateTimeFrom" class="form-control" style="width:150px" value="@(dataFilter.CreateTimeFrom?.ToString("yyyy-MM-dd"))" />
                 <span class="sp-toolbar__label">至</span>
-                <input type="date" name="CreateTimeTo" class="form-control" style="width:150px" value="@(DataFilter.CreateTimeTo?.ToString("yyyy-MM-dd"))" />
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <input type="date" name="CreateTimeTo" class="form-control" style="width:150px" value="@(dataFilter.CreateTimeTo?.ToString("yyyy-MM-dd"))" />
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
                 <button type="button" id="btnExportReportCsv" class="btn btn-outline-success" title="按当前筛选导出最多 5000 行 CSV">
                     <i class="fa-solid fa-file-csv me-1"></i>导出 CSV
                 </button>
@@ -67,9 +67,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td>
@@ -101,14 +101,14 @@
                                     <span class="text-muted">观察已不存在</span>
                                 }
                             </td>
-                            <td>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</td>
+                            <td>@DateTimeTool.UtcToLocal(item.CreateTime, ctz).ToCommonString()</td>
                             <td>
                                 <span class="badge @(item.Status == ReportStatus.Pending ? "bg-warning" : (item.Status == ReportStatus.Hidden ? "bg-success" : "bg-secondary"))">@EnumReader.GetText(item.Status)</span>
                             </td>
                             <td>
                                 @if (item.Status != ReportStatus.Pending)
                                 {
-                                    <div>@DateTimeTool.UtcToLocal(item.HandleTime!.Value, CTZ).ToCommonString()</div>
+                                    <div>@DateTimeTool.UtcToLocal(item.HandleTime!.Value, ctz).ToCommonString()</div>
                                     @if (!string.IsNullOrWhiteSpace(item.HandleRemark))
                                     {
                                         <div class="text-muted small">@item.HandleRemark</div>
@@ -138,7 +138,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="9" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="9" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>

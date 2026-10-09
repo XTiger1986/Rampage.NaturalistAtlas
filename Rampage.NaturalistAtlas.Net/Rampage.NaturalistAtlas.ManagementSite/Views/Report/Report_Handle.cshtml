@@ -1,15 +1,15 @@
 @model ObservationDetailDto?
 @{
     // 举报处理页：工单信息 + 被举报观察摘要 → 隐藏结单 / 驳回结单（POST api/report/handle）
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    Rampage.NaturalistAtlas.Model.Po.Report ReportData = ViewBag.Report;
+    Rampage.NaturalistAtlas.Model.Po.Report reportData = ViewBag.Report;
     ObservationDetailDto? ObservationDetail = Model;
     var obs = ObservationDetail?.Observation;
-    ViewBag.PageTitle = $"处理举报 - {ReportData.Id}";
-    bool CanHide = obs != null && obs.Status != ObservationStatus.SourceDeleted;
+    ViewBag.PageTitle = $"处理举报 - {reportData.Id}";
+    bool canHide = obs != null && obs.Status != ObservationStatus.SourceDeleted;
 }
 
 @section Head {
@@ -28,28 +28,28 @@
         <div class="sp-panel h-100">
             <div class="sp-panel__hd">
                 <h2 class="sp-panel__title"><i class="fa-solid fa-flag me-2"></i>举报信息</h2>
-                <span class="badge @(ReportData.Status == ReportStatus.Pending ? "bg-warning" : "bg-secondary")">@EnumReader.GetText(ReportData.Status)</span>
+                <span class="badge @(reportData.Status == ReportStatus.Pending ? "bg-warning" : "bg-secondary")">@EnumReader.GetText(reportData.Status)</span>
             </div>
             <div class="sp-panel__bd">
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">举报原因</label>
-                    <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(ReportData.Reason)</p></div>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(reportData.Reason)</p></div>
                 </div>
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">补充说明</label>
-                    <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(ReportData.Content) ? "-" : ReportData.Content)</p></div>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(reportData.Content) ? "-" : reportData.Content)</p></div>
                 </div>
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">联系方式</label>
-                    <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(ReportData.Contact) ? "-（匿名）" : ReportData.Contact)</p></div>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(reportData.Contact) ? "-（匿名）" : reportData.Contact)</p></div>
                 </div>
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">提交时间</label>
-                    <div class="col-sm-9"><p class="form-control-plaintext">@DateTimeTool.UtcToLocal(ReportData.CreateTime, CTZ).ToCommonString()</p></div>
+                    <div class="col-sm-9"><p class="form-control-plaintext">@DateTimeTool.UtcToLocal(reportData.CreateTime, ctz).ToCommonString()</p></div>
                 </div>
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">工单Id</label>
-                    <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@ReportData.Id</p></div>
+                    <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@reportData.Id</p></div>
                 </div>
             </div>
         </div>
@@ -93,13 +93,13 @@
         <h2 class="sp-panel__title"><i class="fa-solid fa-gavel me-2"></i>处理决定</h2>
     </div>
     <div class="sp-panel__bd">
-        @if (ReportData.Status == ReportStatus.Pending)
+        @if (reportData.Status == ReportStatus.Pending)
         {
             <form id="ReportHandleForm" action="~/api/report/handle" method="post">
-                <input type="hidden" name="ReportId" value="@ReportData.Id" />
+                <input type="hidden" name="ReportId" value="@reportData.Id" />
                 <div class="mb-3">
                     <div class="form-check mb-2">
-                        <input class="form-check-input" type="radio" name="Hide" id="radHide" value="true" @(CanHide ? "" : "disabled") />
+                        <input class="form-check-input" type="radio" name="Hide" id="radHide" value="true" @(canHide ? "" : "disabled") />
                         <label class="form-check-label" for="radHide">
                             隐藏观察并结单 —— 观察置为「隐藏」，主站在隐藏缓存 TTL（见常规设置）内不再展示
                         </label>
@@ -126,10 +126,10 @@
         {
             <div class="setting-hint">
                 <i class="fa-solid fa-circle-info me-1"></i>
-                该工单已于 @DateTimeTool.UtcToLocal(ReportData.HandleTime!.Value, CTZ).ToCommonString() 处理为「@EnumReader.GetText(ReportData.Status)」，不能重复操作。
-                @if (!string.IsNullOrWhiteSpace(ReportData.HandleRemark))
+                该工单已于 @DateTimeTool.UtcToLocal(reportData.HandleTime!.Value, ctz).ToCommonString() 处理为「@EnumReader.GetText(reportData.Status)」，不能重复操作。
+                @if (!string.IsNullOrWhiteSpace(reportData.HandleRemark))
                 {
-                    <span>处理备注：@ReportData.HandleRemark</span>
+                    <span>处理备注：@reportData.HandleRemark</span>
                 }
             </div>
         }

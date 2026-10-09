@@ -1,9 +1,9 @@
 ﻿@model ListViewData<ManageMenuDto>
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
-    List<ManageMenuDto> DataList = Model!.DataList;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
+    List<ManageMenuDto> dataList = Model!.DataList;
 }
 
 @section Head {
@@ -13,13 +13,13 @@
 <div class="sp-page-head">
     <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
     <div class="sp-page-actions">
-        <a class="btn btn-primary" href="~/Admin/Menu_Add"><i class="fa-solid fa-plus me-1"></i>@GL.Get("AddManageMenu")</a>
+        <a class="btn btn-primary" href="~/Admin/Menu_Add"><i class="fa-solid fa-plus me-1"></i>@gl.Get("AddManageMenu")</a>
     </div>
 </div>
 
 <div class="sp-panel">
     <div class="sp-panel__hd">
-        <h2 class="sp-panel__title">@GL.Get("ManageMenuList")</h2>
+        <h2 class="sp-panel__title">@gl.Get("ManageMenuList")</h2>
     </div>
     <div class="sp-panel__bd">
         <div class="sp-table-wrap">
@@ -27,23 +27,23 @@
                 <thead>
                     <tr>
                         <th>Id</th>
-                        <th>@GL.Get("Name")</th>
-                        <th>@(GL.Get("RelatedFunction"))</th>
-                        <th>@(GL.Get("Path"))</th>
-                        <th>@(GL.Get("SortValue"))</th>
-                        <th>@GL.Get("Status")</th>
-                        <th>@GL.Get("CreatedTime")/@GL.Get("UpdateTime")</th>
-                        <th>@GL.Get("Operations")</th>
+                        <th>@gl.Get("Name")</th>
+                        <th>@(gl.Get("RelatedFunction"))</th>
+                        <th>@(gl.Get("Path"))</th>
+                        <th>@(gl.Get("SortValue"))</th>
+                        <th>@gl.Get("Status")</th>
+                        <th>@gl.Get("CreatedTime")/@gl.Get("UpdateTime")</th>
+                        <th>@gl.Get("Operations")</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (DataList.Count > 0)
+                    @if (dataList.Count > 0)
                     {
-                        @WebLogicUtility.RenderMenuTreeTableHtml(DataList, GL, CTZ)
+                        @WebLogicUtility.RenderMenuTreeTableHtml(dataList, gl, ctz)
                     }
                     else
                     {
-                        <tr><td colspan="8" class="sp-empty">@GL.Get("NoData")</td></tr>
+                        <tr><td colspan="8" class="sp-empty">@gl.Get("NoData")</td></tr>
                     }
                 </tbody>
             </table>
@@ -58,7 +58,7 @@
             var btn = $(this);
             var id = btn.attr('data-id');
             var isToDisable = btn.attr('data-action') === 'disable-menu';
-            var text = isToDisable ? '@(GL.Get("ConfirmDisableMenuText"))' : '@(GL.Get("ConfirmEnableMenuText"))';
+            var text = isToDisable ? '@(gl.Get("ConfirmDisableMenuText"))' : '@(gl.Get("ConfirmEnableMenuText"))';
 
             RPG.confirm(text, function () {
                 btn.prop('disabled', true);
@@ -87,6 +87,6 @@
 
         AdminPages.bindDelete('[data-action=delete-menu]', function (id) {
             return '/api/admin/menu/delete/' + id;
-        }, '@(GL.Get("ConfirmDeleteMenuText"))');
+        }, '@(gl.Get("ConfirmDeleteMenuText"))');
     </script>
 }

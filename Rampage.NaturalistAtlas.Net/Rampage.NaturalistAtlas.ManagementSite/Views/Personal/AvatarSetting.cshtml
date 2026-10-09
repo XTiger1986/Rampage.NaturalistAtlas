@@ -1,14 +1,14 @@
 @{
     // 个人中心 · 头像设置：选择图片即自动上传（admin-personal.js），成功后本地即时预览
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
-    CurrentAuthorizationInfo CurrentAuthorization = ViewBag.CurrentAuthorization;
-    AdminDto CurrentAdmin = CurrentAuthorization.CurrentAdmin!;
-    ViewBag.PageTitle = GL.Get("MyProfilePicture");
-    string? avatarUrl = CurrentAdmin.AvatarUrl;
-    string initial = !string.IsNullOrWhiteSpace(CurrentAdmin.DisplayName)
-        ? CurrentAdmin.DisplayName!.Substring(0, 1).ToUpperInvariant()
-        : (CurrentAdmin.Username ?? "A").Substring(0, 1).ToUpperInvariant();
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
+    CurrentAuthorizationInfo currentAuthorization = ViewBag.CurrentAuthorization;
+    AdminDto currentAdmin = currentAuthorization.CurrentAdmin!;
+    ViewBag.PageTitle = gl.Get("MyProfilePicture");
+    string? avatarUrl = currentAdmin.AvatarUrl;
+    string initial = !string.IsNullOrWhiteSpace(currentAdmin.DisplayName)
+        ? currentAdmin.DisplayName!.Substring(0, 1).ToUpperInvariant()
+        : (currentAdmin.Username ?? "A").Substring(0, 1).ToUpperInvariant();
 }
 
 @section Head {
@@ -17,14 +17,14 @@
 
 <div class="sp-page-head">
     <div>
-        <h1 class="sp-page-title"><i class="fa-solid fa-circle-user me-2"></i>@(GL.Get("MyProfilePicture"))</h1>
+        <h1 class="sp-page-title"><i class="fa-solid fa-circle-user me-2"></i>@(gl.Get("MyProfilePicture"))</h1>
     </div>
 </div>
 
 <nav class="personal-nav">
-    <a href="~/Personal/EditProfile/"><i class="fa-solid fa-id-card"></i>@(GL.Get("EditMyProfile"))</a>
-    <a href="~/Personal/ChangePassword/"><i class="fa-solid fa-key"></i>@(GL.Get("ChangePassword"))</a>
-    <a class="active" href="~/Personal/AvatarSetting/"><i class="fa-solid fa-circle-user"></i>@(GL.Get("MyProfilePicture"))</a>
+    <a href="~/Personal/EditProfile/"><i class="fa-solid fa-id-card"></i>@(gl.Get("EditMyProfile"))</a>
+    <a href="~/Personal/ChangePassword/"><i class="fa-solid fa-key"></i>@(gl.Get("ChangePassword"))</a>
+    <a class="active" href="~/Personal/AvatarSetting/"><i class="fa-solid fa-circle-user"></i>@(gl.Get("MyProfilePicture"))</a>
 </nav>
 
 <div class="sp-panel">

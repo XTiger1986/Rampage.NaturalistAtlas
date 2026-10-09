@@ -1,9 +1,9 @@
 ﻿@model ListViewData<ManageGroupDto>
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
-    List<ManageGroupDto> DataList = Model!.DataList;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
+    List<ManageGroupDto> dataList = Model!.DataList;
 }
 
 @section Head {
@@ -13,13 +13,13 @@
 <div class="sp-page-head">
     <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
     <div class="sp-page-actions">
-        <a class="btn btn-primary" href="~/Admin/Group_Add"><i class="fa-solid fa-plus me-1"></i>@GL.Get("AddAdminGroup")</a>
+        <a class="btn btn-primary" href="~/Admin/Group_Add"><i class="fa-solid fa-plus me-1"></i>@gl.Get("AddAdminGroup")</a>
     </div>
 </div>
 
 <div class="sp-panel">
     <div class="sp-panel__hd">
-        <h2 class="sp-panel__title">@GL.Get("AdminGroupList")</h2>
+        <h2 class="sp-panel__title">@gl.Get("AdminGroupList")</h2>
     </div>
     <div class="sp-panel__bd">
         <div class="sp-table-wrap">
@@ -27,17 +27,17 @@
                 <thead>
                     <tr>
                         <th>Id</th>
-                        <th>@GL.Get("Name")</th>
-                        <th>@GL.Get("Description")</th>
-                        <th>@GL.Get("Status")</th>
-                        <th>@GL.Get("CreatedTime")/@GL.Get("UpdateTime")</th>
-                        <th>@GL.Get("Operations")</th>
+                        <th>@gl.Get("Name")</th>
+                        <th>@gl.Get("Description")</th>
+                        <th>@gl.Get("Status")</th>
+                        <th>@gl.Get("CreatedTime")/@gl.Get("UpdateTime")</th>
+                        <th>@gl.Get("Operations")</th>
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td>@item.Id</td>
@@ -47,15 +47,15 @@
                                 <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-danger")">@EnumReader.GetText(item.Status)</span>
                             </td>
                             <td>
-                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</div>
-                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, CTZ).ToCommonString()</div>
+                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, ctz).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, ctz).ToCommonString()</div>
                             </td>
                             <td class="text-nowrap">
                                 <a href="~/Admin/Group_Modify?GroupId=@(item.Id)" class="btn btn-sm btn-info">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@gl.Get("Edit")
                                 </a>
                                 <button type="button" data-id="@item.Id" data-action="delete-group" class="btn btn-sm btn-danger">
-                                    <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                    <i class="fa-solid fa-trash me-1"></i>@gl.Get("Delete")
                                 </button>
                             </td>
                         </tr>
@@ -63,7 +63,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="6" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="6" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>
@@ -76,6 +76,6 @@
     <script>
         AdminPages.bindDelete('[data-action=delete-group]', function (id) {
             return '/api/admin/group/delete/' + id;
-        }, '@(GL.Get("ConfirmDeleteAdminGroupText"))');
+        }, '@(gl.Get("ConfirmDeleteAdminGroupText"))');
     </script>
 }

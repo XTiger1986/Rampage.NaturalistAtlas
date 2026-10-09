@@ -1,11 +1,11 @@
 @{
     // 侧栏：品牌区 + 动态授权菜单树 + 个人区（响应式下由遮罩控制开合）
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    CurrentAuthorizationInfo CurrentAuthorization = ViewBag.CurrentAuthorization;
-    ManageMenuDto? CurrentMenu = CurrentAuthorization.CurrentMenu;
-    List<ManageMenuDto> AuthorizedMenuList = CurrentAuthorization.AuthorizedMenuList ?? new List<ManageMenuDto>();
+    CurrentAuthorizationInfo currentAuthorization = ViewBag.CurrentAuthorization;
+    ManageMenuDto? CurrentMenu = currentAuthorization.CurrentMenu;
+    List<ManageMenuDto> authorizedMenuList = currentAuthorization.AuthorizedMenuList ?? new List<ManageMenuDto>();
 
     // 菜单图标解析：菜单记录自带 fa- 类则优先；否则按标题关键词映射自然志业务图标
     string ResolveMenuIcon(ManageMenuDto menu)
@@ -55,10 +55,10 @@
         <div class="sp-nav-cat"><i class="fa-solid fa-seedling me-1"></i> 概览</div>
         <a class="sp-nav-link@(isHome ? " active" : "")" href="~/">
             <i class="fa-solid fa-leaf"></i>
-            <span>@(GL.Get("Dashboard", "管理首页"))</span>
+            <span>@(gl.Get("Dashboard", "管理首页"))</span>
         </a>
 
-        @foreach (var rootMenu in AuthorizedMenuList)
+        @foreach (var rootMenu in authorizedMenuList)
         {
             var menuList = rootMenu.MenuList;
             if (menuList == null || menuList.Count == 0) { continue; }
@@ -112,15 +112,15 @@
         <div class="sp-nav-cat"><i class="fa-solid fa-user-gear me-1"></i> 个人</div>
         <a class="sp-nav-link@(isPersonal && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "EditProfile", StringComparison.OrdinalIgnoreCase) ? " active" : "")" href="~/Personal/EditProfile/">
             <i class="fa-solid fa-id-card"></i>
-            <span>@(GL.Get("EditMyProfile"))</span>
+            <span>@(gl.Get("EditMyProfile"))</span>
         </a>
         <a class="sp-nav-link@(isPersonal && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "ChangePassword", StringComparison.OrdinalIgnoreCase) ? " active" : "")" href="~/Personal/ChangePassword/">
             <i class="fa-solid fa-key"></i>
-            <span>@(GL.Get("ChangePassword"))</span>
+            <span>@(gl.Get("ChangePassword"))</span>
         </a>
         <a class="sp-nav-link@(isPersonal && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "AvatarSetting", StringComparison.OrdinalIgnoreCase) ? " active" : "")" href="~/Personal/AvatarSetting/">
             <i class="fa-solid fa-circle-user"></i>
-            <span>@(GL.Get("MyProfilePicture"))</span>
+            <span>@(gl.Get("MyProfilePicture"))</span>
         </a>
     </div>
 </aside>

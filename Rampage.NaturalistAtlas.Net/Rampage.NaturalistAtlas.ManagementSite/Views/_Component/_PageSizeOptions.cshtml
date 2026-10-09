@@ -1,18 +1,18 @@
 ﻿@model int
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    int PageSize = Model;
-    List<int> PageSizeOptions = new List<int> { 20, 5, 10, 30, 50, 80, 100 };
+    int selectedPageSize = Model;
+    List<int> pageSizeOptions = new List<int> { 20, 5, 10, 30, 50, 80, 100 };
 }
 
 <div class="sp-toolbar__field">
-    <label class="sp-toolbar__label" for="seltPageSize">@GL.Get("SizePerPage")</label>
+    <label class="sp-toolbar__label" for="seltPageSize">@gl.Get("SizePerPage")</label>
     <select id="seltPageSize" name="ps" aria-controls="datatable-basic" class="form-select form-select-sm sp-toolbar__select--sm">
-        @foreach (int pageSize in PageSizeOptions)
+        @foreach (int pageSize in pageSizeOptions)
         {
-            @if (PageSize == pageSize)
+            @if (selectedPageSize == pageSize)
             {
                 <option value="@pageSize" selected="selected">@pageSize</option>
             }

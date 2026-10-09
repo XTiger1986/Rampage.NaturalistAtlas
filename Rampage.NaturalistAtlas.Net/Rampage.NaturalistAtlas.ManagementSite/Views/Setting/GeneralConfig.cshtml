@@ -1,10 +1,10 @@
 @model GeneralSetting
 @{
     // 系统设置 · 常规设置：站点信息 / 业务参数 / 数据源占位，保存走 api/setting/general/save
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    GeneralSetting Data = Model!;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    GeneralSetting data = Model!;
     ViewBag.PageTitle = "常规设置";
-    var CityList = ViewBag.CityList as List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
+    var cityList = ViewBag.CityList as List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
 }
 
 @section Head {
@@ -30,42 +30,42 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtSiteName">网站名称</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtSiteName" name="SiteName" class="form-control" value="@Data.SiteName" />
+                    <input type="text" id="txtSiteName" name="SiteName" class="form-control" value="@data.SiteName" />
                     <div class="invalid-feedback" verify-name="SiteName"></div>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtSiteKeywords">网站关键词</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtSiteKeywords" name="SiteKeywords" class="form-control" value="@Data.SiteKeywords" />
+                    <input type="text" id="txtSiteKeywords" name="SiteKeywords" class="form-control" value="@data.SiteKeywords" />
                     <div class="invalid-feedback" verify-name="SiteKeywords"></div>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtSiteDescription">网站描述</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtSiteDescription" name="SiteDescription" class="form-control" value="@Data.SiteDescription" />
+                    <input type="text" id="txtSiteDescription" name="SiteDescription" class="form-control" value="@data.SiteDescription" />
                     <div class="invalid-feedback" verify-name="SiteDescription"></div>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtCopyright">版权所有</label>
                 <div class="col-sm-10">
-                    <textarea id="txtCopyright" name="Copyright" class="form-control" rows="2">@Html.Raw(Data.Copyright)</textarea>
+                    <textarea id="txtCopyright" name="Copyright" class="form-control" rows="2">@Html.Raw(data.Copyright)</textarea>
                     <div class="invalid-feedback" verify-name="Copyright"></div>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtCopyrightEnglish">英文版权</label>
                 <div class="col-sm-10">
-                    <textarea id="txtCopyrightEnglish" name="CopyrightEnglish" class="form-control" rows="2">@Html.Raw(Data.CopyrightEnglish)</textarea>
+                    <textarea id="txtCopyrightEnglish" name="CopyrightEnglish" class="form-control" rows="2">@Html.Raw(data.CopyrightEnglish)</textarea>
                     <div class="invalid-feedback" verify-name="CopyrightEnglish"></div>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtInternetInformation">备案信息</label>
                 <div class="col-sm-10">
-                    <textarea id="txtInternetInformation" name="InternetInformation" class="form-control" rows="2">@Html.Raw(Data.InternetInformation)</textarea>
+                    <textarea id="txtInternetInformation" name="InternetInformation" class="form-control" rows="2">@Html.Raw(data.InternetInformation)</textarea>
                     <div class="invalid-feedback" verify-name="InternetInformation"></div>
                 </div>
             </div>
@@ -75,9 +75,9 @@
                 <label class="col-sm-2 col-form-label" for="seltDefaultCityId">默认城市</label>
                 <div class="col-sm-10">
                     <select id="seltDefaultCityId" name="DefaultCityId" class="form-select" style="max-width:420px">
-                        @foreach (var city in CityList)
+                        @foreach (var city in cityList)
                         {
-                            <option value="@city.Id" selected="@(city.Id == Data.DefaultCityId)">@city.DisplayName</option>
+                            <option value="@city.Id" selected="@(city.Id == data.DefaultCityId)">@city.DisplayName</option>
                         }
                     </select>
                     <div class="form-text">主站默认展示城市与看板口径城市（保存时校验存在性）。</div>
@@ -87,7 +87,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtHiddenObservationCacheTtlSeconds">隐藏内容缓存TTL(秒)</label>
                 <div class="col-sm-10">
-                    <input type="number" id="txtHiddenObservationCacheTtlSeconds" name="HiddenObservationCacheTtlSeconds" class="form-control" value="@Data.HiddenObservationCacheTtlSeconds" min="0" max="3600" />
+                    <input type="number" id="txtHiddenObservationCacheTtlSeconds" name="HiddenObservationCacheTtlSeconds" class="form-control" value="@data.HiddenObservationCacheTtlSeconds" min="0" max="3600" />
                     <div class="form-text">运营隐藏观察后，主站须在该时限内不再展示（产品验收要求 5 分钟内不可见，默认 300）。</div>
                     <div class="invalid-feedback" verify-name="HiddenObservationCacheTtlSeconds"></div>
                 </div>
@@ -105,14 +105,14 @@
                         <span id="collectionCityCount" class="small text-muted"></span>
                     </div>
                     <!-- 多选列表 + 隐藏字段：提交时 join 成逗号串（原裸 Id 手填易错且无校验） -->
-                    @{ var selectedIds = (Data.CollectionCityIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet(); }
+                    @{ var selectedIds = (data.CollectionCityIds ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet(); }
                     <select id="seltCollectionCities" class="form-select" size="10" multiple style="max-width:420px" aria-label="采集城市清单（按住 Ctrl 多选）">
-                        @foreach (var city in CityList)
+                        @foreach (var city in cityList)
                         {
                             <option value="@city.Id" selected="@(selectedIds.Contains(city.Id.ToString()))">@city.DisplayName</option>
                         }
                     </select>
-                    <input type="hidden" name="CollectionCityIds" id="txtCollectionCityIds" value="@Data.CollectionCityIds" />
+                    <input type="hidden" name="CollectionCityIds" id="txtCollectionCityIds" value="@data.CollectionCityIds" />
                     <div class="form-text">按住 Ctrl（mac：Cmd）多选或用上方快捷键；采集端（Collector）的增量/回补/对账按此清单迭代城市。未选择任何城市时采集端回退默认城市。</div>
                     <div class="invalid-feedback" verify-name="CollectionCityIds"></div>
                 </div>
@@ -122,7 +122,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtInatApiBaseUrl">iNaturalist API基址</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtInatApiBaseUrl" name="InatApiBaseUrl" class="form-control" value="@Data.InatApiBaseUrl" placeholder="https://api.inaturalist.org/v2" />
+                    <input type="text" id="txtInatApiBaseUrl" name="InatApiBaseUrl" class="form-control" value="@data.InatApiBaseUrl" placeholder="https://api.inaturalist.org/v2" />
                     <div class="form-text">iNaturalist v2 API（主数据源），由采集端（Collector）读取。</div>
                     <div class="invalid-feedback" verify-name="InatApiBaseUrl"></div>
                 </div>
@@ -130,7 +130,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtInatRateLimitPerMinute">采集节流(次/分钟)</label>
                 <div class="col-sm-10">
-                    <input type="number" id="txtInatRateLimitPerMinute" name="InatRateLimitPerMinute" class="form-control" value="@Data.InatRateLimitPerMinute" min="1" max="60" />
+                    <input type="number" id="txtInatRateLimitPerMinute" name="InatRateLimitPerMinute" class="form-control" value="@data.InatRateLimitPerMinute" min="1" max="60" />
                     <div class="form-text">iNaturalist 官方硬限 60 次/分钟，内置节流建议不超过 30。</div>
                     <div class="invalid-feedback" verify-name="InatRateLimitPerMinute"></div>
                 </div>
@@ -139,7 +139,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtGbifApiBaseUrl">GBIF API基址</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtGbifApiBaseUrl" name="GbifApiBaseUrl" class="form-control" value="@Data.GbifApiBaseUrl" placeholder="https://api.gbif.org/v1" />
+                    <input type="text" id="txtGbifApiBaseUrl" name="GbifApiBaseUrl" class="form-control" value="@data.GbifApiBaseUrl" placeholder="https://api.gbif.org/v1" />
                     <div class="form-text">GBIF Occurrence API（双源并行采集的第二数据源），由采集端（Collector）读取。</div>
                     <div class="invalid-feedback" verify-name="GbifApiBaseUrl"></div>
                 </div>
@@ -147,7 +147,7 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtGbifRateLimitPerMinute">GBIF节流(次/分钟)</label>
                 <div class="col-sm-10">
-                    <input type="number" id="txtGbifRateLimitPerMinute" name="GbifRateLimitPerMinute" class="form-control" value="@Data.GbifRateLimitPerMinute" min="1" max="120" />
+                    <input type="number" id="txtGbifRateLimitPerMinute" name="GbifRateLimitPerMinute" class="form-control" value="@data.GbifRateLimitPerMinute" min="1" max="120" />
                     <div class="form-text">GBIF 无硬性限额，建议保持克制（默认 60）。</div>
                     <div class="invalid-feedback" verify-name="GbifRateLimitPerMinute"></div>
                 </div>

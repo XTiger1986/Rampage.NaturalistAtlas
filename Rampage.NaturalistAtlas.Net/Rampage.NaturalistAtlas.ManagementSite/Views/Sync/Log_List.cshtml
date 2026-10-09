@@ -1,16 +1,16 @@
 @model ListViewData<SyncLog, SyncLogAdminFilter>
 @{
     // 同步日志列表：来源/城市/任务/状态/时间范围筛选；行内进详情
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<SyncLog> DataList = Model!.DataList;
+    List<SyncLog> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    SyncLogAdminFilter DataFilter = Model!.DataFilter;
-    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> CityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
-    Dictionary<int, string> CityNameDict = ViewBag.CityNameDict ?? new Dictionary<int, string>();
-    List<string> TaskOptions = Rampage.NaturalistAtlas.Model.Enums.SyncTaskCodes.All.ToList();
+    SyncLogAdminFilter dataFilter = Model!.DataFilter;
+    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> cityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
+    Dictionary<int, string> cityNameDict = ViewBag.CityNameDict ?? new Dictionary<int, string>();
+    List<string> taskOptions = Rampage.NaturalistAtlas.Model.Enums.SyncTaskCodes.All.ToList();
 }
 
 @section Head {
@@ -30,30 +30,30 @@
             <div class="sp-toolbar__filters">
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = DataFilter.Source }' />
+                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = dataFilter.Source }' />
                 <select name="CityId" class="form-select" style="width:120px">
                     <option value="">全部城市</option>
-                    @foreach (var city in CityList)
+                    @foreach (var city in cityList)
                     {
-                        <option value="@city.Id" selected="@(DataFilter.CityId == city.Id)">@city.DisplayName</option>
+                        <option value="@city.Id" selected="@(dataFilter.CityId == city.Id)">@city.DisplayName</option>
                     }
                 </select>
                 <select name="Task" class="form-select" style="width:150px">
                     <option value="">全部任务类型</option>
-                    @foreach (var task in TaskOptions)
+                    @foreach (var task in taskOptions)
                     {
-                        <option value="@task" selected="@(DataFilter.Task == task)">@SyncTaskCodes.LabelOf(task)</option>
+                        <option value="@task" selected="@(dataFilter.Task == task)">@SyncTaskCodes.LabelOf(task)</option>
                     }
                 </select>
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<SyncLogStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                         model='new EnumSelector<SyncLogStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = dataFilter.Status }' />
             </div>
             <div class="sp-toolbar__filters">
                 <span class="sp-toolbar__label">开始时间</span>
-                <input type="date" name="StartTimeFrom" class="form-control" style="width:150px" value="@(DataFilter.StartTimeFrom?.ToString("yyyy-MM-dd"))" />
+                <input type="date" name="StartTimeFrom" class="form-control" style="width:150px" value="@(dataFilter.StartTimeFrom?.ToString("yyyy-MM-dd"))" />
                 <span class="sp-toolbar__label">至</span>
-                <input type="date" name="StartTimeTo" class="form-control" style="width:150px" value="@(DataFilter.StartTimeTo?.ToString("yyyy-MM-dd"))" />
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <input type="date" name="StartTimeTo" class="form-control" style="width:150px" value="@(dataFilter.StartTimeTo?.ToString("yyyy-MM-dd"))" />
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
                 <button type="button" id="btnExportLogCsv" class="btn btn-outline-success" title="按当前筛选导出最多 5000 行 CSV">
                     <i class="fa-solid fa-file-csv me-1"></i>导出 CSV
                 </button>
@@ -76,15 +76,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
-                            <td>@DateTimeTool.UtcToLocal(item.StartTime, CTZ).ToCommonString()</td>
+                            <td>@DateTimeTool.UtcToLocal(item.StartTime, ctz).ToCommonString()</td>
                             <td>
                                 <div>@EnumReader.GetText(item.Source)</div>
-                                <div class="text-muted small">@(CityNameDict.TryGetValue(item.CityId, out string? cityName) ? cityName : item.CityId.ToString())</div>
+                                <div class="text-muted small">@(cityNameDict.TryGetValue(item.CityId, out string? cityName) ? cityName : item.CityId.ToString())</div>
                             </td>
                             <td><code class="sp-mono" title="@item.Task">@SyncTaskCodes.LabelOf(item.Task)</code></td>
                             <td>
@@ -104,7 +104,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="9" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="9" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>

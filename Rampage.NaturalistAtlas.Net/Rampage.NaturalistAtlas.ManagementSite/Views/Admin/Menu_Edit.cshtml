@@ -1,15 +1,15 @@
 ﻿@model ManageMenuDto
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    ManageMenuDto Data = Model!;
-    List<ManageMenuDto> TreeManageMenuList = ViewBag.TreeManageMenuList!;
-    Dictionary<string, List<PermissionActionInfo>> ResourceActionListDict = ViewBag.ResourceActionListDict;
+    ManageMenuDto data = Model!;
+    List<ManageMenuDto> treeManageMenuList = ViewBag.TreeManageMenuList!;
+    Dictionary<string, List<PermissionActionInfo>> resourceActionListDict = ViewBag.ResourceActionListDict;
 
-    string PageTitle = Data.Id <= 0 ? GL.Get("AddManageMenu", string.Empty)! : GL.GetText("EditTheManageMenu", Data.Title);
-    ViewBag.PageTitle = PageTitle;
+    string pageTitle = data.Id <= 0 ? gl.Get("AddManageMenu", string.Empty)! : gl.GetText("EditTheManageMenu", data.Title);
+    ViewBag.PageTitle = pageTitle;
 }
 
 @section Head {
@@ -19,62 +19,62 @@
 <div class="sp-page-head">
     <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
     <div class="sp-page-actions">
-        <a class="btn btn-outline-secondary" href="~/Admin/Menu_List"><i class="fa-solid fa-arrow-left me-1"></i>@(GL.Get("ReturnList"))</a>
-        @if (Data.Id > 0)
+        <a class="btn btn-outline-secondary" href="~/Admin/Menu_List"><i class="fa-solid fa-arrow-left me-1"></i>@(gl.Get("ReturnList"))</a>
+        @if (data.Id > 0)
         {
-            <a class="btn btn-primary" href="~/Admin/Menu_Add"><i class="fa-solid fa-plus me-1"></i>@GL.Get("AddManageMenu")</a>
+            <a class="btn btn-primary" href="~/Admin/Menu_Add"><i class="fa-solid fa-plus me-1"></i>@gl.Get("AddManageMenu")</a>
         }
     </div>
 </div>
 
 <div class="sp-panel">
     <div class="sp-panel__hd">
-        <h2 class="sp-panel__title">@PageTitle</h2>
+        <h2 class="sp-panel__title">@pageTitle</h2>
     </div>
     <div class="sp-panel__bd">
         <form id="ManageMenuEditForm" action="~/api/admin/menu/save" method="post">
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="txtTitle">@(GL.Get("Name"))</label>
+                <label class="col-sm-2 col-form-label" for="txtTitle">@(gl.Get("Name"))</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtTitle" name="Title" class="form-control" value="@Data.Title" />
+                    <input type="text" id="txtTitle" name="Title" class="form-control" value="@data.Title" />
                     <div class="invalid-feedback" verify-name="Title"></div>
                 </div>
             </div>
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label" for="txtCss">Css</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtCss" name="Css" class="form-control" value="@Data.Css" />
+                    <input type="text" id="txtCss" name="Css" class="form-control" value="@data.Css" />
                     <div class="invalid-feedback" verify-name="Css"></div>
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="txtStyle">@(GL.Get("CustomStyle"))</label>
+                <label class="col-sm-2 col-form-label" for="txtStyle">@(gl.Get("CustomStyle"))</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtStyle" name="Style" class="form-control" value="@Data.Style" />
+                    <input type="text" id="txtStyle" name="Style" class="form-control" value="@data.Style" />
                     <div class="invalid-feedback" verify-name="Style"></div>
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="seltParentId">@(GL.Get("ParentMenu"))</label>
+                <label class="col-sm-2 col-form-label" for="seltParentId">@(gl.Get("ParentMenu"))</label>
                 <div class="col-sm-10">
                     <select name="ParentId" id="seltParentId" class="form-select">
-                        <option value="0">@(GL.Get("NotBelongToAnyMenu"))</option>
-                        @WebLogicUtility.RenderMenuTreeSelectorHtml(TreeManageMenuList, GL, CTZ, Data.ParentId, Data.Id > 0 ? Data.Depth : ManagementVars.ManageMenuMaxDepth, Data.Id)
+                        <option value="0">@(gl.Get("NotBelongToAnyMenu"))</option>
+                        @WebLogicUtility.RenderMenuTreeSelectorHtml(treeManageMenuList, gl, ctz, data.ParentId, data.Id > 0 ? data.Depth : ManagementVars.ManageMenuMaxDepth, data.Id)
                     </select>
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="seltActionId">@(GL.Get("RelatedFunction"))</label>
+                <label class="col-sm-2 col-form-label" for="seltActionId">@(gl.Get("RelatedFunction"))</label>
                 <div class="col-sm-10">
                     <select name="ActionId" id="seltActionId" class="form-select">
-                        <option value="">@(GL.Get("NotRelated"))</option>
-                        @foreach (var item in ResourceActionListDict)
+                        <option value="">@(gl.Get("NotRelated"))</option>
+                        @foreach (var item in resourceActionListDict)
                         {
                             var actionList = item.Value;
                             <optgroup label="@item.Key">
                                 @foreach (var action in actionList)
                                 {
-                                    if (StringTool.EqualsIgnoreCase(action.ActionId, Data.ActionId))
+                                    if (StringTool.EqualsIgnoreCase(action.ActionId, data.ActionId))
                                     {
                                         <option value="@action.ActionId" selected="selected">@action.GetTitle()</option>
                                     }
@@ -89,30 +89,30 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="txtUrl">@(GL.Get("Path"))</label>
+                <label class="col-sm-2 col-form-label" for="txtUrl">@(gl.Get("Path"))</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtUrl" name="Url" class="form-control" value="@Data.Url" />
+                    <input type="text" id="txtUrl" name="Url" class="form-control" value="@data.Url" />
                     <div class="invalid-feedback" verify-name="Url"></div>
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label">@(GL.Get("Status"))</label>
+                <label class="col-sm-2 col-form-label">@(gl.Get("Status"))</label>
                 <div class="col-sm-10">
-                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<CommonStatus>{ FormItemId = "seltStatus", FormItemName = "Status", SelectedValue = Data.Status }' />
+                    <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<CommonStatus>{ FormItemId = "seltStatus", FormItemName = "Status", SelectedValue = data.Status }' />
                 </div>
             </div>
             <div class="row mb-3">
-                <label class="col-sm-2 col-form-label" for="txtSortOrder">@(GL.Get("SortValue"))</label>
+                <label class="col-sm-2 col-form-label" for="txtSortOrder">@(gl.Get("SortValue"))</label>
                 <div class="col-sm-10">
-                    <input type="text" id="txtSortOrder" name="SortOrder" class="form-control" value="@Data.SortOrder" />
+                    <input type="text" id="txtSortOrder" name="SortOrder" class="form-control" value="@data.SortOrder" />
                     <div class="invalid-feedback" verify-name="SortOrder"></div>
-                    <div class="form-text">@GL.Get("SortValueDescText")</div>
+                    <div class="form-text">@gl.Get("SortValueDescText")</div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-center">
-                <input type="hidden" id="hdId" name="Id" value="@Data.Id" />
-                <button class="btn btn-primary px-5" type="submit">@(Data.Id <= 0 ? GL.Get("SubmitToAdd") : GL.Get("SubmitToSave"))</button>
+                <input type="hidden" id="hdId" name="Id" value="@data.Id" />
+                <button class="btn btn-primary px-5" type="submit">@(data.Id <= 0 ? gl.Get("SubmitToAdd") : gl.Get("SubmitToSave"))</button>
             </div>
             <div id="tipMessage" class="sp-tip" style="display:none;"></div>
         </form>

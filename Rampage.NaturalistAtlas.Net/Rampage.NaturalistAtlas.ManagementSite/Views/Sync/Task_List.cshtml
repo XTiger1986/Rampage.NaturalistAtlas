@@ -1,16 +1,16 @@
 @model ListViewData<SyncCursor, SyncCursorAdminFilter>
 @{
     // 采集任务列表：水位与上次运行状态；「手动触发」按钮预留禁用（待采集端接入）
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<SyncCursor> DataList = Model!.DataList;
+    List<SyncCursor> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    SyncCursorAdminFilter DataFilter = Model!.DataFilter;
-    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> CityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
-    Dictionary<int, string> CityNameDict = ViewBag.CityNameDict ?? new Dictionary<int, string>();
-    List<string> TaskOptions = Rampage.NaturalistAtlas.Model.Enums.SyncTaskCodes.All.ToList();
+    SyncCursorAdminFilter dataFilter = Model!.DataFilter;
+    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> cityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
+    Dictionary<int, string> cityNameDict = ViewBag.CityNameDict ?? new Dictionary<int, string>();
+    List<string> taskOptions = Rampage.NaturalistAtlas.Model.Enums.SyncTaskCodes.All.ToList();
 }
 
 @section Head {
@@ -35,24 +35,24 @@
             <div class="sp-toolbar__filters">
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = DataFilter.Source }' />
+                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = dataFilter.Source }' />
                 <select name="CityId" class="form-select" style="width:120px">
                     <option value="">全部城市</option>
-                    @foreach (var city in CityList)
+                    @foreach (var city in cityList)
                     {
-                        <option value="@city.Id" selected="@(DataFilter.CityId == city.Id)">@city.DisplayName</option>
+                        <option value="@city.Id" selected="@(dataFilter.CityId == city.Id)">@city.DisplayName</option>
                     }
                 </select>
                 <select name="Task" class="form-select" style="width:150px">
                     <option value="">全部任务类型</option>
-                    @foreach (var task in TaskOptions)
+                    @foreach (var task in taskOptions)
                     {
-                        <option value="@task" selected="@(DataFilter.Task == task)">@SyncTaskCodes.LabelOf(task)</option>
+                        <option value="@task" selected="@(dataFilter.Task == task)">@SyncTaskCodes.LabelOf(task)</option>
                     }
                 </select>
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<CursorRunStatus> { FormItemId = "seltStatus", FormItemName = "LastRunStatus", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.LastRunStatus }' />
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                         model='new EnumSelector<CursorRunStatus> { FormItemId = "seltStatus", FormItemName = "LastRunStatus", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = dataFilter.LastRunStatus }' />
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
             </div>
         </form>
 
@@ -71,21 +71,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td>@item.Id</td>
                             <td>@EnumReader.GetText(item.Source)</td>
-                            <td>@(CityNameDict.TryGetValue(item.CityId, out string? cityName) ? cityName : item.CityId.ToString())</td>
+                            <td>@(cityNameDict.TryGetValue(item.CityId, out string? cityName) ? cityName : item.CityId.ToString())</td>
                             <td><code class="sp-mono" title="@item.Task">@SyncTaskCodes.LabelOf(item.Task)</code></td>
-                            <td>@(item.Watermark.HasValue ? DateTimeTool.UtcToLocal(item.Watermark.Value, CTZ).ToCommonString() : "未开始")</td>
+                            <td>@(item.Watermark.HasValue ? DateTimeTool.UtcToLocal(item.Watermark.Value, ctz).ToCommonString() : "未开始")</td>
                             <td>
                                 <div>
                                     <span class="badge @(item.LastRunStatus == CursorRunStatus.Success ? "bg-success" : (item.LastRunStatus == CursorRunStatus.Failed ? "bg-danger" : (item.LastRunStatus == CursorRunStatus.CircuitSkipped ? "bg-secondary" : "bg-warning")))">@EnumReader.GetText(item.LastRunStatus)</span>
                                 </div>
-                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.LastRunTime, CTZ).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.LastRunTime, ctz).ToCommonString()</div>
                             </td>
                             <td style="max-width:280px" class="small">@(string.IsNullOrWhiteSpace(item.LastRunMessage) ? "-" : item.LastRunMessage)</td>
                             <td class="text-nowrap">
@@ -102,7 +102,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="8" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="8" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>

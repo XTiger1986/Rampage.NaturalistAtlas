@@ -1,13 +1,13 @@
 @model ListViewData<Taxon, TaxonAdminFilter>
 @{
     // 分类单元列表：只读检索（学名/中文名/英文名 + 类群/阶元/数据源/状态），行内进详情
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<Taxon> DataList = Model!.DataList;
+    List<Taxon> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    TaxonAdminFilter DataFilter = Model!.DataFilter;
+    TaxonAdminFilter dataFilter = Model!.DataFilter;
 }
 
 @section Head {
@@ -31,21 +31,21 @@
         <form class="sp-toolbar" action="~/Taxon/Taxon_List" method="get">
             <div class="sp-toolbar__filters">
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
-                <input type="search" name="Keywords" class="form-control" style="width:210px" placeholder="学名 / 中文名 / 英文名" value="@DataFilter.Keywords" />
+                <input type="search" name="Keywords" class="form-control" style="width:210px" placeholder="学名 / 中文名 / 英文名" value="@dataFilter.Keywords" />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<IconicTaxon> { FormItemId = "seltIconic", FormItemName = "IconicTaxon", Css = "form-select", Style = "width:130px", DefaultText = "全部类群", DefaultValue = "", SelectedValue = DataFilter.IconicTaxon }' />
+                         model='new EnumSelector<IconicTaxon> { FormItemId = "seltIconic", FormItemName = "IconicTaxon", Css = "form-select", Style = "width:130px", DefaultText = "全部类群", DefaultValue = "", SelectedValue = dataFilter.IconicTaxon }' />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<TaxonRank> { FormItemId = "seltRank", FormItemName = "Rank", Css = "form-select", Style = "width:120px", DefaultText = "全部阶元", DefaultValue = "", SelectedValue = DataFilter.Rank }' />
+                         model='new EnumSelector<TaxonRank> { FormItemId = "seltRank", FormItemName = "Rank", Css = "form-select", Style = "width:120px", DefaultText = "全部阶元", DefaultValue = "", SelectedValue = dataFilter.Rank }' />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = DataFilter.Source }' />
+                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = dataFilter.Source }' />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = dataFilter.Status }' />
                 <select name="Threatened" class="form-select" style="width:140px">
-                    <option value="" selected="@(DataFilter.Threatened == null)">受威胁：全部</option>
-                    <option value="true" selected="@(DataFilter.Threatened == true)">仅受威胁</option>
-                    <option value="false" selected="@(DataFilter.Threatened == false)">非受威胁</option>
+                    <option value="" selected="@(dataFilter.Threatened == null)">受威胁：全部</option>
+                    <option value="true" selected="@(dataFilter.Threatened == true)">仅受威胁</option>
+                    <option value="false" selected="@(dataFilter.Threatened == false)">非受威胁</option>
                 </select>
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
             </div>
         </form>
 
@@ -64,9 +64,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td class="sp-mono">@item.ScientificName</td>
@@ -88,7 +88,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="8" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="8" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>

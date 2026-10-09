@@ -1,11 +1,11 @@
 ﻿@{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    CurrentAuthorizationInfo CurrentAuthorization = (CurrentAuthorizationInfo)ViewBag.CurrentAuthorization;
-    PermissionActionInfo? CurrentAction = CurrentAuthorization.CurrentAction;
-    ManageMenuDto? CurrentMenu = CurrentAuthorization.CurrentMenu;
-    List<MenuBreadCrumb>? MenuBreadCrumbList = CurrentAuthorization.MenuBreadCrumbList;
+    CurrentAuthorizationInfo currentAuthorization = (CurrentAuthorizationInfo)ViewBag.CurrentAuthorization;
+    PermissionActionInfo? CurrentAction = currentAuthorization.CurrentAction;
+    ManageMenuDto? CurrentMenu = currentAuthorization.CurrentMenu;
+    List<MenuBreadCrumb>? MenuBreadCrumbList = currentAuthorization.MenuBreadCrumbList;
 
     string pageTitle = CurrentAction != null
         ? (CurrentAction.GetTitle() ?? string.Empty)
@@ -15,7 +15,7 @@
 <div class="sp-page-head-main">
     <h1 class="sp-page-title">@pageTitle</h1>
     <ol class="sp-breadcrumb">
-        <li><a href="~/">@(GL.Get("Dashboard", "管理首页"))</a></li>
+        <li><a href="~/">@(gl.Get("Dashboard", "管理首页"))</a></li>
         @if (MenuBreadCrumbList != null && MenuBreadCrumbList.Any())
         {
             foreach (MenuBreadCrumb menu in MenuBreadCrumbList)

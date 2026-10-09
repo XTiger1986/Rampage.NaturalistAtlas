@@ -1,66 +1,66 @@
 ﻿@model DataPager
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    DataPager CurrentPager = Model!;
+    DataPager currentPager = Model!;
 }
 
-<div id="pager_@(CurrentPager.Id)" class="row">
+<div id="pager_@(currentPager.Id)" class="row">
     <div class="col-sm-12 col-md-5">
-        @if (CurrentPager.RecordCount > 0)
+        @if (currentPager.RecordCount > 0)
         {
-            <div class="dataTables_info" id="datatable-basic_info" role="status" aria-live="polite"> @(CurrentPager.BeginIndex)-@(CurrentPager.EndIndex) / @(CurrentPager.RecordCount)</div>
+            <div class="dataTables_info" id="datatable-basic_info" role="status" aria-live="polite"> @(currentPager.BeginIndex)-@(currentPager.EndIndex) / @(currentPager.RecordCount)</div>
         }
     </div>
 
     <div class="col-sm-12 col-md-7">
         <div class="dataTables_paginate paging_simple_numbers" id="datatable-basic_paginate">
             <ul class="pagination">
-                <li id="pagerPrevious_@(CurrentPager.Id)" class="paginate_button page-item previous@(CurrentPager.PageIndex == 1 ? " disabled" : "")">
-                    <a class="page-link" href="@(CurrentPager.PageIndex == 1 ? "javascript:void(0)" : CurrentPager.PrevUrl)" @(CurrentPager.PageIndex == 1 ? " aria-disabled=\"true\"" : "")>@GL.Get("PreviousPage")</a>
+                <li id="pagerPrevious_@(currentPager.Id)" class="paginate_button page-item previous@(currentPager.PageIndex == 1 ? " disabled" : "")">
+                    <a class="page-link" href="@(currentPager.PageIndex == 1 ? "javascript:void(0)" : currentPager.PrevUrl)" @(currentPager.PageIndex == 1 ? " aria-disabled=\"true\"" : "")>@gl.Get("PreviousPage")</a>
                 </li>
 
-                @if (CurrentPager.PageIndex > 1 && CurrentPager.StartPage > 1)
+                @if (currentPager.PageIndex > 1 && currentPager.StartPage > 1)
                 {
-                    <li class="paginate_button page-item"><a class="page-link" href="@(CurrentPager.GetUrl(1))">1</a></li>
+                    <li class="paginate_button page-item"><a class="page-link" href="@(currentPager.GetUrl(1))">1</a></li>
                 }
-                @if (CurrentPager.StartPage > 2)
+                @if (currentPager.StartPage > 2)
                 {
                     <li class="paginate_button page-item disabled"><a class="page-link" href="javascript:void(0)">...</a></li>
                 }
-                @for (long page = CurrentPager.StartPage; page <= CurrentPager.EndPage; page++)
+                @for (long page = currentPager.StartPage; page <= currentPager.EndPage; page++)
                 {
-                    if (page == CurrentPager.PageIndex)
+                    if (page == currentPager.PageIndex)
                     {
-                        <li class="paginate_button page-item active"><a class="page-link" href="@(CurrentPager.GetUrl(page))">@(page)</a></li>
+                        <li class="paginate_button page-item active"><a class="page-link" href="@(currentPager.GetUrl(page))">@(page)</a></li>
                     }
                     else
                     {
-                        <li class="paginate_button page-item"><a class="page-link" href="@(CurrentPager.GetUrl(page))">@(page)</a></li>
+                        <li class="paginate_button page-item"><a class="page-link" href="@(currentPager.GetUrl(page))">@(page)</a></li>
                     }
                 }
-                @if (CurrentPager.TotalPage - CurrentPager.EndPage >= 2)
+                @if (currentPager.TotalPage - currentPager.EndPage >= 2)
                 {
                     <li class="paginate_button page-item disabled"><a class="page-link" href="javascript:void(0)">...</a></li>
                 }
-                @if (CurrentPager.PageIndex < CurrentPager.TotalPage && CurrentPager.EndPage < CurrentPager.TotalPage)
+                @if (currentPager.PageIndex < currentPager.TotalPage && currentPager.EndPage < currentPager.TotalPage)
                 {
-                    <li class="paginate_button page-item"><a class="page-link" href="@(CurrentPager.GetUrl(CurrentPager.TotalPage))">@(CurrentPager.TotalPage)</a></li>
+                    <li class="paginate_button page-item"><a class="page-link" href="@(currentPager.GetUrl(currentPager.TotalPage))">@(currentPager.TotalPage)</a></li>
                 }
-                <li class="paginate_button page-item next@(CurrentPager.PageIndex == CurrentPager.TotalPage ? " disabled" : "")">
-                    <a class="page-link" href="@(CurrentPager.PageIndex == CurrentPager.TotalPage ? "javascript:void(0)" : CurrentPager.NextUrl)" @(CurrentPager.PageIndex == CurrentPager.TotalPage ? " aria-disabled=\"true\"" : "")>@GL.Get("NextPage") </a>
+                <li class="paginate_button page-item next@(currentPager.PageIndex == currentPager.TotalPage ? " disabled" : "")">
+                    <a class="page-link" href="@(currentPager.PageIndex == currentPager.TotalPage ? "javascript:void(0)" : currentPager.NextUrl)" @(currentPager.PageIndex == currentPager.TotalPage ? " aria-disabled=\"true\"" : "")>@gl.Get("NextPage") </a>
                 </li>
 
-                @if (CurrentPager.TotalPage > 7)
+                @if (currentPager.TotalPage > 7)
                 {
                     <!-- 跳页：深翻页成本高（10 万+ 观察的列表），按页码直达；page 参数交给 URL API 处理 -->
                     <li class="paginate_button page-item d-flex align-items-center ms-2">
-                        <input type="number" min="1" max="@CurrentPager.TotalPage" value="@CurrentPager.PageIndex"
+                        <input type="number" min="1" max="@currentPager.TotalPage" value="@currentPager.PageIndex"
                                class="form-control form-control-sm sp-mono" style="width:74px"
                                aria-label="跳转到页码"
-                               onkeydown="if(event.key==='Enter'){var v=parseInt(this.value,10);if(v>=1&&v<=@(CurrentPager.TotalPage)){var u=new URL(window.location.href);u.searchParams.set('page',String(v));window.location.href=u.pathname+u.search;}}" />
-                        <span class="ms-1 text-muted small">/ @CurrentPager.TotalPage</span>
+                               onkeydown="if(event.key==='Enter'){var v=parseInt(this.value,10);if(v>=1&&v<=@(currentPager.TotalPage)){var u=new URL(window.location.href);u.searchParams.set('page',String(v));window.location.href=u.pathname+u.search;}}" />
+                        <span class="ms-1 text-muted small">/ @currentPager.TotalPage</span>
                     </li>
                 }
 

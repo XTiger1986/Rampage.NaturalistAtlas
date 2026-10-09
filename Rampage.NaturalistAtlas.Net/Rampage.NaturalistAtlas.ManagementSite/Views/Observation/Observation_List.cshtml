@@ -1,14 +1,14 @@
 @model ListViewData<ObservationRowDto, ObservationAdminFilter>
 @{
     // 观察数据列表：多条件筛选 + 行内隐藏/恢复；右上角提供按作者批量隐藏
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<ObservationRowDto> DataList = Model!.DataList;
+    List<ObservationRowDto> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    ObservationAdminFilter DataFilter = Model!.DataFilter;
-    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> CityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
+    ObservationAdminFilter dataFilter = Model!.DataFilter;
+    List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption> cityList = ViewBag.CityList ?? new List<Rampage.NaturalistAtlas.ManagementSite.Models.CityOption>();
 }
 
 @section Head {
@@ -37,28 +37,28 @@
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
                 <select name="CityId" class="form-select" style="width:120px">
                     <option value="">全部城市</option>
-                    @foreach (var city in CityList)
+                    @foreach (var city in cityList)
                     {
-                        <option value="@city.Id" selected="@(DataFilter.CityId == city.Id)">@city.DisplayName</option>
+                        <option value="@city.Id" selected="@(dataFilter.CityId == city.Id)">@city.DisplayName</option>
                     }
                 </select>
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<IconicTaxon> { FormItemId = "seltIconic", FormItemName = "IconicTaxon", Css = "form-select", Style = "width:120px", DefaultText = "全部类群", DefaultValue = "", SelectedValue = DataFilter.IconicTaxon }' />
+                         model='new EnumSelector<IconicTaxon> { FormItemId = "seltIconic", FormItemName = "IconicTaxon", Css = "form-select", Style = "width:120px", DefaultText = "全部类群", DefaultValue = "", SelectedValue = dataFilter.IconicTaxon }' />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<QualityGrade> { FormItemId = "seltGrade", FormItemName = "QualityGrade", Css = "form-select", Style = "width:130px", DefaultText = "全部级别", DefaultValue = "", SelectedValue = DataFilter.QualityGrade }' />
+                         model='new EnumSelector<QualityGrade> { FormItemId = "seltGrade", FormItemName = "QualityGrade", Css = "form-select", Style = "width:130px", DefaultText = "全部级别", DefaultValue = "", SelectedValue = dataFilter.QualityGrade }' />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<ObservationStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
+                         model='new EnumSelector<ObservationStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = dataFilter.Status }' />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = DataFilter.Source }' />
+                         model='new EnumSelector<AtlasSource> { FormItemId = "seltSource", FormItemName = "Source", Css = "form-select", Style = "width:130px", DefaultText = "全部来源", DefaultValue = "", SelectedValue = dataFilter.Source }' />
             </div>
             <div class="sp-toolbar__filters">
-                <input type="text" name="UserLogin" class="form-control" style="width:150px" placeholder="观察者昵称" value="@DataFilter.UserLogin" />
-                <input type="text" name="SourceObservationId" class="form-control sp-mono" style="width:170px" placeholder="源站观察ID" value="@DataFilter.SourceObservationId" />
-                <input type="text" name="TaxonId" class="form-control sp-mono" style="width:190px" placeholder="分类单元Id（雪花）" value="@DataFilter.TaxonId" />
+                <input type="text" name="UserLogin" class="form-control" style="width:150px" placeholder="观察者昵称" value="@dataFilter.UserLogin" />
+                <input type="text" name="SourceObservationId" class="form-control sp-mono" style="width:170px" placeholder="源站观察ID" value="@dataFilter.SourceObservationId" />
+                <input type="text" name="TaxonId" class="form-control sp-mono" style="width:190px" placeholder="分类单元Id（雪花）" value="@dataFilter.TaxonId" />
                 <span class="sp-toolbar__label">观察日期</span>
-                <input type="date" name="ObservedOnFrom" class="form-control" style="width:150px" value="@(DataFilter.ObservedOnFrom?.ToString("yyyy-MM-dd"))" />
+                <input type="date" name="ObservedOnFrom" class="form-control" style="width:150px" value="@(dataFilter.ObservedOnFrom?.ToString("yyyy-MM-dd"))" />
                 <span class="sp-toolbar__label">至</span>
-                <input type="date" name="ObservedOnTo" class="form-control" style="width:150px" value="@(DataFilter.ObservedOnTo?.ToString("yyyy-MM-dd"))" />
+                <input type="date" name="ObservedOnTo" class="form-control" style="width:150px" value="@(dataFilter.ObservedOnTo?.ToString("yyyy-MM-dd"))" />
                 @{
                     string sort = ViewBag.Sort as string ?? "create_desc";
                 }
@@ -68,7 +68,7 @@
                     <option value="observed_desc" selected="@(sort == "observed_desc")">观察日期 新→旧</option>
                     <option value="observed_asc" selected="@(sort == "observed_asc")">观察日期 旧→新</option>
                 </select>
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
                 <button type="button" id="btnExportObsCsv" class="btn btn-outline-success" title="按当前筛选导出最多 5000 行 CSV">
                     <i class="fa-solid fa-file-csv me-1"></i>导出 CSV
                 </button>
@@ -93,9 +93,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td>
@@ -124,7 +124,7 @@
                             <td>
                                 <span class="badge @(item.Status == ObservationStatus.Normal ? "bg-success" : (item.Status == ObservationStatus.Hidden ? "bg-warning" : "bg-secondary"))">@EnumReader.GetText(item.Status)</span>
                             </td>
-                            <td>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</td>
+                            <td>@DateTimeTool.UtcToLocal(item.CreateTime, ctz).ToCommonString()</td>
                             <td class="text-nowrap">
                                 <a href="~/Observation/Observation_Detail?ObservationId=@(item.Id)" class="btn btn-sm btn-info">
                                     <i class="fa-solid fa-magnifying-glass me-1"></i>详情
@@ -147,7 +147,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="11" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="11" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>

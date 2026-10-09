@@ -1,10 +1,10 @@
 @{
     // 运营看板首页：指标卡 + 三张 Chart.js 图表 + 同步健康度（数据由 admin-dashboard.js 异步加载）
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
-    CurrentAuthorizationInfo CurrentAuthorization = ViewBag.CurrentAuthorization;
-    AdminDto CurrentAdmin = CurrentAuthorization.CurrentAdmin!;
-    ViewBag.PageTitle = GL.Get("Dashboard");
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
+    CurrentAuthorizationInfo currentAuthorization = ViewBag.CurrentAuthorization;
+    AdminDto currentAdmin = currentAuthorization.CurrentAdmin!;
+    ViewBag.PageTitle = gl.Get("Dashboard");
 }
 
 @section Head {

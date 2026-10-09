@@ -1,23 +1,23 @@
 ﻿@{
-    var Selector = Model!;
-    Selector.Init();
+    var selector = Model!;
+    selector.Init();
 }
 
-<select name="@(Selector.FormItemName)" id="@(Selector.FormItemId)" @Html.Raw(Selector.Multiple ? "multiple=\"multiple\"" : "") class="form-select @(Selector.Css)" style="@(Selector.Style)">
-    @if (Selector.UseDefault)
+<select name="@(selector.FormItemName)" id="@(selector.FormItemId)" @Html.Raw(selector.Multiple ? "multiple=\"multiple\"" : "") class="form-select @(selector.Css)" style="@(selector.Style)">
+    @if (selector.UseDefault)
     {
-        <option value="@(Selector.DefaultValue)">@(Selector.DefaultText)</option>
+        <option value="@(selector.DefaultValue)">@(selector.DefaultText)</option>
     }
 
-    @foreach (var item in Selector.Items)
+    @foreach (var item in selector.Items)
     {
-        if (Selector.UseStringValue)
+        if (selector.UseStringValue)
         {
-            @Html.Raw("<option " + (Selector.IsSelected(item.Text) ? "selected=\"selected\"" : "") + ">" + item.Text + "</option>")
+            @Html.Raw("<option " + (selector.IsSelected(item.Text) ? "selected=\"selected\"" : "") + ">" + item.Text + "</option>")
         }
         else
         {
-            @Html.Raw("<option " + (Selector.IsSelected(item.Value) ? "selected=\"selected\"" : "") + " value=\"" + item.Value + "\">" + item.Text + "</option>")
+            @Html.Raw("<option " + (selector.IsSelected(item.Value) ? "selected=\"selected\"" : "") + " value=\"" + item.Value + "\">" + item.Text + "</option>")
         }
     }
 </select>

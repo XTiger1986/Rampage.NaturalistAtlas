@@ -1,15 +1,15 @@
 ﻿@model ListViewData<AdminDto, AdminFilter>
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    CurrentAuthorizationInfo CurrentAuthorization = (CurrentAuthorizationInfo)ViewBag.CurrentAuthorization;
-    AdminDto CurrentAdmin = CurrentAuthorization.CurrentAdmin!;
+    CurrentAuthorizationInfo currentAuthorization = (CurrentAuthorizationInfo)ViewBag.CurrentAuthorization;
+    AdminDto currentAdmin = currentAuthorization.CurrentAdmin!;
 
-    List<AdminDto> DataList = Model!.DataList;
+    List<AdminDto> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    AdminFilter DataFilter = Model!.DataFilter;
+    AdminFilter dataFilter = Model!.DataFilter;
 }
 
 @section Head {
@@ -19,20 +19,20 @@
 <div class="sp-page-head">
     <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
     <div class="sp-page-actions">
-        <a class="btn btn-primary" href="~/Admin/Admin_Add"><i class="fa-solid fa-plus me-1"></i>@GL.Get("AddAdmin")</a>
+        <a class="btn btn-primary" href="~/Admin/Admin_Add"><i class="fa-solid fa-plus me-1"></i>@gl.Get("AddAdmin")</a>
     </div>
 </div>
 
 <div class="sp-panel">
     <div class="sp-panel__hd">
-        <h2 class="sp-panel__title">@GL.Get("AdminList")</h2>
+        <h2 class="sp-panel__title">@gl.Get("AdminList")</h2>
     </div>
     <div class="sp-panel__bd">
         <form class="sp-toolbar" action="~/Admin/Admin_List" method="get">
             <div class="sp-toolbar__filters">
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
-                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="@GL.Get("Keywords")" value="@DataFilter.Keywords" />
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="@gl.Get("Keywords")" value="@dataFilter.Keywords" />
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
             </div>
         </form>
 
@@ -41,24 +41,24 @@
                 <thead>
                     <tr>
                         <th>Id</th>
-                        <th>@GL.Get("Username")</th>
-                        <th>@GL.Get("RealName")</th>
-                        <th>@GL.Get("MobileNumber")</th>
-                        <th>@GL.Get("Email")</th>
-                        <th>@GL.Get("Gender")</th>
-                        <th>@GL.Get("SuperAdministrator")</th>
-                        <th>@GL.Get("Status")</th>
-                        <th>@GL.Get("LastLogin")</th>
-                        <th>@GL.Get("CreatedTime")/@GL.Get("UpdateTime")</th>
-                        <th>@GL.Get("Operations")</th>
+                        <th>@gl.Get("Username")</th>
+                        <th>@gl.Get("RealName")</th>
+                        <th>@gl.Get("MobileNumber")</th>
+                        <th>@gl.Get("Email")</th>
+                        <th>@gl.Get("Gender")</th>
+                        <th>@gl.Get("SuperAdministrator")</th>
+                        <th>@gl.Get("Status")</th>
+                        <th>@gl.Get("LastLogin")</th>
+                        <th>@gl.Get("CreatedTime")/@gl.Get("UpdateTime")</th>
+                        <th>@gl.Get("Operations")</th>
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    for (int i = 0; i < DataList.Count; i++)
+                    for (int i = 0; i < dataList.Count; i++)
                     {
-                        var item = DataList[i];
+                        var item = dataList[i];
                         <tr id="trDataItem_@(item.Id)">
                             <td>@item.Id</td>
                             <td>
@@ -74,26 +74,26 @@
                             <td>@item.Mobile</td>
                             <td>@item.Email</td>
                             <td>@EnumReader.GetText(item.Gender)</td>
-                            <td>@(GL.Get(item.IsMaster ? "Yes" : "No"))</td>
+                            <td>@(gl.Get(item.IsMaster ? "Yes" : "No"))</td>
                             <td>
                                 <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-danger")">@EnumReader.GetText(item.Status)</span>
                             </td>
                             <td>
-                                <div>@DateTimeTool.UtcToLocal(item.LoginTime, CTZ).ToCommonString()</div>
+                                <div>@DateTimeTool.UtcToLocal(item.LoginTime, ctz).ToCommonString()</div>
                                 <div class="text-muted small">(@item.LoginIp)</div>
                             </td>
                             <td>
-                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</div>
-                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, CTZ).ToCommonString()</div>
+                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, ctz).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, ctz).ToCommonString()</div>
                             </td>
                             <td class="text-nowrap">
                                 <a href="~/Admin/Admin_Modify?AdminId=@(item.Id)" class="btn btn-sm btn-info">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@gl.Get("Edit")
                                 </a>
-                                @if (item.Id > 1 && CurrentAdmin.Id != item.Id)
+                                @if (item.Id > 1 && currentAdmin.Id != item.Id)
                                 {
                                     <button type="button" data-id="@item.Id" data-action="delete-admin" class="btn btn-sm btn-danger">
-                                        <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                        <i class="fa-solid fa-trash me-1"></i>@gl.Get("Delete")
                                     </button>
                                 }
                             </td>
@@ -102,7 +102,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="11" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="11" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>
@@ -119,6 +119,6 @@
     <script>
         AdminPages.bindDelete('[data-action=delete-admin]', function (id) {
             return '/api/admin/delete/' + id;
-        }, '@(GL.Get("ConfirmDeleteAdminText"))');
+        }, '@(gl.Get("ConfirmDeleteAdminText"))');
     </script>
 }

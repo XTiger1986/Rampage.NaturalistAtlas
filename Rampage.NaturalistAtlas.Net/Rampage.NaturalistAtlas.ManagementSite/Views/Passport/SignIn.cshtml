@@ -2,15 +2,15 @@
     // 登录页：独立布局（Layout=null），左侧品牌视觉 + 右侧登录表单
     Layout = null;
 
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 }
 <!DOCTYPE html>
 <html lang="zh-CN" data-bs-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@(GL.Get("Login")) - @AppInfo.Name</title>
+    <title>@(gl.Get("Login")) - @AppInfo.Name</title>
     <link rel="icon" type="image/svg+xml" href="~/assets/img/logo-mark.svg" />
     <link rel="stylesheet" href="~/assets/vendor/bootstrap5.3.2/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/assets/vendor/fontawesome.free.7.2.0/css/all.min.css" />
@@ -29,18 +29,18 @@
         </section>
         <section class="sp-auth__panel">
             <div class="sp-auth__card">
-                <h2>@(GL.Get("Welcome"))</h2>
-                <p class="sp-auth-sub">@(GL.Get("PleaseLogin"))</p>
+                <h2>@(gl.Get("Welcome"))</h2>
+                <p class="sp-auth-sub">@(gl.Get("PleaseLogin"))</p>
                 <form id="LoginForm" name="LoginForm" method="post" action="~/api/passport/login">
                     <div class="mb-3">
-                        <label class="form-label" for="txtAccount">@(GL.Get("Account"))</label>
-                        <input class="form-control" id="txtAccount" name="Account" placeholder="@(GL.Get("Username"))/@(GL.Get("MobileNumber"))/@(GL.Get("Email"))" type="text" autocomplete="username" autofocus />
+                        <label class="form-label" for="txtAccount">@(gl.Get("Account"))</label>
+                        <input class="form-control" id="txtAccount" name="Account" placeholder="@(gl.Get("Username"))/@(gl.Get("MobileNumber"))/@(gl.Get("Email"))" type="text" autocomplete="username" autofocus />
                         <div class="invalid-feedback" verify-name="Account"></div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="txtPassword">@(GL.Get("Password"))</label>
+                        <label class="form-label" for="txtPassword">@(gl.Get("Password"))</label>
                         <div class="sp-auth-password">
-                            <input class="form-control" id="txtPassword" name="Password" placeholder="@(GL.Get("Password"))" type="password" autocomplete="current-password" />
+                            <input class="form-control" id="txtPassword" name="Password" placeholder="@(gl.Get("Password"))" type="password" autocomplete="current-password" />
                             <button type="button" class="sp-auth-password__toggle" data-sp-password-toggle aria-label="显示或隐藏密码" tabindex="-1">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
@@ -49,9 +49,9 @@
                     </div>
                     <div class="mb-3 form-check">
                         <input class="form-check-input" type="checkbox" value="true" id="chkIsRemember" name="IsRemember" />
-                        <label class="form-check-label" for="chkIsRemember">@(GL.Get("RememberMe"))</label>
+                        <label class="form-check-label" for="chkIsRemember">@(gl.Get("RememberMe"))</label>
                     </div>
-                    <button type="submit" id="btnLogin" class="btn btn-primary w-100"><i class="fa-solid fa-right-to-bracket me-1"></i>@GL.Get("SignIn")</button>
+                    <button type="submit" id="btnLogin" class="btn btn-primary w-100"><i class="fa-solid fa-right-to-bracket me-1"></i>@gl.Get("SignIn")</button>
                     <div id="tipMessage" class="sp-tip" style="display:none;"></div>
                 </form>
             </div>

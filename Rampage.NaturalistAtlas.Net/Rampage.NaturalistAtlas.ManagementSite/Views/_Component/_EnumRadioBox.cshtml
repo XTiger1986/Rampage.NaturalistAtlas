@@ -1,28 +1,28 @@
 ﻿@{
-    var Selector = Model!;
-    Selector.Init();
+    var selector = Model!;
+    selector.Init();
 }
 
 
-@if (Selector.UseDefault)
+@if (selector.UseDefault)
 {
     <div class="form-check form-check-inline">
-        <input type="radio" id="@(Selector.FormItemId)" name="@(Selector.FormItemName)" value="@(Selector.DefaultValue)" class="form-check-input" />
-        <label for="@(Selector.FormItemId)" class="form-check-label @(Selector.Css)" style="@(Selector.Style)">@(Selector.DefaultText)</label>
+        <input type="radio" id="@(selector.FormItemId)" name="@(selector.FormItemName)" value="@(selector.DefaultValue)" class="form-check-input" />
+        <label for="@(selector.FormItemId)" class="form-check-label @(selector.Css)" style="@(selector.Style)">@(selector.DefaultText)</label>
     </div>
 }
-@foreach (var item in Selector.Items)
+@foreach (var item in selector.Items)
 {
     <div class="form-check form-check-inline">
-        @if (Selector.UseStringValue)
+        @if (selector.UseStringValue)
         {
-            <input type="radio" id="@(Selector.FormItemId)_@(item.Value)" name="@(Selector.FormItemName)" value="@(item.Text)" class="form-check-input" @Html.Raw(Selector.IsSelected(item.Text) ? "checked=\"checked\"" : "") />
+            <input type="radio" id="@(selector.FormItemId)_@(item.Value)" name="@(selector.FormItemName)" value="@(item.Text)" class="form-check-input" @Html.Raw(selector.IsSelected(item.Text) ? "checked=\"checked\"" : "") />
         }
         else
         {
-            <input type="radio" id="@(Selector.FormItemId)_@(item.Value)" name="@(Selector.FormItemName)" value="@(item.Value)" class="form-check-input" @Html.Raw(Selector.IsSelected(item.Value) ? "checked=\"checked\"" : "") />
+            <input type="radio" id="@(selector.FormItemId)_@(item.Value)" name="@(selector.FormItemName)" value="@(item.Value)" class="form-check-input" @Html.Raw(selector.IsSelected(item.Value) ? "checked=\"checked\"" : "") />
         }
-        <label for="@(Selector.FormItemId)_@(item.Value)" class="form-check-label @(Selector.Css)" style="@(Selector.Style)">@(item.Text)</label>
+        <label for="@(selector.FormItemId)_@(item.Value)" class="form-check-label @(selector.Css)" style="@(selector.Style)">@(item.Text)</label>
     </div>
 }
 

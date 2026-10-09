@@ -1,12 +1,12 @@
 @model SyncLog
 @{
     // 同步日志详情：起止时间、计数、运行摘要
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
-    SyncLog Data = Model!;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
+    SyncLog data = Model!;
     string? CityName = ViewBag.CityName;
-    ViewBag.PageTitle = $"同步日志 - {Data.Task}";
+    ViewBag.PageTitle = $"同步日志 - {data.Task}";
 }
 
 @section Head {
@@ -23,37 +23,37 @@
 <div class="row g-3 mb-3">
     <div class="col-6 col-md-2">
         <div class="sp-stat">
-            <div class="sp-stat__num">@Data.RequestCount.ToString("N0")</div>
+            <div class="sp-stat__num">@data.RequestCount.ToString("N0")</div>
             <div class="sp-stat__label">请求次数</div>
         </div>
     </div>
     <div class="col-6 col-md-2">
         <div class="sp-stat">
-            <div class="sp-stat__num">@Data.InsertCount.ToString("N0")</div>
+            <div class="sp-stat__num">@data.InsertCount.ToString("N0")</div>
             <div class="sp-stat__label">新增</div>
         </div>
     </div>
     <div class="col-6 col-md-2">
         <div class="sp-stat">
-            <div class="sp-stat__num">@Data.UpdateCount.ToString("N0")</div>
+            <div class="sp-stat__num">@data.UpdateCount.ToString("N0")</div>
             <div class="sp-stat__label">更新</div>
         </div>
     </div>
     <div class="col-6 col-md-2">
         <div class="sp-stat">
-            <div class="sp-stat__num">@Data.FailCount.ToString("N0")</div>
+            <div class="sp-stat__num">@data.FailCount.ToString("N0")</div>
             <div class="sp-stat__label">失败</div>
         </div>
     </div>
     <div class="col-6 col-md-2">
         <div class="sp-stat">
-            <div class="sp-stat__num">@(Data.EndTime.HasValue ? (Data.EndTime.Value - Data.StartTime).ToString(@"hh\:mm\:ss") : "-")</div>
+            <div class="sp-stat__num">@(data.EndTime.HasValue ? (data.EndTime.Value - data.StartTime).ToString(@"hh\:mm\:ss") : "-")</div>
             <div class="sp-stat__label">耗时</div>
         </div>
     </div>
     <div class="col-6 col-md-2">
         <div class="sp-stat">
-            <div class="sp-stat__num"><span class="badge @(Data.Status == SyncLogStatus.Success ? "bg-success" : (Data.Status == SyncLogStatus.Failed ? "bg-danger" : (Data.Status == SyncLogStatus.CircuitSkipped ? "bg-secondary" : "bg-info")))">@EnumReader.GetText(Data.Status)</span></div>
+            <div class="sp-stat__num"><span class="badge @(data.Status == SyncLogStatus.Success ? "bg-success" : (data.Status == SyncLogStatus.Failed ? "bg-danger" : (data.Status == SyncLogStatus.CircuitSkipped ? "bg-secondary" : "bg-info")))">@EnumReader.GetText(data.Status)</span></div>
             <div class="sp-stat__label">运行状态</div>
         </div>
     </div>
@@ -66,27 +66,27 @@
     <div class="sp-panel__bd">
         <div class="row mb-2">
             <label class="col-sm-3 col-form-label">来源 / 城市</label>
-            <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(Data.Source) · @(CityName ?? Data.CityId.ToString())</p></div>
+            <div class="col-sm-9"><p class="form-control-plaintext">@EnumReader.GetText(data.Source) · @(CityName ?? data.CityId.ToString())</p></div>
         </div>
         <div class="row mb-2">
             <label class="col-sm-3 col-form-label">任务类型</label>
-            <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@(Data.Task ?? "-")</p></div>
+            <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@(data.Task ?? "-")</p></div>
         </div>
         <div class="row mb-2">
             <label class="col-sm-3 col-form-label">开始时间（UTC）</label>
-            <div class="col-sm-9"><p class="form-control-plaintext">@DateTimeTool.UtcToLocal(Data.StartTime, CTZ).ToCommonString()</p></div>
+            <div class="col-sm-9"><p class="form-control-plaintext">@DateTimeTool.UtcToLocal(data.StartTime, ctz).ToCommonString()</p></div>
         </div>
         <div class="row mb-2">
             <label class="col-sm-3 col-form-label">结束时间（UTC）</label>
-            <div class="col-sm-9"><p class="form-control-plaintext">@(Data.EndTime.HasValue ? DateTimeTool.UtcToLocal(Data.EndTime.Value, CTZ).ToCommonString() : "运行中")</p></div>
+            <div class="col-sm-9"><p class="form-control-plaintext">@(data.EndTime.HasValue ? DateTimeTool.UtcToLocal(data.EndTime.Value, ctz).ToCommonString() : "运行中")</p></div>
         </div>
         <div class="row mb-2">
             <label class="col-sm-3 col-form-label">本地日志Id</label>
-            <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@Data.Id</p></div>
+            <div class="col-sm-9"><p class="form-control-plaintext sp-mono">@data.Id</p></div>
         </div>
         <div class="row mb-2">
             <label class="col-sm-3 col-form-label">运行摘要</label>
-            <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(Data.Message) ? "-" : Data.Message)</p></div>
+            <div class="col-sm-9"><p class="form-control-plaintext">@(string.IsNullOrWhiteSpace(data.Message) ? "-" : data.Message)</p></div>
         </div>
     </div>
 </div>

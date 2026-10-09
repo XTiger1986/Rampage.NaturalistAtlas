@@ -1,17 +1,17 @@
 @{
     // 全站布局：装配页面标题、当前管理员与面包屑，再渲染外壳结构
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    CurrentAuthorizationInfo CurrentAuthorization = ViewBag.CurrentAuthorization;
-    AdminDto CurrentAdmin = CurrentAuthorization.CurrentAdmin!;
-    List<MenuBreadCrumb> MenuBreadCrumbList = CurrentAuthorization.MenuBreadCrumbList ?? new List<MenuBreadCrumb>();
+    CurrentAuthorizationInfo currentAuthorization = ViewBag.CurrentAuthorization;
+    AdminDto currentAdmin = currentAuthorization.CurrentAdmin!;
+    List<MenuBreadCrumb> menuBreadCrumbList = currentAuthorization.MenuBreadCrumbList ?? new List<MenuBreadCrumb>();
 
     // 页面标题：优先取 ViewBag.PageTitle，缺省拼面包屑链，末尾追加站点名
     string? PageTitle = ViewBag.PageTitle;
-    if (string.IsNullOrEmpty(PageTitle) && MenuBreadCrumbList.Any())
+    if (string.IsNullOrEmpty(PageTitle) && menuBreadCrumbList.Any())
     {
-        PageTitle = string.Join("_", MenuBreadCrumbList.Select(m => m.Title));
+        PageTitle = string.Join("_", menuBreadCrumbList.Select(m => m.Title));
     }
     if (!string.IsNullOrEmpty(PageTitle))
     {
@@ -20,11 +20,11 @@
     PageTitle += AppInfo.Name;
 
     // 顶栏展示名：优先真实姓名，缺省账号名；头像缺省取首字母
-    string adminDisplay = !string.IsNullOrWhiteSpace(CurrentAdmin.DisplayName)
-        ? CurrentAdmin.DisplayName!
-        : (CurrentAdmin.Username ?? "Admin");
+    string adminDisplay = !string.IsNullOrWhiteSpace(currentAdmin.DisplayName)
+        ? currentAdmin.DisplayName!
+        : (currentAdmin.Username ?? "Admin");
     string adminInitial = adminDisplay.Length > 0 ? adminDisplay.Substring(0, 1).ToUpperInvariant() : "A";
-    string? avatarUrl = CurrentAdmin.AvatarUrl;
+    string? avatarUrl = currentAdmin.AvatarUrl;
 }
 
 <!DOCTYPE html>
@@ -69,11 +69,11 @@
                             <i class="fa-solid fa-chevron-down" style="font-size:11px;opacity:.7"></i>
                         </button>
                         <div class="sp-admin-dropdown">
-                            <a href="~/Personal/EditProfile/"><i class="fa-solid fa-id-card"></i><span>@(GL.Get("EditMyProfile"))</span></a>
-                            <a href="~/Personal/ChangePassword/"><i class="fa-solid fa-key"></i><span>@(GL.Get("ChangePassword"))</span></a>
-                            <a href="~/Personal/AvatarSetting/"><i class="fa-solid fa-circle-user"></i><span>@(GL.Get("MyProfilePicture"))</span></a>
+                            <a href="~/Personal/EditProfile/"><i class="fa-solid fa-id-card"></i><span>@(gl.Get("EditMyProfile"))</span></a>
+                            <a href="~/Personal/ChangePassword/"><i class="fa-solid fa-key"></i><span>@(gl.Get("ChangePassword"))</span></a>
+                            <a href="~/Personal/AvatarSetting/"><i class="fa-solid fa-circle-user"></i><span>@(gl.Get("MyProfilePicture"))</span></a>
                             <div class="sp-drop-sep"></div>
-                            <a href="javascript:void(0)" data-sp-logout><i class="fa-solid fa-right-from-bracket"></i><span>@(GL.Get("Logout") ?? "退出")</span></a>
+                            <a href="javascript:void(0)" data-sp-logout><i class="fa-solid fa-right-from-bracket"></i><span>@(gl.Get("Logout") ?? "退出")</span></a>
                         </div>
                     </div>
                 </div>
@@ -96,9 +96,9 @@
     <script src="~/assets/js/admin-shell.js?v=@AppInfo.ResVer"></script>
     <script>
         document.getElementById('spYear').textContent = new Date().getFullYear();
-        RPG.Lang.Confirm = '@(GL.Get("Confirm") ?? "确认")';
-        RPG.Lang.Cancel = '@(GL.Get("Cancel") ?? "取消")';
-        RPG.Lang.OperationConfirm = '@(GL.Get("OperationConfirm") ?? "确认操作")';
+        RPG.Lang.Confirm = '@(gl.Get("Confirm") ?? "确认")';
+        RPG.Lang.Cancel = '@(gl.Get("Cancel") ?? "取消")';
+        RPG.Lang.OperationConfirm = '@(gl.Get("OperationConfirm") ?? "确认操作")';
     </script>
     @RenderSection("Foot", false)
 </body>

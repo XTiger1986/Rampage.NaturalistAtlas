@@ -1,12 +1,12 @@
 ﻿@model ListViewData<AdminOperationLogDto, AdminOperationLogFilter>
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<AdminOperationLogDto> DataList = Model!.DataList;
+    List<AdminOperationLogDto> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    AdminOperationLogFilter DataFilter = Model!.DataFilter;
+    AdminOperationLogFilter dataFilter = Model!.DataFilter;
 }
 
 @section Head {
@@ -19,14 +19,14 @@
 
 <div class="sp-panel">
     <div class="sp-panel__hd">
-        <h2 class="sp-panel__title">@GL.Get("AdministratorOperationRecordList")</h2>
+        <h2 class="sp-panel__title">@gl.Get("AdministratorOperationRecordList")</h2>
     </div>
     <div class="sp-panel__bd">
         <form class="sp-toolbar" action="~/Admin/AdminOperationLog_List" method="get">
             <div class="sp-toolbar__filters">
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
-                <input type="search" name="OperationName" class="form-control" style="width:240px" placeholder="@GL.Get("OperationName")" value="@DataFilter.OperationName" />
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                <input type="search" name="OperationName" class="form-control" style="width:240px" placeholder="@gl.Get("OperationName")" value="@dataFilter.OperationName" />
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
             </div>
         </form>
 
@@ -35,20 +35,20 @@
                 <thead>
                     <tr>
                         <th>Id</th>
-                        <th>@GL.Get("Administrator")</th>
-                        <th>@GL.Get("OperationName")</th>
-                        <th>@GL.Get("Controller")</th>
-                        <th>@GL.Get("Action")</th>
-                        <th>@GL.Get("RequestAddress")</th>
-                        <th>@GL.Get("OperatorIP")</th>
-                        <th>@GL.Get("CreatedTime")/@GL.Get("UpdateTime")</th>
-                        <th>@GL.Get("Operations")</th>
+                        <th>@gl.Get("Administrator")</th>
+                        <th>@gl.Get("OperationName")</th>
+                        <th>@gl.Get("Controller")</th>
+                        <th>@gl.Get("Action")</th>
+                        <th>@gl.Get("RequestAddress")</th>
+                        <th>@gl.Get("OperatorIP")</th>
+                        <th>@gl.Get("CreatedTime")/@gl.Get("UpdateTime")</th>
+                        <th>@gl.Get("Operations")</th>
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td>@item.Id</td>
@@ -59,12 +59,12 @@
                             <td class="sp-mono">@item.RawUrl</td>
                             <td>@item.OperationIp</td>
                             <td>
-                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</div>
-                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, CTZ).ToCommonString()</div>
+                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, ctz).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, ctz).ToCommonString()</div>
                             </td>
                             <td>
                                 <a href="~/Admin/AdminOperationLog_Detail?LogId=@(item.Id)" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fa-solid fa-eye me-1"></i>@GL.Get("View")
+                                    <i class="fa-solid fa-eye me-1"></i>@gl.Get("View")
                                 </a>
                             </td>
                         </tr>
@@ -72,7 +72,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="9" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="9" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>

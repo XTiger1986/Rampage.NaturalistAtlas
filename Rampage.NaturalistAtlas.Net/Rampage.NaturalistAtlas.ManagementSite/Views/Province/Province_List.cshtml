@@ -1,15 +1,15 @@
 @model ListViewData<Province, ProvinceAdminFilter>
 @{
     // 省份列表：国家筛选 + 区划码/中英文名关键字 + 状态；行内编辑/启停/删除
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<Province> DataList = Model!.DataList;
+    List<Province> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    ProvinceAdminFilter DataFilter = Model!.DataFilter;
-    List<Country> CountryList = ViewBag.CountryList ?? new List<Country>();
-    Dictionary<int, string> CountryNameDict = ViewBag.CountryNameDict ?? new Dictionary<int, string>();
+    ProvinceAdminFilter dataFilter = Model!.DataFilter;
+    List<Country> countryList = ViewBag.CountryList ?? new List<Country>();
+    Dictionary<int, string> countryNameDict = ViewBag.CountryNameDict ?? new Dictionary<int, string>();
 }
 
 @section Head {
@@ -38,15 +38,15 @@
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
                 <select name="CountryId" class="form-select" style="width:160px">
                     <option value="">全部国家</option>
-                    @foreach (var country in CountryList)
+                    @foreach (var country in countryList)
                     {
-                        <option value="@country.Id" selected="@(DataFilter.CountryId == country.Id)">@country.Name</option>
+                        <option value="@country.Id" selected="@(dataFilter.CountryId == country.Id)">@country.Name</option>
                     }
                 </select>
-                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="区划码 / 中文名 / 英文名" value="@DataFilter.Keywords" />
+                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="区划码 / 中文名 / 英文名" value="@dataFilter.Keywords" />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = dataFilter.Status }' />
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
             </div>
         </form>
 
@@ -64,13 +64,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td>@item.Id</td>
-                            <td>@(CountryNameDict.TryGetValue(item.CountryId, out string? countryName) ? countryName : item.CountryId.ToString())</td>
+                            <td>@(countryNameDict.TryGetValue(item.CountryId, out string? countryName) ? countryName : item.CountryId.ToString())</td>
                             <td><code class="sp-mono">@(string.IsNullOrWhiteSpace(item.Code) ? "-" : item.Code)</code></td>
                             <td>@item.Name</td>
                             <td>@item.NameEn</td>
@@ -79,7 +79,7 @@
                             </td>
                             <td class="text-nowrap">
                                 <a href="~/Province/Province_Edit?ProvinceId=@(item.Id)" class="btn btn-sm btn-info">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@gl.Get("Edit")
                                 </a>
                                 <button type="button" data-id="@item.Id"
                                         data-status="@(item.Status == CommonStatus.Enabled ? 0 : 1)"
@@ -89,7 +89,7 @@
                                     <i class="fa-solid @(item.Status == CommonStatus.Enabled ? "fa-ban" : "fa-circle-check") me-1"></i>@(item.Status == CommonStatus.Enabled ? "停用" : "启用")
                                 </button>
                                 <button type="button" data-id="@item.Id" data-api="/api/province" data-action="geo-delete" class="btn btn-sm btn-danger">
-                                    <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                    <i class="fa-solid fa-trash me-1"></i>@gl.Get("Delete")
                                 </button>
                             </td>
                         </tr>
@@ -97,7 +97,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="7" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="7" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>

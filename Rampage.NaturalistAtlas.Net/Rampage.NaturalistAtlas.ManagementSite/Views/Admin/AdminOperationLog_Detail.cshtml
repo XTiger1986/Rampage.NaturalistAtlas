@@ -1,9 +1,9 @@
 ﻿@model AdminOperationLogDto
 @{
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
-    AdminOperationLogDto Data = Model!;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
+    AdminOperationLogDto data = Model!;
 }
 
 @section Head {
@@ -13,80 +13,80 @@
 <div class="sp-page-head">
     <partial name="~/Views/Shared/_BreadCrumb.cshtml" />
     <div class="sp-page-actions">
-        <a class="btn btn-outline-secondary" href="~/Admin/AdminOperationLog_List"><i class="fa-solid fa-arrow-left me-1"></i>@GL.Get("ReturnList")</a>
+        <a class="btn btn-outline-secondary" href="~/Admin/AdminOperationLog_List"><i class="fa-solid fa-arrow-left me-1"></i>@gl.Get("ReturnList")</a>
     </div>
 </div>
 
 <div class="sp-panel admin-log-block">
     <div class="sp-panel__hd">
-        <h2 class="sp-panel__title">@GL.Get("AdministratorOperationLog") · #@Data.Id</h2>
+        <h2 class="sp-panel__title">@gl.Get("AdministratorOperationLog") · #@data.Id</h2>
     </div>
     <div class="sp-panel__bd">
         <div class="row mb-3">
-            <label class="col-md-2 col-form-label">@GL.Get("Administrator")</label>
+            <label class="col-md-2 col-form-label">@gl.Get("Administrator")</label>
             <div class="col-md-10">
-                <input type="text" class="form-control" value="@(Data.Admin != null ? Data.Admin.DisplayName : Data.AdminId.ToString())" readonly />
+                <input type="text" class="form-control" value="@(data.Admin != null ? data.Admin.DisplayName : data.AdminId.ToString())" readonly />
             </div>
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("OperationName")</label>
-            <input type="text" class="form-control" value="@Data.OperationName" readonly />
+            <label class="form-label">@gl.Get("OperationName")</label>
+            <input type="text" class="form-control" value="@data.OperationName" readonly />
         </div>
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <label class="form-label">@GL.Get("Controller")</label>
-                <input type="text" class="form-control sp-mono" value="@Data.ControllerName" readonly />
+                <label class="form-label">@gl.Get("Controller")</label>
+                <input type="text" class="form-control sp-mono" value="@data.ControllerName" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">@GL.Get("Action")</label>
-                <input type="text" class="form-control sp-mono" value="@Data.ActionName" readonly />
+                <label class="form-label">@gl.Get("Action")</label>
+                <input type="text" class="form-control sp-mono" value="@data.ActionName" readonly />
             </div>
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("RequestAddress")</label>
-            <input type="text" class="form-control sp-mono" value="@Data.RawUrl" readonly />
+            <label class="form-label">@gl.Get("RequestAddress")</label>
+            <input type="text" class="form-control sp-mono" value="@data.RawUrl" readonly />
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("OperationDataType")</label>
-            <input type="text" class="form-control" value="@Data.DataTypeName" readonly />
+            <label class="form-label">@gl.Get("OperationDataType")</label>
+            <input type="text" class="form-control" value="@data.DataTypeName" readonly />
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("InputData")</label>
-            <textarea class="form-control" rows="5" readonly>@Data.DataIn</textarea>
+            <label class="form-label">@gl.Get("InputData")</label>
+            <textarea class="form-control" rows="5" readonly>@data.DataIn</textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("OutputData")</label>
-            <textarea class="form-control" rows="5" readonly>@Data.DataOut</textarea>
+            <label class="form-label">@gl.Get("OutputData")</label>
+            <textarea class="form-control" rows="5" readonly>@data.DataOut</textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("PostData")</label>
-            <textarea class="form-control" rows="5" readonly>@Data.PostData</textarea>
+            <label class="form-label">@gl.Get("PostData")</label>
+            <textarea class="form-control" rows="5" readonly>@data.PostData</textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("CookiesData")</label>
-            <textarea class="form-control" rows="4" readonly>@Data.CookieData</textarea>
+            <label class="form-label">@gl.Get("CookiesData")</label>
+            <textarea class="form-control" rows="4" readonly>@data.CookieData</textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("HeadersData")</label>
-            <textarea class="form-control" rows="4" readonly>@Data.Headers</textarea>
+            <label class="form-label">@gl.Get("HeadersData")</label>
+            <textarea class="form-control" rows="4" readonly>@data.Headers</textarea>
         </div>
         <div class="mb-3">
-            <label class="form-label">@GL.Get("ReferencePath")</label>
-            <input type="text" class="form-control" value="@Data.Referrer" readonly />
+            <label class="form-label">@gl.Get("ReferencePath")</label>
+            <input type="text" class="form-control" value="@data.Referrer" readonly />
         </div>
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <label class="form-label">@GL.Get("OperatorIP")</label>
-                <input type="text" class="form-control" value="@Data.OperationIp" readonly />
+                <label class="form-label">@gl.Get("OperatorIP")</label>
+                <input type="text" class="form-control" value="@data.OperationIp" readonly />
             </div>
             <div class="col-md-6">
-                <label class="form-label">@GL.Get("OperatorClient")</label>
-                <input type="text" class="form-control" value="@Data.UserAgent" readonly />
+                <label class="form-label">@gl.Get("OperatorClient")</label>
+                <input type="text" class="form-control" value="@data.UserAgent" readonly />
             </div>
         </div>
         <div>
-            <label class="form-label">@GL.Get("OperationTime")</label>
-            <div>@DateTimeTool.UtcToLocal(Data.CreateTime, CTZ).ToCommonString() ~ @DateTimeTool.UtcToLocal(Data.UpdateTime, CTZ).ToCommonString()</div>
+            <label class="form-label">@gl.Get("OperationTime")</label>
+            <div>@DateTimeTool.UtcToLocal(data.CreateTime, ctz).ToCommonString() ~ @DateTimeTool.UtcToLocal(data.UpdateTime, ctz).ToCommonString()</div>
         </div>
     </div>
 </div>

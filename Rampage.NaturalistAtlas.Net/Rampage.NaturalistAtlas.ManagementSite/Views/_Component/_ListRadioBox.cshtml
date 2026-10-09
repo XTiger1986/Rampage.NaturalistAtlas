@@ -1,22 +1,22 @@
 ﻿@{
-    var Selector = Model!;
-    Selector.Init();
+    var selector = Model!;
+    selector.Init();
 }
 
 
-@if (Selector.UseDefault)
+@if (selector.UseDefault)
 {
     <div class="form-check form-check-inline">
-        <input type="radio" id="@(Selector.FormItemId)" name="@(Selector.FormItemName)" value="@(Selector.DefaultValue)" class="form-check-input" />
-        <label for="@(Selector.FormItemId)" class="form-check form-check-inline @(Selector.Css)" style="@(Selector.Style)">@(Selector.DefaultText)</label>
+        <input type="radio" id="@(selector.FormItemId)" name="@(selector.FormItemName)" value="@(selector.DefaultValue)" class="form-check-input" />
+        <label for="@(selector.FormItemId)" class="form-check form-check-inline @(selector.Css)" style="@(selector.Style)">@(selector.DefaultText)</label>
     </div>
 }
 
-@foreach (var item in Selector.Items)
+@foreach (var item in selector.Items)
 {
     <div class="form-check form-check-inline">
-        <input type="radio" id="@(Selector.FormItemId)_@(item.Key)" name="@(Selector.FormItemName)" value="@(item.Key)" class="form-check-input" @Html.Raw(Selector.IsSelected(item.Key) ? "checked=\"checked\"" : "") />
-        <label for="@(Selector.FormItemId)_@(item.Key)" class="form-check form-check-inline @(Selector.Css)" style="@(Selector.Style)">@(item.Value)</label>
+        <input type="radio" id="@(selector.FormItemId)_@(item.Key)" name="@(selector.FormItemName)" value="@(item.Key)" class="form-check-input" @Html.Raw(selector.IsSelected(item.Key) ? "checked=\"checked\"" : "") />
+        <label for="@(selector.FormItemId)_@(item.Key)" class="form-check form-check-inline @(selector.Css)" style="@(selector.Style)">@(item.Value)</label>
     </div>
 }
 

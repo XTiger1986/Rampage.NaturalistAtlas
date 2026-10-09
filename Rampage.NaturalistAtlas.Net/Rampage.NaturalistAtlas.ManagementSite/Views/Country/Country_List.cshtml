@@ -1,13 +1,13 @@
 @model ListViewData<Country, CountryAdminFilter>
 @{
     // 国家列表：代码/中英文名关键字 + 状态筛选；行内编辑/启停/删除
-    SuperViewInfo ViewInfo = ViewBag.ViewInfo;
-    TimeZoneInfo CTZ = ViewInfo.ClientTimeZone!;
-    LocalizationModule GL = ViewInfo.GlobalLanguage;
+    SuperViewInfo viewInfo = ViewBag.ViewInfo;
+    TimeZoneInfo ctz = viewInfo.ClientTimeZone!;
+    LocalizationModule gl = viewInfo.GlobalLanguage;
 
-    List<Country> DataList = Model!.DataList;
+    List<Country> dataList = Model!.DataList;
     DataPager DataPager = Model!.DataPager!;
-    CountryAdminFilter DataFilter = Model!.DataFilter;
+    CountryAdminFilter dataFilter = Model!.DataFilter;
 }
 
 @section Head {
@@ -29,10 +29,10 @@
         <form class="sp-toolbar" action="~/Country/Country_List" method="get">
             <div class="sp-toolbar__filters">
                 <partial name="~/Views/_Component/_PageSizeOptions.cshtml" model="DataPager.PageSize" />
-                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="代码 / 中文名 / 英文名" value="@DataFilter.Keywords" />
+                <input type="search" name="Keywords" class="form-control" style="width:220px" placeholder="代码 / 中文名 / 英文名" value="@dataFilter.Keywords" />
                 <partial name="~/Views/_Component/_EnumSelector.cshtml"
-                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = DataFilter.Status }' />
-                <button type="submit" class="btn btn-primary">@GL.Get("Query")</button>
+                         model='new EnumSelector<CommonStatus> { FormItemId = "seltStatus", FormItemName = "Status", Css = "form-select", Style = "width:130px", DefaultText = "全部状态", DefaultValue = "", SelectedValue = dataFilter.Status }' />
+                <button type="submit" class="btn btn-primary">@gl.Get("Query")</button>
             </div>
         </form>
 
@@ -50,9 +50,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                @if (DataList.Count > 0)
+                @if (dataList.Count > 0)
                 {
-                    foreach (var item in DataList)
+                    foreach (var item in dataList)
                     {
                         <tr id="trDataItem_@(item.Id)">
                             <td>@item.Id</td>
@@ -63,12 +63,12 @@
                                 <span class="badge @(item.Status == CommonStatus.Enabled ? "bg-success" : "bg-danger")">@EnumReader.GetText(item.Status)</span>
                             </td>
                             <td>
-                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, CTZ).ToCommonString()</div>
-                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, CTZ).ToCommonString()</div>
+                                <div>@DateTimeTool.UtcToLocal(item.CreateTime, ctz).ToCommonString()</div>
+                                <div class="text-muted small">@DateTimeTool.UtcToLocal(item.UpdateTime, ctz).ToCommonString()</div>
                             </td>
                             <td class="text-nowrap">
                                 <a href="~/Country/Country_Edit?CountryId=@(item.Id)" class="btn btn-sm btn-info">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i>@GL.Get("Edit")
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>@gl.Get("Edit")
                                 </a>
                                 <button type="button" data-id="@item.Id"
                                         data-status="@(item.Status == CommonStatus.Enabled ? 0 : 1)"
@@ -78,7 +78,7 @@
                                     <i class="fa-solid @(item.Status == CommonStatus.Enabled ? "fa-ban" : "fa-circle-check") me-1"></i>@(item.Status == CommonStatus.Enabled ? "停用" : "启用")
                                 </button>
                                 <button type="button" data-id="@item.Id" data-api="/api/country" data-action="geo-delete" class="btn btn-sm btn-danger">
-                                    <i class="fa-solid fa-trash me-1"></i>@GL.Get("Delete")
+                                    <i class="fa-solid fa-trash me-1"></i>@gl.Get("Delete")
                                 </button>
                             </td>
                         </tr>
@@ -86,7 +86,7 @@
                 }
                 else
                 {
-                    <tr><td colspan="7" class="sp-empty">@GL.Get("NoData")</td></tr>
+                    <tr><td colspan="7" class="sp-empty">@gl.Get("NoData")</td></tr>
                 }
                 </tbody>
             </table>
