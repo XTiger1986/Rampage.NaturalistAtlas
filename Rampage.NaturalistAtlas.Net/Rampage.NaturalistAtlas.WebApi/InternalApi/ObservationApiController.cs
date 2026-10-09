@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Rampage.Data.Models;
 using Rampage.DependencyInjection;
 using Rampage.Model;

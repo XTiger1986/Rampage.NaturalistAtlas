@@ -196,16 +196,26 @@ namespace Rampage.NaturalistAtlas.Collection
                 return AtlasLicense.AllRightsReserved;
             }
             string s = license.ToUpperInvariant().Replace('-', '_');
-            if (s.Contains("ZERO")) { return AtlasLicense.Cc0; }
-            if (s.Contains("CC0")) { return AtlasLicense.Cc0; }
-            if (s.Contains("MARK")) { return AtlasLicense.Pdm; }
-            if (s.Contains("PDM")) { return AtlasLicense.Pdm; }
-            if (s.Contains("BY_NC_SA") || s.Contains("BY_NCSA")) { return AtlasLicense.CcByNcSa; }
-            if (s.Contains("BY_NC_ND") || s.Contains("BY_NCND")) { return AtlasLicense.CcByNcNd; }
-            if (s.Contains("BY_SA")) { return AtlasLicense.CcBySa; }
-            if (s.Contains("BY_ND")) { return AtlasLicense.CcByNd; }
-            if (s.Contains("BY_NC")) { return AtlasLicense.CcByNc; }
-            if (s.Contains("BY")) { return AtlasLicense.CcBy; }
+            if (s.Contains("ZERO"))
+            { return AtlasLicense.Cc0; }
+            if (s.Contains("CC0"))
+            { return AtlasLicense.Cc0; }
+            if (s.Contains("MARK"))
+            { return AtlasLicense.Pdm; }
+            if (s.Contains("PDM"))
+            { return AtlasLicense.Pdm; }
+            if (s.Contains("BY_NC_SA") || s.Contains("BY_NCSA"))
+            { return AtlasLicense.CcByNcSa; }
+            if (s.Contains("BY_NC_ND") || s.Contains("BY_NCND"))
+            { return AtlasLicense.CcByNcNd; }
+            if (s.Contains("BY_SA"))
+            { return AtlasLicense.CcBySa; }
+            if (s.Contains("BY_ND"))
+            { return AtlasLicense.CcByNd; }
+            if (s.Contains("BY_NC"))
+            { return AtlasLicense.CcByNc; }
+            if (s.Contains("BY"))
+            { return AtlasLicense.CcBy; }
             return AtlasLicense.AllRightsReserved;
         }
 

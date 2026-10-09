@@ -1,4 +1,4 @@
-﻿using Rampage.Model;
+using Rampage.Model;
 using Rampage.NaturalistAtlas.DAL;
 using Rampage.NaturalistAtlas.Model.Po;
 using Rampage.Web;

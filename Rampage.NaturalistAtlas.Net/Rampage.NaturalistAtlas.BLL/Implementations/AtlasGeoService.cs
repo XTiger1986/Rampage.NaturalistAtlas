@@ -32,8 +32,7 @@ namespace Rampage.NaturalistAtlas.BLL
         /// <inheritdoc/>
         public List<CityItemDto> GetCityList()
         {
-            return HandleWebCache(() =>
-            {
+            return HandleWebCache(() => {
                 // 国家/省份为小表，整表载入内存做名称映射，避免逐行查询
                 // Countries/provinces are small tables: load them whole for name lookup instead of per-row queries
                 Dictionary<int, string> countryDict = CountryDao.SelectList(c => true).ToDictionary(c => c.Id, c => c.Name);

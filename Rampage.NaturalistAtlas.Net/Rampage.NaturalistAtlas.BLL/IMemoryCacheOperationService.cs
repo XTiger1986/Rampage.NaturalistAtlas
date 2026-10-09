@@ -1,4 +1,4 @@
-﻿using Rampage.NaturalistAtlas.Model.Dto;
+using Rampage.NaturalistAtlas.Model.Dto;
 using System;
 
 namespace Rampage.NaturalistAtlas.BLL

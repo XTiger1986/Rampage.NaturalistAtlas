@@ -1,4 +1,4 @@
-﻿namespace Rampage.NaturalistAtlas.ManagementSite.Internal
+namespace Rampage.NaturalistAtlas.ManagementSite.Internal
 {
     public class AppInfo
     {

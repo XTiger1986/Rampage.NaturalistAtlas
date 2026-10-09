@@ -47,8 +47,7 @@ namespace Rampage.NaturalistAtlas.BLL
                     .Select(r => r.ObservationId!).Distinct().ToList())
                 .ToDictionary(o => o.Id);
 
-            return list.Select(po =>
-            {
+            return list.Select(po => {
                 Observation? observation = po.ObservationId != null && observationDict.TryGetValue(po.ObservationId!, out Observation? item) ? item : null;
                 return new ReportRowDto
                 {

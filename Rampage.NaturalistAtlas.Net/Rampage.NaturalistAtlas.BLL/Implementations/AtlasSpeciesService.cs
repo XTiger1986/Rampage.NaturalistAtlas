@@ -94,8 +94,7 @@ namespace Rampage.NaturalistAtlas.BLL
                 effective.Quality = "1";
             }
 
-            return HandleWebCache(() =>
-            {
+            return HandleWebCache(() => {
                 List<SpeciesRankItemDto> list = ObservationDao.SelectSpeciesRankPage(effective, kw, orderKey, (pager.PageIndex - 1) * pager.PageSize, pager.PageSize);
                 pager.RecordCount = ObservationDao.CountSpeciesRank(effective, kw);
                 return new PageData<SpeciesRankItemDto> { Pager = pager, DataList = list };
@@ -112,8 +111,7 @@ namespace Rampage.NaturalistAtlas.BLL
                 return null;
             }
             string id = taxonId.Trim();
-            return HandleWebCache<SpeciesDetailDto?>(() =>
-            {
+            return HandleWebCache<SpeciesDetailDto?>(() => {
                 TaxonInfoDto? taxon = TaxonDao.SelectTaxonInfo(id);
                 if (taxon == null)
                 {
@@ -148,8 +146,7 @@ namespace Rampage.NaturalistAtlas.BLL
                 return BuildEmergence(history, new List<EmergenceRowDto>(), researchOnly);
             }
 
-            return HandleWebCache(() =>
-            {
+            return HandleWebCache(() => {
                 List<EmergenceRowDto> rows;
                 if (history)
                 {
@@ -182,8 +179,7 @@ namespace Rampage.NaturalistAtlas.BLL
         {
             top = Math.Clamp(top, 5, 100);
             AtlasObservationQuery noMonth = query.WithoutMonth();
-            return HandleWebCache(() =>
-            {
+            return HandleWebCache(() => {
                 // 行展开 → 物种行：SQL 已按总数降序，按首次出现顺序归组即保持排序
                 // Unpivoted cells → species rows: SQL is ordered by total, so grouping in first-seen order keeps the ranking
                 List<PhenologyRowDto> rows = new List<PhenologyRowDto>();
@@ -333,8 +329,7 @@ namespace Rampage.NaturalistAtlas.BLL
         {
             int size = history ? 12 : 36;
             Dictionary<int, EmergenceRowDto> dict = rows.Where(r => r.Idx >= 1 && r.Idx <= size).ToDictionary(r => r.Idx);
-            List<EmergencePointDto> series = Enumerable.Range(1, size).Select(i =>
-            {
+            List<EmergencePointDto> series = Enumerable.Range(1, size).Select(i => {
                 dict.TryGetValue(i, out EmergenceRowDto? row);
                 long research = row?.ResearchCount ?? 0;
                 return new EmergencePointDto

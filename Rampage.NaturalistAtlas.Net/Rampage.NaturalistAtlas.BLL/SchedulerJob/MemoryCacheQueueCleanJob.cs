@@ -1,4 +1,4 @@
-﻿using Rampage.DependencyInjection;
+using Rampage.DependencyInjection;
 using Rampage.NaturalistAtlas.BLL;
 using Rampage.NaturalistAtlas.Model.Dto;
 using System;

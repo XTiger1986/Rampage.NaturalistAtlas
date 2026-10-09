@@ -1,4 +1,4 @@
-﻿using Rampage.Data;
+using Rampage.Data;
 using Rampage.Enums;
 using System;
 
@@ -10,7 +10,7 @@ namespace Rampage.NaturalistAtlas.Model.Po
     [TableMapping("city")]
     public class City
     {
-        
+
         /// <summary>
         /// 主键
         /// </summary>
@@ -41,31 +41,31 @@ namespace Rampage.NaturalistAtlas.Model.Po
         /// </summary>
         [FieldMapping(ColumnName = "name_en")]
         public string? NameEn { get; set; }
-        
+
         /// <summary>
         /// URL标识
         /// </summary>
         [FieldMapping(ColumnName = "slug")]
         public string? Slug { get; set; }
-        
+
         /// <summary>
         /// bbox西南角经度
         /// </summary>
         [FieldMapping(ColumnName = "sw_lng")]
         public decimal SwLng { get; set; }
-        
+
         /// <summary>
         /// bbox西南角纬度
         /// </summary>
         [FieldMapping(ColumnName = "sw_lat")]
         public decimal SwLat { get; set; }
-        
+
         /// <summary>
         /// bbox东北角经度
         /// </summary>
         [FieldMapping(ColumnName = "ne_lng")]
         public decimal NeLng { get; set; }
-        
+
         /// <summary>
         /// bbox东北角纬度
         /// </summary>
@@ -85,24 +85,24 @@ namespace Rampage.NaturalistAtlas.Model.Po
         /// </summary>
         [FieldMapping(ColumnName = "boundary_wkt")]
         public string? BoundaryWkt { get; set; }
-        
+
         /// <summary>
         /// 状态(1=启用,0=停用)
         /// </summary>
         [FieldMapping(ColumnName = "status")]
         public CommonStatus Status { get; set; }
-        
+
         /// <summary>
         /// 创建时间(UTC)
         /// </summary>
         [FieldMapping(ColumnName = "create_time")]
         public DateTime CreateTime { get; set; }
-        
+
         /// <summary>
         /// 修改时间(UTC)
         /// </summary>
         [FieldMapping(ColumnName = "update_time")]
         public DateTime UpdateTime { get; set; }
-        
+
     }
 }

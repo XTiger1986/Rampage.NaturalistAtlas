@@ -1,4 +1,4 @@
-﻿using Rampage.DependencyInjection;
+using Rampage.DependencyInjection;
 using Rampage.Json;
 using Rampage.Model;
 using Rampage.NaturalistAtlas.DAL;
@@ -9,7 +9,7 @@ using System;
 
 namespace Rampage.NaturalistAtlas.BLL
 {
-    public class SettingService: SuperService<Setting, ISettingDao>, ISettingService
+    public class SettingService : SuperService<Setting, ISettingDao>, ISettingService
     {
         [Auto]
         protected ISettingDao SettingDao = default!;
@@ -34,8 +34,7 @@ namespace Rampage.NaturalistAtlas.BLL
         {
             Type type = typeof(S);
             string typeName = type.FullName!;
-            return HandleWebCache<S>(() =>
-            {
+            return HandleWebCache<S>(() => {
                 return GetSetting<S>();
             }, Setting.CACHE_KEY_ONE_TPL, MathTool.GenerateInt(1800, 2400), typeName)!;
         }

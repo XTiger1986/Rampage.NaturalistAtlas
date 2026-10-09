@@ -41,8 +41,7 @@ namespace Rampage.NaturalistAtlas.BLL
             {
                 return null;
             }
-            return HandleWebCache<CityOverviewDto?>(() =>
-            {
+            return HandleWebCache<CityOverviewDto?>(() => {
                 City? city = CityDao.SelectById(cityId);
                 if (city == null)
                 {

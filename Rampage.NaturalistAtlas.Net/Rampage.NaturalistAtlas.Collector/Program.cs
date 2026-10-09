@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 
 namespace Rampage.NaturalistAtlas.Collector
@@ -13,7 +13,9 @@ namespace Rampage.NaturalistAtlas.Collector
         static void Main(string[] args)
         {
             // 重定向/服务场景下默认按本地码页输出会把中文写坏，统一 UTF-8（个别宿主不允许设置时忽略）
-            try { Console.OutputEncoding = System.Text.Encoding.UTF8; } catch { /* ignore */ }
+            try
+            { Console.OutputEncoding = System.Text.Encoding.UTF8; }
+            catch { /* ignore */ }
 
             RampageBooter.Run<NaturalistAtlasCollectorApplication>(args);
             if (Console.IsInputRedirected)

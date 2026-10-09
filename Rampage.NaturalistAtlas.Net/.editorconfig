@@ -1,0 +1,71 @@
+# 自然地图志后端代码规范（C#）
+# 规范要点：4 空格缩进禁用制表符；花括号独占一行且不可省略；
+# using 严格按字母音序（不把 System 提前）；同行只放一条语句。
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+
+[*.{cs,cshtml}]
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+[*.cs]
+# 花括号独占一行（Allman）：类型/方法/属性块/控制块/初始化器均换行；
+# 唯独访问器列表 { get; set; } 保持微软官方单行样式，不拆分
+csharp_new_line_before_open_brace = types, methods, properties, control_blocks, object_collection_array_initializers, anonymous_types
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+
+# 同行只放一条语句；已存在的单行块（{ get; set; } 等访问器列表）保留原样
+csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = true
+
+# if/foreach/catch 等内嵌语句体必须换行（不可与控制语句同行）；与补花括号规则配合
+csharp_style_allow_embedded_statements_on_same_line_experimental = false
+csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true
+csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false
+csharp_style_allow_statement_immediately_after_block_experimental = false
+
+# 单行 if/for/while 等必须补全花括号，即使只有一句代码
+csharp_prefer_braces = true:warning
+
+# using 严格按字母音序排列（Rampage… 排在 System… 之前），且不分组
+dotnet_sort_system_directives_first = false
+dotnet_separate_import_directive_groups = false
+csharp_using_directive_placement = outside_namespace:silent
+
+# 命名空间风格保持现状（块级/文件级混存不统一，非本轮规范项），不设置 csharp_style_namespace_declarations
+
+# 缩进
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_case_contents_when_block = true
+csharp_indent_labels = one_less_than_current
+
+# 空格：关键字与左括号之间有空格；方法名与左括号之间无空格
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_after_cast = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_between_parentheses = false
+csharp_space_after_comma = true
+csharp_space_before_comma = false
+csharp_space_after_dot = false
+csharp_space_before_dot = false
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_around_declaration_statements = false
+csharp_space_before_open_square_brackets = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_square_brackets = false

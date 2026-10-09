@@ -1,4 +1,4 @@
-﻿using Rampage.Utilities;
+using Rampage.Utilities;
 using Rampage.Web.Extensions;
 using System;
 using System.Globalization;

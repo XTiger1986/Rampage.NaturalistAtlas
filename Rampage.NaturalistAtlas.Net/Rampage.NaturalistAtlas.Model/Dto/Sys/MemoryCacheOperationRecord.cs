@@ -1,4 +1,4 @@
-﻿using Rampage.Enums;
+using Rampage.Enums;
 using System;
 
 namespace Rampage.NaturalistAtlas.Model.Dto

@@ -1,4 +1,4 @@
-﻿using Rampage.Hierarchy;
+using Rampage.Hierarchy;
 using Rampage.NaturalistAtlas.Model.Dto.Public;
 using Rampage.NaturalistAtlas.Model.Po;
 using System;
@@ -9,7 +9,7 @@ namespace Rampage.NaturalistAtlas.DAL
     /// <summary>
     /// 城市 Dao 实现 / City Dao implementation
     /// </summary>
-    public class CityDao: SuperDao<City>, ICityDao
+    public class CityDao : SuperDao<City>, ICityDao
     {
         /// <inheritdoc/>
         public List<GeoSearchRowDto> SelectGeoSearch(string keyword, int limit)

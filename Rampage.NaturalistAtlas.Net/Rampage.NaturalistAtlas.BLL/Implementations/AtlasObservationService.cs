@@ -40,8 +40,7 @@ namespace Rampage.NaturalistAtlas.BLL
         public ObservationPointResultDto GetPoints(AtlasObservationQuery query, int limit)
         {
             limit = Math.Clamp(limit, 1, 10000);
-            return HandleWebCache(() =>
-            {
+            return HandleWebCache(() => {
                 List<ObservationPointDto> points = ObservationDao.SelectPublicPoints(query, limit);
                 // 未触顶时总数即点位数，省去一次 COUNT
                 // Below the limit the total equals the point count, saving a COUNT query

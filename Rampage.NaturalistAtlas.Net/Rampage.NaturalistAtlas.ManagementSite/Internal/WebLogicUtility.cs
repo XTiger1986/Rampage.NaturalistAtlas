@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Html;
 using Rampage.Data;
 using Rampage.Data.Query;
 using Rampage.Enums;
@@ -107,8 +107,7 @@ namespace Rampage.NaturalistAtlas.ManagementSite.Internal
 
         public static IHtmlContent RenderMenuTreeSelectorHtml(List<ManageMenuDto> treeMenuList, LocalizationModule lang, TimeZoneInfo ctz, int? defaultId = null, int? maxDepth = null, int? excludeId = null)
         {
-            return ManagementLogicUtility.RenderMenuTreeHtml(treeMenuList, (ManageMenuDto item, int? did, int depth, int i, LocalizationModule lang, TimeZoneInfo ctz) =>
-            {
+            return ManagementLogicUtility.RenderMenuTreeHtml(treeMenuList, (ManageMenuDto item, int? did, int depth, int i, LocalizationModule lang, TimeZoneInfo ctz) => {
                 string text = item.Title!;
                 string value = item.Id.ToString();
                 string title = item.Title!;

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Rampage.AppLog;
 using Rampage.NaturalistAtlas.BLL;
 using Rampage.NaturalistAtlas.Collector.Jobs;
@@ -5,7 +6,6 @@ using Rampage.NaturalistAtlas.Model.Enums;
 using Rampage.NaturalistAtlas.SchedulerJob;
 using Rampage.Utilities;
 using System;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Rampage.NaturalistAtlas.Collector
 {

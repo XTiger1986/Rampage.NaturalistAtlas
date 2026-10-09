@@ -92,7 +92,8 @@ namespace Rampage.NaturalistAtlas.BLL
             // 合并策略：在原 config 上仅覆盖表单声明的键，未列出的参数原样保留（Collector 后续扩展字段不丢失）
             JsonObject configNode = ParseConfig(origin.Config);
             bool windowChanged = false;
-            if (input.BatchSize.HasValue) { configNode["BatchSize"] = input.BatchSize.Value; }
+            if (input.BatchSize.HasValue)
+            { configNode["BatchSize"] = input.BatchSize.Value; }
             if (input.FromDate.HasValue)
             {
                 string newValue = input.FromDate.Value.ToString("yyyy-MM-dd");
@@ -105,7 +106,8 @@ namespace Rampage.NaturalistAtlas.BLL
                 windowChanged |= ReadString(configNode, "ToDate") != newValue;
                 configNode["ToDate"] = newValue;
             }
-            if (input.SampleSize.HasValue) { configNode["SampleSize"] = input.SampleSize.Value; }
+            if (input.SampleSize.HasValue)
+            { configNode["SampleSize"] = input.SampleSize.Value; }
             if (windowChanged)
             {
                 // 回补窗口被修改：清除回补进度键，让采集端按新窗口重新回补——否则 BfDone=true 的

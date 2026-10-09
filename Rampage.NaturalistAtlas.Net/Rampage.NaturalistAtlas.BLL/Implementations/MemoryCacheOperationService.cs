@@ -1,4 +1,4 @@
-﻿using Rampage.AppLog;
+using Rampage.AppLog;
 using Rampage.Enums;
 using Rampage.Hierarchy;
 using Rampage.NaturalistAtlas.Model.Dto;

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Rampage.Management.Mvc;
 
 namespace Rampage.NaturalistAtlas.ManagementSite.Controllers

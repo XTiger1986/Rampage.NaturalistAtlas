@@ -1,7 +1,7 @@
-﻿using Rampage.AppLog;
+using Rampage.AppLog;
+using Rampage.Management.Web.Api;
 using Rampage.Model;
 using System;
-using Rampage.Management.Web.Api;
 
 namespace Rampage.NaturalistAtlas.ManagementSite.InternalApi
 {

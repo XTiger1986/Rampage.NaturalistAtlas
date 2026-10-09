@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Rampage.Management;
 using Rampage.DependencyInjection;
+using Rampage.Management;
 using Rampage.Management.Mvc;
 using Rampage.Management.Permission;
 using Rampage.Model;

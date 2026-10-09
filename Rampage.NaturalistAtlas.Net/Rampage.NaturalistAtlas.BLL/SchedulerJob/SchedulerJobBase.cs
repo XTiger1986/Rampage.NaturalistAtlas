@@ -1,4 +1,4 @@
-﻿using FluentScheduler;
+using FluentScheduler;
 using Microsoft.Extensions.DependencyInjection;
 using Rampage.AppLog;
 using Rampage.Caching;
@@ -51,8 +51,7 @@ namespace Rampage.NaturalistAtlas.SchedulerJob
         private string? _scopeName;
         protected string ScopeName
         {
-            get
-            {
+            get {
                 if (string.IsNullOrEmpty(_scopeName))
                 {
                     _scopeName = $"SchedulerJob_{this.GetType().Name}";

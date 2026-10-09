@@ -1,4 +1,4 @@
-﻿using Rampage.Hierarchy;
+using Rampage.Hierarchy;
 using Rampage.NaturalistAtlas.Model.Dto.Public;
 using Rampage.NaturalistAtlas.Model.Po;
 using System;
@@ -9,7 +9,7 @@ namespace Rampage.NaturalistAtlas.DAL
     /// <summary>
     /// 预聚合物候统计 Dao 实现 / Pre-aggregated emergence stat Dao implementation
     /// </summary>
-    public class EmergenceStatDao: SuperDao<EmergenceStat>, IEmergenceStatDao
+    public class EmergenceStatDao : SuperDao<EmergenceStat>, IEmergenceStatDao
     {
         /// <inheritdoc/>
         public List<EmergenceRowDto> SelectTenDaySeries(int cityId, string taxonId, int fromYear)

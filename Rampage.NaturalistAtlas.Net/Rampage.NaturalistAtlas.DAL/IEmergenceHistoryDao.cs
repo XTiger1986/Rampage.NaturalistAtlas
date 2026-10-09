@@ -1,4 +1,4 @@
-﻿using Rampage.Hierarchy;
+using Rampage.Hierarchy;
 using Rampage.NaturalistAtlas.Model.Dto.Public;
 using Rampage.NaturalistAtlas.Model.Po;
 using System;
