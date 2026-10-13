@@ -56,6 +56,8 @@
   "Email": "邮箱",
   "Password": "密码",
   "RememberMe": "记住我",
+  "Captcha": "验证码",
+  "CaptchaRefresh": "换一张",
 
   "AddAdmin": "添加管理员",
   "EditTheAdmin": "编辑管理员【{0}】",

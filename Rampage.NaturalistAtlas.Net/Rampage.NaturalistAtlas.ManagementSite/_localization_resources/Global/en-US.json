@@ -56,6 +56,8 @@
   "Email": "Email",
   "Password": "Password",
   "RememberMe": "Remember me",
+  "Captcha": "Captcha",
+  "CaptchaRefresh": "Get a new one",
 
   "AddAdmin": "Add administrator",
   "EditTheAdmin": "Edit administrator【{0}】",

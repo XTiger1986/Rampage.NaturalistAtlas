@@ -9,6 +9,11 @@
   "SecurityUtility": {
     "AES_KEY": "xtiger1986_rampage__naturalist__"
   },
+  "LoginCaptcha": {
+    "Enabled": false,
+    "CodeTypes": null,
+    "ExpireSeconds": 300
+  },
   "Cors": {
     "Enabled": false,
     "AllowLocalhost": true,

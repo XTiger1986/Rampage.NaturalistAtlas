@@ -47,6 +47,26 @@
                         </div>
                         <div class="invalid-feedback" verify-name="Password"></div>
                     </div>
+                    @if (ViewBag.CaptchaEnabled == true)
+                    {
+                        <div class="mb-3" id="captchaRow" style="display:none;">
+                            <label class="form-label" for="txtCaptcha">@(gl.Get("Captcha") ?? "验证码")</label>
+                            <div class="sp-captcha">
+                                <input class="form-control" id="txtCaptcha" name="CaptchaCode" type="text" maxlength="16" autocomplete="off" />
+                                <img id="imgCaptcha" class="sp-captcha__img" alt="@(gl.Get("Captcha") ?? "验证码")" title="@(gl.Get("CaptchaRefresh") ?? "换一张")" />
+                            </div>
+                            <div class="invalid-feedback" verify-name="CaptchaCode"></div>
+                        </div>
+                        <div class="mb-3" id="captchaClickRow" style="display:none;">
+                            <label class="form-label">@(gl.Get("Captcha") ?? "验证码")<span id="captchaTip" class="sp-captcha__tip"></span></label>
+                            <div class="sp-captcha-click" id="captchaClickArea">
+                                <img id="imgCaptchaClick" alt="@(gl.Get("Captcha") ?? "验证码")" />
+                            </div>
+                            <button type="button" id="btnCaptchaRefresh" class="btn btn-link btn-sm px-0 sp-captcha__refresh">
+                                <i class="fa-solid fa-rotate-right me-1"></i>@(gl.Get("CaptchaRefresh") ?? "换一张")
+                            </button>
+                        </div>
+                    }
                     <div class="mb-3 form-check">
                         <input class="form-check-input" type="checkbox" value="true" id="chkIsRemember" name="IsRemember" />
                         <label class="form-check-label" for="chkIsRemember">@(gl.Get("RememberMe"))</label>
@@ -65,10 +85,87 @@
     <script src="~/assets/js/rpg-core.js?v=@AppInfo.ResVer"></script>
     <script>
         $(function () {
+            // 登录验证码状态（服务端按 LoginCaptcha 配置决定是否启用；令牌一次性，提交即消费）
+            var captcha = {
+                enabled: @(ViewBag.CaptchaEnabled == true ? "true" : "false"),
+                token: '',
+                mode: 'input',
+                points: []
+            };
+
+            // 点选标记序号重画：位置由 captcha.points（自然像素）按当前显示尺寸换算
+            function renderCaptchaMarks() {
+                var $area = $('#captchaClickArea');
+                $area.find('.sp-captcha__mark').remove();
+                if (!captcha.points.length) { return; }
+                var img = document.getElementById('imgCaptchaClick');
+                var rect = img.getBoundingClientRect();
+                var scaleX = rect.width / img.naturalWidth;
+                var scaleY = rect.height / img.naturalHeight;
+                for (var i = 0; i < captcha.points.length; i++) {
+                    var p = captcha.points[i];
+                    $('<span class="sp-captcha__mark"></span>')
+                        .text(i + 1)
+                        .css({ left: (p.X * scaleX) + 'px', top: (p.Y * scaleY) + 'px' })
+                        .data('idx', i)
+                        .appendTo($area);
+                }
+            }
+
+            function loadCaptcha() {
+                RPG.Get('/api/passport/captcha', null, function (r) {
+                    if (!r || !r.IsSuccess || !r.Data) { return; }
+                    var d = r.Data;
+                    captcha.token = d.Token;
+                    captcha.mode = d.Mode;
+                    captcha.points = [];
+                    if (d.Mode === 'click') {
+                        $('#captchaRow').hide();
+                        $('#captchaClickRow').show();
+                        $('#imgCaptchaClick').attr('src', 'data:image/png;base64,' + d.Base64);
+                        $('#captchaTip').text(d.Tip || '');
+                        renderCaptchaMarks();
+                    } else {
+                        $('#captchaClickRow').hide();
+                        $('#captchaRow').show();
+                        $('#imgCaptcha').attr('src', 'data:image/png;base64,' + d.Base64);
+                        $('#txtCaptcha').val('').attr('placeholder', d.Tip || '');
+                    }
+                });
+            }
+
+            if (captcha.enabled) {
+                // 点选采点：换算成图片自然像素（单词点选图 440 宽会缩放显示，不可假设 1:1）
+                $('#imgCaptchaClick').on('click', function (e) {
+                    var rect = this.getBoundingClientRect();
+                    captcha.points.push({
+                        X: Math.round((e.clientX - rect.left) * (this.naturalWidth / rect.width) * 10) / 10,
+                        Y: Math.round((e.clientY - rect.top) * (this.naturalHeight / rect.height) * 10) / 10
+                    });
+                    renderCaptchaMarks();
+                });
+                // 点击标记 = 删除该点（阻止冒泡，避免在图上误采点）
+                $('#captchaClickArea').on('click', '.sp-captcha__mark', function (e) {
+                    e.stopPropagation();
+                    captcha.points.splice($(this).data('idx'), 1);
+                    renderCaptchaMarks();
+                });
+                // 图形验证码点击图片换一张
+                $('#imgCaptcha').on('click', loadCaptcha);
+                $('#btnCaptchaRefresh').on('click', loadCaptcha);
+                loadCaptcha();
+            }
+
             // 登录接口为 [FromBody]，须 JSON（useBody:true）；表单编码会 415
             RPG.FormSubmitter('LoginForm', {
                 prepareHandler: function (data) {
                     data.IsRemember = $('#chkIsRemember').is(':checked');
+                    if (captcha.enabled) {
+                        data.CaptchaToken = captcha.token;
+                        if (captcha.mode === 'click') {
+                            data.CaptchaPoints = captcha.points;
+                        }
+                    }
                 },
                 completeHandler: function (jsonResult) {
                     // 登录成功：携带服务端校验过的本地 returnUrl 跳转
@@ -76,7 +173,8 @@
                     location.href = returnUrl;
                 },
                 failHandler: function () {
-                    // 失败后聚焦密码框并全选，减少管理员重复定位成本
+                    // 验证码令牌已被一次性消费，失败后必刷新；再聚焦密码框并全选
+                    if (captcha.enabled) { loadCaptcha(); }
                     $('#txtPassword').trigger('focus').trigger('select');
                 },
                 useBody: true,

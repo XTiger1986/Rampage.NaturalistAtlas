@@ -264,3 +264,77 @@
         border-top: 1px solid var(--auth-line);
     }
 }
+
+/* --- 登录验证码 --- */
+/* 图形验证码行：输入框 + 图片并排 */
+.sp-captcha {
+    display: flex;
+    gap: .5rem;
+    align-items: stretch;
+}
+
+.sp-captcha .form-control {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.sp-captcha__img {
+    flex: 0 0 auto;
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid var(--auth-line);
+    background: rgba(255, 255, 255, .04);
+    cursor: pointer;
+}
+
+/* 点选验证码区：容器裁剪标记点，图片等比缩放铺满 */
+.sp-captcha-click {
+    position: relative;
+    border-radius: 8px;
+    border: 1px solid var(--auth-line);
+    overflow: hidden;
+    background: rgba(255, 255, 255, .04);
+}
+
+.sp-captcha-click img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    cursor: crosshair;
+}
+
+/* 点选标记点：序号圆点，点击可删除该点 */
+.sp-captcha__mark {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border-radius: 50%;
+    background: var(--auth-accent);
+    color: #fff;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, .35);
+}
+
+/* 点选提示文案与刷新链接 */
+.sp-captcha__tip {
+    margin-left: .5rem;
+    font-size: .78rem;
+    color: var(--auth-accent-2);
+}
+
+.sp-captcha__refresh {
+    padding: 0;
+    margin-top: .25rem;
+    font-size: .8rem;
+    color: var(--auth-text-dim);
+    text-decoration: none;
+}
+
+.sp-captcha__refresh:hover {
+    color: var(--auth-text);
+}
