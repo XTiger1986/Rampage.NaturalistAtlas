@@ -10,6 +10,9 @@
  * 服务端契约（Rampage.Model.R）：
  *   { Code:0, Message, Data, IsSuccess }  — JSON 保持原始大小写
  *   验证失败附带 ValidationResult.Details = { 字段名: { Name, Description } }
+ *
+ * 非 2xx：能读出 R / 字段错误时回填文案；裸 415（problem+json 无业务字段）与 HTML
+ * 失败才使用「网络异常」。[FromBody] 接口必须 useBody:true，表单编码会 415。
  */
 (function (global, $) {
     'use strict';
@@ -79,18 +82,81 @@
     function applyVerifyFeedback(form, validationResult) {
         if (!form) { return; }
         clearVerifyFeedback(form);
-        var details = validationResult && validationResult.Details;
+        var details = validationResult && (validationResult.Details || validationResult.details);
         if (!details) { return; }
         Object.keys(details).forEach(function (name) {
             var item = details[name];
+            var text = '格式错误';
+            if (typeof item === 'string') {
+                text = item;
+            } else if (item) {
+                text = item.Description || item.description || item.Name || item.name || text;
+            }
             var feedback = $(form).find('[verify-name="' + name + '"]');
             if (feedback.length > 0) {
-                feedback[0].textContent = item.Description || item.Name || '格式错误';
+                feedback[0].textContent = text;
                 feedback[0].style.display = 'block';
             }
             // 高亮对应输入控件（name 相同者）
             $(form).find('[name="' + name + '"]').addClass('is-invalid');
         });
+    }
+
+    /**
+     * 从 ajax 失败响应取出 JSON。HTML（登录页、异常页）与空体返回 null。
+     * application/problem+json 时 jQuery 不一定填 responseJSON，回退解析 responseText。
+     */
+    function readAjaxJson(xhr) {
+        if (!xhr) { return null; }
+        if (xhr.responseJSON && typeof xhr.responseJSON === 'object') { return xhr.responseJSON; }
+        var text = xhr.responseText;
+        if (!text || typeof text !== 'string') { return null; }
+        var trimmed = text.replace(/^\uFEFF/, '').trim();
+        if (!trimmed || trimmed.charAt(0) === '<') { return null; }
+        try {
+            var parsed = JSON.parse(trimmed);
+            return parsed && typeof parsed === 'object' ? parsed : null;
+        } catch (ignore) {
+            return null;
+        }
+    }
+
+    /** R 契约或 ASP.NET 字段错误（errors）。裸 415 的 problem+json 只有 title/status，不算业务体。 */
+    function isBusinessPayload(payload) {
+        if (!payload || typeof payload !== 'object') { return false; }
+        if (payload.Message || payload.message) { return true; }
+        if (payload.ValidationResult || payload.validationResult) { return true; }
+        if (payload.errors && typeof payload.errors === 'object') { return true; }
+        return false;
+    }
+
+    /**
+     * 非 2xx 分类：
+     *   business — 有 Message / ValidationResult / errors，应展示业务或字段文案
+     *   http     — 其它带 title/detail 的 JSON（非 415）
+     *   network  — 无体、HTML，或裸 415
+     */
+    function classifyAjaxFailure(payload, status) {
+        if (isBusinessPayload(payload)) {
+            return { kind: 'business', payload: payload };
+        }
+        var code = status || 0;
+        if (!payload || code === 415 || code === 0) {
+            return { kind: 'network', payload: null };
+        }
+        if (payload.title || payload.detail) {
+            return { kind: 'http', payload: payload, message: payload.detail || payload.title };
+        }
+        return { kind: 'network', payload: null };
+    }
+
+    /** problem+json 的 errors 键（$.Gender / input.Gender）对齐到表单字段名 */
+    function problemFieldName(key) {
+        var name = String(key || '');
+        if (name.indexOf('$.') === 0) { name = name.substring(2); }
+        var dot = name.lastIndexOf('.');
+        if (dot >= 0) { name = name.substring(dot + 1); }
+        return name;
     }
 
     /** 收集表单数据为对象（含 checkbox 布尔与多选数组） */
@@ -170,38 +236,68 @@
                 formData = new FormData(form);
             }
 
+            function showResultTip(message, ok) {
+                if (settings.tipContainerId) {
+                    showTip(settings.tipContainerId, message, ok);
+                } else {
+                    showFloatingTip(message, ok);
+                }
+            }
+
+            /** 业务失败：回填 ValidationResult / problem.errors，提示条用服务端文案 */
+            function presentApiFailure(jsonResult) {
+                var extras = [];
+                if (settings.verifyFeedback && jsonResult) {
+                    var validation = jsonResult.ValidationResult || jsonResult.validationResult;
+                    if (validation) {
+                        applyVerifyFeedback(form, validation);
+                    }
+                    if (jsonResult.errors && typeof jsonResult.errors === 'object') {
+                        var mapped = {};
+                        Object.keys(jsonResult.errors).forEach(function (key) {
+                            var raw = jsonResult.errors[key];
+                            var text = Array.isArray(raw) ? raw.filter(Boolean).join(' ') : String(raw || '');
+                            var field = problemFieldName(key);
+                            if (field && $(form).find('[verify-name="' + field + '"]').length > 0) {
+                                mapped[field] = text;
+                            } else if (text) {
+                                extras.push(text);
+                            }
+                        });
+                        if (!validation) { clearVerifyFeedback(form); }
+                        if (Object.keys(mapped).length > 0) { fillVerifyFeedback(form, mapped); }
+                    }
+                }
+                var fallback = (jsonResult && (jsonResult.detail || jsonResult.title)) || Lang.OperationFailed;
+                var message = getMessage(jsonResult, fallback);
+                if (extras.length > 0 && message === fallback) {
+                    message = extras.join(' ');
+                }
+                showResultTip(message, false);
+                if (settings.failHandler) { settings.failHandler(jsonResult); }
+            }
+
             var ajaxOptions = {
                 url: form.action,
                 type: form.method || 'POST',
                 success: function (jsonResult) {
                     if (isSuccess(jsonResult)) {
-                        if (settings.tipContainerId) {
-                            showTip(settings.tipContainerId, getMessage(jsonResult, '操作成功'), true);
-                        } else {
-                            showFloatingTip(getMessage(jsonResult, '操作成功'), true);
-                        }
+                        showResultTip(getMessage(jsonResult, '操作成功'), true);
                         if (settings.completeHandler) { settings.completeHandler(jsonResult); }
                     } else {
-                        // 验证失败优先回填字段级反馈
-                        if (settings.verifyFeedback && jsonResult && jsonResult.ValidationResult) {
-                            applyVerifyFeedback(form, jsonResult.ValidationResult);
-                        }
-                        if (settings.tipContainerId) {
-                            showTip(settings.tipContainerId, getMessage(jsonResult), false);
-                        } else {
-                            showFloatingTip(getMessage(jsonResult), false);
-                        }
-                        if (settings.failHandler) { settings.failHandler(jsonResult); }
+                        presentApiFailure(jsonResult);
                     }
                 },
-                error: function () {
-                    var message = Lang.NetworkError;
-                    if (settings.tipContainerId) {
-                        showTip(settings.tipContainerId, message, false);
-                    } else {
-                        showFloatingTip(message, false);
+                error: function (xhr) {
+                    var payload = readAjaxJson(xhr);
+                    var classified = classifyAjaxFailure(payload, xhr ? xhr.status : 0);
+                    // 裸 415 与 HTML/断网仍是网络异常；带业务字段的非 2xx 展示原文
+                    if (classified.kind === 'network') {
+                        showResultTip(Lang.NetworkError, false);
+                        if (settings.failHandler) { settings.failHandler(null); }
+                        return;
                     }
-                    if (settings.failHandler) { settings.failHandler(null); }
+                    presentApiFailure(classified.payload);
                 },
                 complete: function () {
                     if (settings.btnLoading) {
@@ -328,6 +424,8 @@
         Lang: Lang,
         isSuccess: isSuccess,
         getMessage: getMessage,
+        readAjaxJson: readAjaxJson,
+        classifyAjaxFailure: classifyAjaxFailure,
         FormSubmitter: FormSubmitter,
         Get: Get,
         Post: Post,

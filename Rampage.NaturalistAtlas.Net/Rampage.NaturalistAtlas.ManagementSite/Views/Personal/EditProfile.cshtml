@@ -1,6 +1,6 @@
 @model AdminDto
 @{
-    // 个人中心 · 资料编辑：回显当前管理员基础资料，保存走框架 api/personal/profile/save
+    // 个人中心 · 资料编辑：回显当前管理员基础资料，保存走框架 api/personal/profile/save（[FromBody]）
     SuperViewInfo viewInfo = ViewBag.ViewInfo;
     LocalizationModule gl = viewInfo.GlobalLanguage;
     AdminDto data = Model!;
@@ -61,6 +61,7 @@
                 <label class="col-sm-2 col-form-label">@gl.Get("Gender")</label>
                 <div class="col-sm-10">
                     <partial name="~/Views/_Component/_EnumRadioBox.cshtml" model='new EnumSelector<UserGender> { FormItemId = "txtGender", FormItemName = "Gender", SelectedValue = data.Gender }' />
+                    <div class="invalid-feedback" verify-name="Gender"></div>
                 </div>
             </div>
             <div class="d-flex justify-content-center">
@@ -75,6 +76,14 @@
     <script>
         $(function () {
             RPG.FormSubmitter('PersonalProfileForm', {
+                // Gender 是枚举。表单值是数字字符串；[FromBody] 不接受 "1"，须写成 JSON 数字
+                prepareHandler: function (data) {
+                    if (data.Gender !== undefined && data.Gender !== null && data.Gender !== '' && /^-?\d+$/.test(String(data.Gender))) {
+                        data.Gender = parseInt(data.Gender, 10);
+                    }
+                },
+                // [FromBody]：表单编码会 415，与修改密码同一类问题
+                useBody: true,
                 tipContainerId: 'tipMessage',
                 tipAutoHidden: 1,
                 verifyFeedback: 1
