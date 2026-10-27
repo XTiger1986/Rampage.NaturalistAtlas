@@ -1235,10 +1235,11 @@ namespace Rampage.NaturalistAtlas.Collection
             return query;
         }
 
-        /// <summary>GBIF 查询公共参数（过滤基线 PRESENT+坐标+静图；geometry 按边界 WKT 优先，回退 bbox 矩形）/ GBIF shared query params (PRESENT+coordinate+StillImage baseline; boundary WKT first, bbox rectangle fallback)</summary>
+        /// <summary>GBIF 查询公共参数（过滤基线 PRESENT+坐标+静图；geometry 按边界 WKT 优先，回退 bbox 矩形，并归一化环向）/ GBIF shared query params (PRESENT+coordinate+StillImage baseline; boundary WKT first, bbox rectangle fallback, ring orientation normalized)</summary>
         private Dictionary<string, object?> BuildGbifQuery(City city, string eventDate, int limit, int offset)
         {
-            string geometry = !string.IsNullOrEmpty(city.BoundaryWkt) ? city.BoundaryWkt : BuildBboxWkt(city);
+            string geometry = GbifGeometry.NormalizeRingOrientation(
+                !string.IsNullOrEmpty(city.BoundaryWkt) ? city.BoundaryWkt : BuildBboxWkt(city));
             return new Dictionary<string, object?>
             {
                 ["geometry"] = geometry,
